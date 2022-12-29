@@ -11,8 +11,18 @@ export const lineLayer: LayerProps = {
   filter: ['==', ['geometry-type'], 'LineString'],
   paint: {
     'line-color': appColors.lineStrokeColor,
-    'line-width': 2,
-    'line-opacity': 0.8,
+    'line-width': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      4,
+      2,
+    ],
+    'line-opacity': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      1,
+      0.8,
+    ],
   },
 };
 
@@ -38,7 +48,12 @@ export const polygonLayer: LayerProps = {
   filter: ['==', ['geometry-type'], 'Polygon'],
   paint: {
     'fill-color': appColors.spotFillColor,
-    'fill-opacity': 0.7,
+    'fill-opacity': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      0.9,
+      0.7,
+    ],
   },
 };
 
@@ -64,6 +79,7 @@ export const polygonLabelLayer: LayerProps = {
   paint: {
     'text-color': 'white',
     'icon-color': appColors.spotFillColor,
+    'icon-opacity': 0.8,
     // 'text-halo-color': 'white',
     // 'text-halo-width': 1,
   },
@@ -111,7 +127,17 @@ export const clusterLayer: LayerProps = {
       200,
       colors.green[900],
     ],
-    'circle-radius': ['step', ['get', 'point_count'], 20, 50, 30, 200, 40],
+    'circle-radius': [
+      'step',
+      ['get', 'point_count'],
+      20,
+      50,
+      25,
+      200,
+      30,
+      400,
+      35,
+    ],
   },
 };
 
