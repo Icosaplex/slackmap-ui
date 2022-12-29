@@ -1,7 +1,7 @@
 export interface AppState {
   authState?: AuthState;
   snackbarNotification: SnackbarNotification;
-  userIdentityType?: IdentityType;
+  userIdentityType?: UserIdentityType;
   cognitoAttributes?: {
     sub: string;
     email_verified: boolean;

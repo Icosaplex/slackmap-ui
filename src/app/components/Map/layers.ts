@@ -1,7 +1,6 @@
-import { alpha, colors } from '@mui/material';
+import { colors } from '@mui/material';
 import type { LayerProps } from 'react-map-gl';
 import { appColors } from 'styles/theme/colors';
-import { darken } from '@mui/material';
 
 export const lineLayer: LayerProps = {
   id: 'line',
@@ -9,17 +8,28 @@ export const lineLayer: LayerProps = {
   source: 'main',
   minzoom: 13,
   filter: ['==', ['geometry-type'], 'LineString'],
+  layout: {
+    'line-cap': 'round',
+    'line-join': 'round',
+  },
   paint: {
     'line-color': appColors.lineStrokeColor,
     'line-width': [
       'case',
+      ['boolean', ['feature-state', 'isSelected'], false],
+      6,
       ['boolean', ['feature-state', 'hover'], false],
       4,
       2,
     ],
     'line-opacity': [
       'case',
-      ['boolean', ['feature-state', 'hover'], false],
+      [
+        'boolean',
+        ['feature-state', 'hover'],
+        ['feature-state', 'isSelected'],
+        false,
+      ],
       1,
       0.8,
     ],
@@ -31,7 +41,7 @@ export const polygonOutlineLayer: LayerProps = {
   type: 'line',
   source: 'main',
   minzoom: 13,
-  maxzoom: 16,
+  maxzoom: 15,
   filter: ['==', ['geometry-type'], 'Polygon'],
   paint: {
     'line-color': appColors.lineStrokeColor,
@@ -50,9 +60,11 @@ export const polygonLayer: LayerProps = {
     'fill-color': appColors.spotFillColor,
     'fill-opacity': [
       'case',
+      ['boolean', ['feature-state', 'isSelected'], false],
+      1,
       ['boolean', ['feature-state', 'hover'], false],
-      0.9,
-      0.7,
+      0.8,
+      0.6,
     ],
   },
 };
@@ -89,7 +101,7 @@ export const lineLabelLayer: LayerProps = {
   id: 'lineLabel',
   type: 'symbol',
   source: 'main',
-  minzoom: 16,
+  minzoom: 15,
   filter: ['==', ['geometry-type'], 'LineString'],
   layout: {
     'icon-image': 'marker',
@@ -107,6 +119,17 @@ export const lineLabelLayer: LayerProps = {
   paint: {
     'text-color': 'white',
     'icon-color': appColors.lineStrokeColor,
+    'icon-opacity': [
+      'case',
+      [
+        'boolean',
+        ['feature-state', 'hover'],
+        ['feature-state', 'isSelected'],
+        false,
+      ],
+      1,
+      0.8,
+    ],
     // 'text-halo-color': 'white',
     // 'text-halo-width': 1,
   },

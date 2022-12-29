@@ -8,11 +8,11 @@ import { Auth } from 'aws-amplify';
 import { showErrorNotification } from 'utils';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: '',
+  baseUrl: 'https://wt5d2cy2w1.execute-api.eu-central-1.amazonaws.com/dev/',
   prepareHeaders: async (headers, { getState }) => {
-    const token = await Auth.currentSession().then(s =>
-      s.getIdToken().getJwtToken(),
-    );
+    const token = await Auth.currentSession()
+      .then(s => s.getIdToken().getJwtToken())
+      .catch(() => null);
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
