@@ -1,6 +1,17 @@
 import { colors } from '@mui/material';
-import type { LayerProps } from 'react-map-gl';
+import type { LayerProps, SkyLayer } from 'react-map-gl';
 import { appColors } from 'styles/theme/colors';
+
+
+export const skyLayer: SkyLayer = {
+  id: 'sky',
+  type: 'sky',
+  paint: {
+    'sky-type': 'atmosphere',
+    'sky-atmosphere-sun': [0.0, 0.0],
+    'sky-atmosphere-sun-intensity': 15,
+  },
+};
 
 export const lineLayer: LayerProps = {
   id: 'line',
@@ -109,6 +120,8 @@ export const lineLabelLayer: LayerProps = {
     'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
     'text-field': '{l}m',
     'text-size': 12,
+    // 'icon-allow-overlap': true,
+    // 'text-allow-overlap': true,
     // 'text-size': ['interpolate', ['linear'], ['zoom'], 14, 8, 16, 12, 18, 18],
     // 'icon-size': ['interpolate', ['linear'], ['zoom'], 13, 0.2, 15, 0.5, 24, 1],
     // 'icon-anchor': 'bottom',

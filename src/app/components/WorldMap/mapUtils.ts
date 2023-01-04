@@ -4,6 +4,9 @@ export const mapUrlSearchParams = {
   parse: (searchParams: URLSearchParams) => {
     const [longitude, latitude, zoom] =
       searchParams.get('map')?.split(',').map(Number) ?? [];
+    if (!longitude || !latitude || !zoom) {
+      return undefined;
+    }
     return {
       longitude,
       latitude,

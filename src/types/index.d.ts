@@ -7,3 +7,4 @@ type SlacklineType =
   | 'speedline'
   | 'other';
 type SlacklineRestrictionLevel = 'partial' | 'full';
+type MapSlacklineFeatureType = 'line' | 'spot';

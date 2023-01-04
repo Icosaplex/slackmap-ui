@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Map } from 'app/components/Map';
+import { WorldMap } from 'app/components/WorldMap';
 import { Box } from '@mui/system';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { mapUrlSearchParams } from 'app/components/Map/mapUtils';
-import { MapboxGeoJSONFeature } from 'react-map-gl';
-import { MapSlacklineFeatureType } from 'app/components/Map/types';
+import { mapUrlSearchParams } from 'app/components/WorldMap/mapUtils';
+import { Button } from '@mui/material';
 
 interface Props {}
 
@@ -12,25 +11,25 @@ export function Homepage(props: Props) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const handleFeatureClick = (
-    feature: MapboxGeoJSONFeature,
-    type: MapSlacklineFeatureType,
-    id: string,
-  ) => {
-    navigate(`/${type}/${id}`);
+  const onDetailsClick = (id: string, type: MapSlacklineFeatureType) => {
+    if (type === 'line') {
+      navigate(`/line/${id}`);
+    }
   };
 
   return (
     <Box
       sx={{
+        position: 'relative',
         height: '100vh',
         width: '100vw',
       }}
     >
-      <Map
+      {/* <Button></Button> */}
+      <WorldMap
         syncMapLocationToUrlParams
         initialViewState={mapUrlSearchParams.parse(searchParams)}
-        onFeatureClick={handleFeatureClick}
+        onDetailsClick={onDetailsClick}
       />
     </Box>
   );

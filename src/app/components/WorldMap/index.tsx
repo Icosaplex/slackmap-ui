@@ -13,6 +13,7 @@ import {
   MapboxGeoJSONFeature,
   ViewStateChangeEvent,
   ViewState,
+  PopupProps,
 } from 'react-map-gl';
 import type { Point, Position } from 'geojson';
 import type { MapRef } from 'react-map-gl';
@@ -29,12 +30,13 @@ import {
 } from './layers';
 import { useMapStyle } from './useMapStyle';
 import MapImage from './MapImage';
-import { ShortInfoPopup } from './ShortInfoPopup';
+import { InfoPopup } from './InfoPopup';
 import { useSearchParams } from 'react-router-dom';
 import mapboxgl, { MapSourceDataEvent } from 'mapbox-gl';
 import { mapUrlSearchParams } from './mapUtils';
-import { MapSlacklineFeatureType } from './types';
-import { LineString } from '@turf/turf';
+import { LineString, centerOfMass } from '@turf/turf';
+import { useMediaQuery } from 'utils/hooks/useMediaQuery';
+import { styled } from '@mui/material/styles';
 
 // FIX: https://github.com/visgl/react-map-gl/issues/1266
 // @ts-ignore
@@ -42,12 +44,7 @@ mapboxgl.workerClass =
   // eslint-disable-next-line import/no-webpack-loader-syntax
   require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 interface Props {
-  onFeatureClick?: (
-    feature: MapboxGeoJSONFeature,
-    type: MapSlacklineFeatureType,
-    id: string,
-  ) => void;
-  featureIdToFocus?: string;
+  onDetailsClick: (id: string, type: MapSlacklineFeatureType) => void;
   syncMapLocationToUrlParams?: boolean;
   initialViewState?: Partial<ViewState>;
 }
@@ -69,31 +66,39 @@ const cursorInteractiveleLayers = [
 
 const mouseHoverableLayers = [lineLabelLayer.id, lineLayer.id, polygonLayer.id];
 
-export const Map = (props: Props) => {
+export const WorldMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
 
   const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
   const [isMapDataLoaded, setIsMapDataLoaded] = useState<boolean>(false);
   const [zoomLevel, setZoomLevel] = useState<number>();
-  const mapStyle = useMapStyle(
-    props.initialViewState?.zoom ?? zoomLevel,
-    isMapLoaded,
-  );
+  const mapStyle = useMapStyle(props.initialViewState?.zoom ?? zoomLevel);
   const [cursor, setCursor] = useState('auto');
   const [hoveredFeature, setHoveredFeature] = useState<MapboxGeoJSONFeature>();
   const [selectedFeature, setSelectedFeature] =
     useState<MapboxGeoJSONFeature>();
   const [popup, setPopup] = useState<{
     feature: MapboxGeoJSONFeature;
+    type: MapSlacklineFeatureType;
+    id: string;
     position: Position;
   }>();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const { isDesktop } = useMediaQuery();
 
-  const moveMapTo = (position: Position, zoom: number) => {
-    mapRef.current?.flyTo({
+  const moveMapTo = (
+    position: Position,
+    zoom?: number,
+    paddingRight?: number,
+  ) => {
+    const map = mapRef.current?.getMap();
+    map?.flyTo({
       center: [position[0], position[1]],
-      zoom: zoom,
+      zoom: zoom || map.getZoom(),
+      padding: paddingRight
+        ? { top: 0, left: 0, bottom: 0, right: paddingRight }
+        : 0,
       duration: 300,
     });
   };
@@ -122,7 +127,7 @@ export const Map = (props: Props) => {
 
       moveMapTo([response.longitude, response.latitude], response.zoom);
     };
-    if (!props.initialViewState && !props.featureIdToFocus) {
+    if (!props.initialViewState) {
       zoomToUserLocation();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -144,35 +149,37 @@ export const Map = (props: Props) => {
     const map = mapRef.current?.getMap();
     if (selectedFeature) {
       map?.setFeatureState(selectedFeature, { isSelected: true });
-      // setPopup({
-      //   feature: selectedFeature,
-      //   position: (selectedFeature.geometry as LineString)
-      //     .coordinates[0] as Position,
-      // });
+      const originalId = selectedFeature.properties?.id;
+      let type: MapSlacklineFeatureType | undefined;
+      switch (selectedFeature.layer.id) {
+        case lineLayer.id:
+        case lineLabelLayer.id:
+          type = 'line';
+          break;
+        case polygonLayer.id:
+        case polygonLabelLayer.id:
+          type = 'spot';
+          break;
+        default:
+          break;
+      }
+      const center = centerOfMass(selectedFeature).geometry.coordinates;
+      if (originalId && type) {
+        moveMapTo(center, undefined, !isDesktop ? 250 : undefined);
+        setPopup({
+          feature: selectedFeature,
+          type,
+          id: originalId,
+          position: center,
+        });
+      }
     }
     return () => {
       if (selectedFeature) {
         map?.removeFeatureState(selectedFeature, 'isSelected');
       }
     };
-  }, [selectedFeature]);
-
-  useEffect(() => {
-    const map = mapRef.current?.getMap();
-
-    if (props.featureIdToFocus && isMapDataLoaded) {
-      const lines = map?.queryRenderedFeatures(undefined, {
-        layers: [lineLayer.id!],
-      });
-      for (const line of lines ?? []) {
-        console.log(props.featureIdToFocus, line.properties);
-      }
-      // console.log(
-      //   props.featureIdToFocus,
-      //   lines?.find(l => l.properties?.id === props.featureIdToFocus),
-      // );
-    }
-  }, [isMapDataLoaded, props.featureIdToFocus]);
+  }, [isDesktop, selectedFeature]);
 
   const onMapMoveEnd = (event: ViewStateChangeEvent) => {
     if (props.syncMapLocationToUrlParams) {
@@ -231,23 +238,6 @@ export const Map = (props: Props) => {
     }
     if (mouseHoverableLayers.includes(feature.layer.id)) {
       setSelectedFeature(feature);
-      const originalId = feature.properties?.id;
-      let type: MapSlacklineFeatureType | undefined;
-      switch (feature.layer.id) {
-        case lineLayer.id:
-        case lineLabelLayer.id:
-          type = 'line';
-          break;
-        case polygonLayer.id:
-        case polygonLabelLayer.id:
-          type = 'spot';
-          break;
-        default:
-          break;
-      }
-      if (originalId && type) {
-        props.onFeatureClick?.(feature, type, originalId);
-      }
     }
   };
 
@@ -287,14 +277,19 @@ export const Map = (props: Props) => {
       <NavigationControl />
       <MapImage name={'marker'} url={'/images/line-marker.png'} />
       {popup && (
-        <Popup
+        <CustomPopup
           longitude={popup.position[0]}
           latitude={popup.position[1]}
           anchor="left"
           onClose={() => setPopup(undefined)}
+          maxWidth="none"
         >
-          <ShortInfoPopup />
-        </Popup>
+          <InfoPopup
+            id={popup.id}
+            type={popup.type}
+            onDetailsClick={props.onDetailsClick}
+          />
+        </CustomPopup>
       )}
 
       <Source
@@ -323,4 +318,15 @@ export const Map = (props: Props) => {
       </Source>
     </ReactMapGL>
   );
-}
+};
+
+const CustomPopup = styled(Popup)<PopupProps>(({ theme }) => ({
+  '.mapboxgl-popup-content': {
+    padding: 4,
+    background: 'transparent',
+    border: 'none',
+  },
+  '.mapboxgl-popup-close-button': {
+    display: 'none',
+  },
+}));
