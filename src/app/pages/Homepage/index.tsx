@@ -31,8 +31,8 @@ export function Homepage(props: Props) {
     <Box
       sx={{
         position: 'relative',
-        height: '100vh',
-        width: '100vw',
+        height: '100%',
+        width: '100%',
       }}
     >
       {/* <Button></Button> */}

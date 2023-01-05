@@ -19,6 +19,7 @@ import GlobalStyles from '@mui/material/GlobalStyles';
 import { LoadingIndicator } from './components/LoadingIndicator';
 import { Homepage } from './pages/Homepage/Loadable';
 import { LineDetailPage } from './pages/LineDetailPage/Loadable';
+import { AppDrawer } from './components/AppDrawer';
 
 export function App() {
   useAppSlice();
@@ -105,11 +106,13 @@ export function App() {
           body: { fontFamily: 'Inter', height: '100%', width: '100%' },
         }}
       />
-      <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="/line/:lineId" element={<LineDetailPage />} />
-        <Route path="*" element={<Homepage />} />
-      </Routes>
+      <AppDrawer>
+        <Routes>
+          <Route path="/" element={<Homepage />} />
+          <Route path="/line/:lineId" element={<LineDetailPage />} />
+          <Route path="*" element={<Homepage />} />
+        </Routes>
+      </AppDrawer>
 
       <NotificationSnackbar
         snackbarNotification={snackbarNotification}

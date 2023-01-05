@@ -1,6 +1,6 @@
 import { useMap } from 'react-map-gl';
 
-export default function MapImage(props: { name: string; url: string }) {
+export const MapImage = (props: { name: string; url: string }) => {
   const { current: map } = useMap();
 
   if (map) {
@@ -15,4 +15,4 @@ export default function MapImage(props: { name: string; url: string }) {
   }
 
   return null;
-}
+};

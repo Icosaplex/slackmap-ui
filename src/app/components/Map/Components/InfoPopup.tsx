@@ -16,7 +16,7 @@ import { SlacklineDetailRestrictionField } from 'app/components/TextFields/Slack
 import { SlacklineDetailSpecsField } from 'app/components/TextFields/SlacklineDetailSpecsField';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { spotApi } from 'app/api/spot-api';
-import { SlacklineDetailInfoField } from '../TextFields/SlacklineDetailInfoField';
+import { SlacklineDetailInfoField } from '../../TextFields/SlacklineDetailInfoField';
 import { appColors } from 'styles/theme/colors';
 
 interface Props {

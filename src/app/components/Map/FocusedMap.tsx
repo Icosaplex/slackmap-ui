@@ -14,7 +14,7 @@ import {
   lineLabelLayerFocused,
   polygonLayerFocused,
 } from './layers';
-import MapImage from './MapImage';
+import { MapImage } from './Components/MapImage';
 import mapboxgl from 'mapbox-gl';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { Skeleton } from '@mui/material';

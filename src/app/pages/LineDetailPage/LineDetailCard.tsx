@@ -32,7 +32,6 @@ export const LineDetailCard = (props: Props) => {
   const { data: lineDetails, isFetching } = lineApi.useGetLineDetailsQuery(
     props.lineId,
   );
-  const [expanded, setExpanded] = React.useState(false);
 
   const onCardHeaderMenuClick = (
     event: React.MouseEvent<HTMLButtonElement>,

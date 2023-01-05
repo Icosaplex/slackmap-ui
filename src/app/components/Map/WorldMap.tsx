@@ -31,8 +31,8 @@ import {
   mouseHoverableLayers,
 } from './layers';
 import { useMapStyle } from './useMapStyle';
-import MapImage from './MapImage';
-import { InfoPopup } from './InfoPopup';
+import { MapImage } from './Components/MapImage';
+import { InfoPopup } from './Components/InfoPopup';
 import { FlyToOptions, PaddingOptions } from 'mapbox-gl';
 import { calculateBounds, parseMapFeature } from './mapUtils';
 import { FeatureCollection } from '@turf/turf';
@@ -40,6 +40,7 @@ import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { styled } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
 import { defaultMapViewState, MAPBOX_TOKEN } from './constants';
+import { MapLogo } from './Components/Logo';
 
 interface Props {
   onPopupDetailsClick?: (id: string, type: MapSlacklineFeatureType) => void;
@@ -236,15 +237,20 @@ export const WorldMap = (props: Props) => {
             left: 0,
             width: '100%',
             height: '100%',
-            zIndex: 1,
+            zIndex: 2,
             backgroundColor: theme => theme.palette.background.paper,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             flexDirection: 'column',
+            padding: 10,
           }}
         >
-          <img src={'/images/slackmapLogo.png'} alt="" />
+          <img
+            style={{ maxWidth: '100%', maxHeight: '100%' }}
+            src={'/images/slackmapLogo.png'}
+            alt=""
+          />
           <Typography
             variant="h6"
             sx={{ color: t => t.palette.text.secondary }}
@@ -253,6 +259,7 @@ export const WorldMap = (props: Props) => {
           </Typography>
         </Box>
       )}
+      <MapLogo />
       <ReactMapGL
         initialViewState={props.initialViewState || defaultMapViewState}
         mapStyle={mapStyle}
