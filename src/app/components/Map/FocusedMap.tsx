@@ -7,23 +7,15 @@ import {
   MapLayerMouseEvent,
   ScaleControl,
   MapboxGeoJSONFeature,
-  ViewStateChangeEvent,
 } from 'react-map-gl';
-import type { Position } from 'geojson';
 import type { MapRef } from 'react-map-gl';
 import {
   lineLayerFocused,
   lineLabelLayerFocused,
   polygonLayerFocused,
 } from './layers';
-import MapImage from '../WorldMap/MapImage';
-import mapboxgl, {
-  LngLatBoundsLike,
-  MapBoxZoomEvent,
-  MapSourceDataEvent,
-  PaddingOptions,
-} from 'mapbox-gl';
-import {} from '@turf/turf';
+import MapImage from './MapImage';
+import mapboxgl from 'mapbox-gl';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { Skeleton } from '@mui/material';
 import {
@@ -32,25 +24,16 @@ import {
   lineLayer,
   mouseHoverableLayers,
   polygonLayer,
-} from '../WorldMap/layers';
-import { calculateBounds, parseMapFeature } from '../WorldMap/mapUtils';
+} from './layers';
+import { calculateBounds, parseMapFeature } from './mapUtils';
 import { FeatureCollection } from '@turf/turf';
+import { defaultMapViewState, MAPBOX_TOKEN } from './constants';
 
 // FIX: https://github.com/visgl/react-map-gl/issues/1266
 // @ts-ignore
 mapboxgl.workerClass =
   // eslint-disable-next-line import/no-webpack-loader-syntax
   require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
-
-const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
-
-const defaultMapState = {
-  latitude: 35.92263245263329,
-  longitude: -39.41644394307363,
-  zoom: 1,
-  bearing: 0,
-  pitch: 0,
-};
 
 interface Props {
   onFeatureClick: (id: string, type: MapSlacklineFeatureType) => void;
@@ -153,7 +136,7 @@ export const FocusedMap = (props: Props) => {
         />
       )}
       <ReactMapGL
-        initialViewState={defaultMapState}
+        initialViewState={defaultMapViewState}
         mapStyle={'mapbox://styles/mapbox/satellite-streets-v11'}
         mapboxAccessToken={MAPBOX_TOKEN}
         attributionControl={false}

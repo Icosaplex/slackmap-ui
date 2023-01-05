@@ -33,53 +33,19 @@ import {
 import { useMapStyle } from './useMapStyle';
 import MapImage from './MapImage';
 import { InfoPopup } from './InfoPopup';
-import { useSearchParams } from 'react-router-dom';
-import mapboxgl, {
-  FitBoundsOptions,
-  FlyToOptions,
-  LngLatBoundsLike,
-  Map,
-  MapSourceDataEvent,
-  MapStyleDataEvent,
-  PaddingOptions,
-} from 'mapbox-gl';
-import {
-  calculateBounds,
-  mapUrlSearchParams,
-  parseMapFeature,
-} from './mapUtils';
-import {
-  bbox,
-  bboxPolygon,
-  center,
-  centerOfMass,
-  circle,
-  FeatureCollection,
-} from '@turf/turf';
+import { FlyToOptions, PaddingOptions } from 'mapbox-gl';
+import { calculateBounds, parseMapFeature } from './mapUtils';
+import { FeatureCollection } from '@turf/turf';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
-
-// FIX: https://github.com/visgl/react-map-gl/issues/1266
-// @ts-ignore
-mapboxgl.workerClass =
-  // eslint-disable-next-line import/no-webpack-loader-syntax
-  require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
-
-const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
-
-const defaultMapViewState = {
-  latitude: 35.92263245263329,
-  longitude: -39.41644394307363,
-  zoom: 1,
-};
+import { Box, Typography } from '@mui/material';
+import { defaultMapViewState, MAPBOX_TOKEN } from './constants';
 
 interface Props {
   onPopupDetailsClick?: (id: string, type: MapSlacklineFeatureType) => void;
   onMapMoveEnd?: (event: ViewStateChangeEvent) => void;
   zoomToUserLocation?: boolean;
   initialViewState?: Partial<ViewState>;
-  // mapBounds?: LngLatBoundsLike;
   selectedFeature?: FeatureCollection;
   showInfoPopup?: boolean;
 }
@@ -87,8 +53,7 @@ interface Props {
 export const WorldMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
   const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
-  const [isMapReady, setIsMapReady] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState<number>();
+  const [zoomLevel, setZoomLevel] = useState(props.initialViewState?.zoom);
   const mapStyle = useMapStyle(zoomLevel);
   const [cursor, setCursor] = useState('auto');
   const [hoveredFeature, setHoveredFeature] = useState<MapboxGeoJSONFeature>();
@@ -273,9 +238,19 @@ export const WorldMap = (props: Props) => {
             height: '100%',
             zIndex: 1,
             backgroundColor: theme => theme.palette.background.paper,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
           }}
         >
-          <div>asdasdasdsa</div>
+          <img src={'/images/slackmapLogo.png'} alt="" />
+          <Typography
+            variant="h6"
+            sx={{ color: t => t.palette.text.secondary }}
+          >
+            Loading Map...
+          </Typography>
         </Box>
       )}
       <ReactMapGL

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { WorldMap } from 'app/components/WorldMap';
+import { WorldMap } from 'app/components/Map/WorldMap';
 import { Box } from '@mui/system';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { mapUrlSearchParams } from 'app/components/WorldMap/mapUtils';
+import { mapUrlSearchParams } from 'app/components/Map/mapUtils';
 import { Button } from '@mui/material';
 import { ViewStateChangeEvent } from 'react-map-gl';
 

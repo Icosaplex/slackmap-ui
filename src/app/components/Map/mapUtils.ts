@@ -13,6 +13,13 @@ import {
   polygonLayer,
   polygonLabelLayer,
 } from './layers';
+import mapboxgl from 'mapbox-gl';
+
+// FIX: https://github.com/visgl/react-map-gl/issues/1266
+// @ts-ignore
+mapboxgl.workerClass =
+  // eslint-disable-next-line import/no-webpack-loader-syntax
+  require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
 export const mapUrlSearchParams = {
   parse: (searchParams: URLSearchParams) => {
