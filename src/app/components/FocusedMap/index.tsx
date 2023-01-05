@@ -12,9 +12,6 @@ import {
 import type { Position } from 'geojson';
 import type { MapRef } from 'react-map-gl';
 import {
-  lineLabelLayer,
-  lineLayer,
-  polygonLayer,
   lineLayerFocused,
   lineLabelLayerFocused,
   polygonLayerFocused,
@@ -24,19 +21,26 @@ import mapboxgl, {
   LngLatBoundsLike,
   MapBoxZoomEvent,
   MapSourceDataEvent,
+  PaddingOptions,
 } from 'mapbox-gl';
-import * as turf from '@turf/turf';
+import {} from '@turf/turf';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { Skeleton } from '@mui/material';
+import {
+  cursorInteractableLayers,
+  lineLabelLayer,
+  lineLayer,
+  mouseHoverableLayers,
+  polygonLayer,
+} from '../WorldMap/layers';
+import { calculateBounds, parseMapFeature } from '../WorldMap/mapUtils';
+import { FeatureCollection } from '@turf/turf';
 
 // FIX: https://github.com/visgl/react-map-gl/issues/1266
 // @ts-ignore
 mapboxgl.workerClass =
   // eslint-disable-next-line import/no-webpack-loader-syntax
   require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
-interface Props {
-  geoJson?: any;
-}
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
@@ -48,54 +52,86 @@ const defaultMapState = {
   pitch: 0,
 };
 
+interface Props {
+  onFeatureClick: (id: string, type: MapSlacklineFeatureType) => void;
+  geoJson?: FeatureCollection;
+}
+
 export const FocusedMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
   const { isDesktop } = useMediaQuery();
-
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [viewState, setViewState] = useState(defaultMapState);
-  const [enableStricMap, setEnableStrictMap] = useState(false);
   const [isMapReady, setIsMapReady] = useState(false);
-
-  const onMapLoad = useCallback(() => {
-    setIsMapLoaded(true);
-  }, []);
-
-  const moveMapTo = (position: Position) => {
-    const map = mapRef.current?.getMap();
-    map?.flyTo({
-      center: [position[0], position[1]],
-      duration: 300,
-    });
-  };
+  const [cursor, setCursor] = useState('auto');
+  const [hoveredFeature, setHoveredFeature] = useState<MapboxGeoJSONFeature>();
 
   useEffect(() => {
     if (!isMapLoaded || !props.geoJson || !mapRef.current) return;
+    const map = mapRef.current;
 
-    const map = mapRef.current.getMap();
-    const bounds = turf.bbox(props.geoJson) as [number, number, number, number];
-    setEnableStrictMap(true);
-    map.fitBounds(bounds, {
-      padding: isDesktop ? 100 : 50,
-      animate: false,
+    const { marginedBounds } = calculateBounds(
+      props.geoJson,
+      props.geoJson.features[0].properties?.l,
+    );
+    map.fitBounds(marginedBounds, {
+      // padding: isDesktop ? 100 : 50,
+      animate: map.getZoom() > 10,
     });
     setIsMapReady(true);
   }, [isDesktop, isMapLoaded, props.geoJson]);
 
-  const onMove = (event: ViewStateChangeEvent) => {
-    if (!isMapLoaded || !mapRef.current) return;
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const map = mapRef.current;
 
-    if (enableStricMap && props.geoJson) {
-      const center = turf.centerOfMass(props.geoJson).geometry.coordinates;
-      setViewState({
-        latitude: center[1],
-        longitude: center[0],
-        zoom: event.viewState.zoom,
-        bearing: 0,
-        pitch: 0,
-      });
-    } else {
-      setViewState(event.viewState);
+    if (hoveredFeature) {
+      map.setFeatureState(hoveredFeature, { hover: true });
+    }
+    return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      const map = mapRef.current;
+      if (hoveredFeature) {
+        map?.removeFeatureState(hoveredFeature, 'hover');
+      }
+    };
+  }, [hoveredFeature]);
+
+  const onMapLoad = useCallback(() => {
+    setIsMapLoaded(true);
+    mapRef.current?.setPadding({ top: 0, left: 0, bottom: 0, right: 0 });
+  }, []);
+
+  const onMouseMove = (event: MapLayerMouseEvent) => {
+    if (!isMapLoaded) return;
+
+    const feature = event.features?.[0];
+    if (!feature) {
+      setHoveredFeature(undefined);
+      setCursor('auto');
+      return;
+    }
+
+    if (cursorInteractableLayers.includes(feature.layer.id)) {
+      setCursor('pointer');
+    }
+
+    if (mouseHoverableLayers.includes(feature.layer.id)) {
+      setHoveredFeature(feature);
+    }
+  };
+
+  const onMapClick = (event: MapLayerMouseEvent) => {
+    if (!isMapLoaded) return;
+
+    const feature = event.features?.[0];
+    if (!feature) {
+      return;
+    }
+    if (mouseHoverableLayers.includes(feature.layer.id)) {
+      const { originalId, type } = parseMapFeature(feature);
+      if (originalId && type) {
+        props.onFeatureClick(originalId, type);
+      }
     }
   };
 
@@ -117,15 +153,23 @@ export const FocusedMap = (props: Props) => {
         />
       )}
       <ReactMapGL
-        {...viewState}
+        initialViewState={defaultMapState}
         mapStyle={'mapbox://styles/mapbox/satellite-streets-v11'}
         mapboxAccessToken={MAPBOX_TOKEN}
         attributionControl={false}
         onLoad={onMapLoad}
         reuseMaps
         ref={mapRef}
-        dragPan={false}
-        onMove={onMove}
+        onMouseMove={onMouseMove}
+        onClick={onMapClick}
+        interactiveLayerIds={[
+          polygonLayer.id!,
+          lineLabelLayer.id!,
+          lineLayer.id!,
+        ]}
+        cursor={cursor}
+        pitchWithRotate={false}
+        maxPitch={0}
         projection="globe"
       >
         <ScaleControl />
@@ -144,7 +188,7 @@ export const FocusedMap = (props: Props) => {
           id="focused"
           type="geojson"
           data={
-            props.geoJson || {
+            (props.geoJson as any) || {
               type: 'FeatureCollection',
               features: [],
             }

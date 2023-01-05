@@ -27,52 +27,69 @@ import {
   polygonOutlineLayer,
   unclusteredPointLayer,
   polygonLabelLayer,
+  cursorInteractableLayers,
+  mouseHoverableLayers,
 } from './layers';
 import { useMapStyle } from './useMapStyle';
 import MapImage from './MapImage';
 import { InfoPopup } from './InfoPopup';
 import { useSearchParams } from 'react-router-dom';
-import mapboxgl, { MapSourceDataEvent } from 'mapbox-gl';
-import { mapUrlSearchParams } from './mapUtils';
-import { LineString, centerOfMass } from '@turf/turf';
+import mapboxgl, {
+  FitBoundsOptions,
+  FlyToOptions,
+  LngLatBoundsLike,
+  Map,
+  MapSourceDataEvent,
+  MapStyleDataEvent,
+  PaddingOptions,
+} from 'mapbox-gl';
+import {
+  calculateBounds,
+  mapUrlSearchParams,
+  parseMapFeature,
+} from './mapUtils';
+import {
+  bbox,
+  bboxPolygon,
+  center,
+  centerOfMass,
+  circle,
+  FeatureCollection,
+} from '@turf/turf';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { styled } from '@mui/material/styles';
+import { Box } from '@mui/material';
 
 // FIX: https://github.com/visgl/react-map-gl/issues/1266
 // @ts-ignore
 mapboxgl.workerClass =
   // eslint-disable-next-line import/no-webpack-loader-syntax
   require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
-interface Props {
-  onDetailsClick: (id: string, type: MapSlacklineFeatureType) => void;
-  syncMapLocationToUrlParams?: boolean;
-  initialViewState?: Partial<ViewState>;
-}
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
-const defaultMapState = {
+const defaultMapViewState = {
   latitude: 35.92263245263329,
   longitude: -39.41644394307363,
   zoom: 1,
 };
 
-const cursorInteractiveleLayers = [
-  lineLabelLayer.id,
-  lineLayer.id,
-  polygonLayer.id,
-  unclusteredPointLayer.id,
-];
-
-const mouseHoverableLayers = [lineLabelLayer.id, lineLayer.id, polygonLayer.id];
+interface Props {
+  onPopupDetailsClick?: (id: string, type: MapSlacklineFeatureType) => void;
+  onMapMoveEnd?: (event: ViewStateChangeEvent) => void;
+  zoomToUserLocation?: boolean;
+  initialViewState?: Partial<ViewState>;
+  // mapBounds?: LngLatBoundsLike;
+  selectedFeature?: FeatureCollection;
+  showInfoPopup?: boolean;
+}
 
 export const WorldMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
-
   const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
-  const [isMapDataLoaded, setIsMapDataLoaded] = useState<boolean>(false);
+  const [isMapReady, setIsMapReady] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<number>();
-  const mapStyle = useMapStyle(props.initialViewState?.zoom ?? zoomLevel);
+  const mapStyle = useMapStyle(zoomLevel);
   const [cursor, setCursor] = useState('auto');
   const [hoveredFeature, setHoveredFeature] = useState<MapboxGeoJSONFeature>();
   const [selectedFeature, setSelectedFeature] =
@@ -83,37 +100,44 @@ export const WorldMap = (props: Props) => {
     id: string;
     position: Position;
   }>();
-
-  const [searchParams, setSearchParams] = useSearchParams();
   const { isDesktop } = useMediaQuery();
 
-  const moveMapTo = (
+  const flyTo = (
     position: Position,
-    zoom?: number,
-    paddingRight?: number,
+    opts: { zoom?: number; padding?: Partial<PaddingOptions> } = {},
   ) => {
-    const map = mapRef.current?.getMap();
-    map?.flyTo({
+    const map = mapRef.current;
+    const params: FlyToOptions = {
       center: [position[0], position[1]],
-      zoom: zoom || map.getZoom(),
-      padding: paddingRight
-        ? { top: 0, left: 0, bottom: 0, right: paddingRight }
-        : 0,
       duration: 300,
-    });
+    };
+    if (opts.zoom) params.zoom = opts.zoom;
+    if (opts.padding)
+      params.padding = {
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        ...opts.padding,
+      };
+    map?.flyTo(params);
   };
 
-  const onMapLoad = useCallback(() => {
-    setIsMapLoaded(true);
-  }, []);
-
-  const onSourceData = useCallback((e: MapSourceDataEvent) => {
-    if (e.sourceId === 'main' || e.sourceId === 'points') {
-      setIsMapDataLoaded(e.isSourceLoaded);
+  const padMap = (padding?: Partial<PaddingOptions>) => {
+    const map = mapRef.current;
+    if (padding) {
+      map?.easeTo({
+        padding: { top: 0, left: 0, bottom: 0, right: 0, ...padding },
+      });
+    } else {
+      map?.easeTo({ padding: { top: 0, left: 0, bottom: 0, right: 0 } });
     }
-  }, []);
+  };
 
   useEffect(() => {
+    if (!isMapLoaded || !props.zoomToUserLocation || props.initialViewState)
+      return;
+
     const zoomToUserLocation = async () => {
       const response = await fetch('https://ipapi.co/json/')
         .then(r =>
@@ -123,22 +147,25 @@ export const WorldMap = (props: Props) => {
             zoom: 6,
           })),
         )
-        .catch(err => defaultMapState);
-
-      moveMapTo([response.longitude, response.latitude], response.zoom);
+        .catch(err => undefined);
+      if (response) {
+        flyTo([response.longitude, response.latitude], { zoom: response.zoom });
+      }
     };
-    if (!props.initialViewState) {
-      zoomToUserLocation();
-    }
+    zoomToUserLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMapLoaded]);
+  }, [isMapLoaded, props.zoomToUserLocation, props.initialViewState]);
 
   useEffect(() => {
-    const map = mapRef.current?.getMap();
+    if (!mapRef.current) return;
+    const map = mapRef.current;
+
     if (hoveredFeature) {
-      map?.setFeatureState(hoveredFeature, { hover: true });
+      map.setFeatureState(hoveredFeature, { hover: true });
     }
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      const map = mapRef.current;
       if (hoveredFeature) {
         map?.removeFeatureState(hoveredFeature, 'hover');
       }
@@ -146,26 +173,16 @@ export const WorldMap = (props: Props) => {
   }, [hoveredFeature]);
 
   useEffect(() => {
-    const map = mapRef.current?.getMap();
+    if (!mapRef.current) return;
+    const map = mapRef.current;
+
     if (selectedFeature) {
-      map?.setFeatureState(selectedFeature, { isSelected: true });
-      const originalId = selectedFeature.properties?.id;
-      let type: MapSlacklineFeatureType | undefined;
-      switch (selectedFeature.layer.id) {
-        case lineLayer.id:
-        case lineLabelLayer.id:
-          type = 'line';
-          break;
-        case polygonLayer.id:
-        case polygonLabelLayer.id:
-          type = 'spot';
-          break;
-        default:
-          break;
+      map.setFeatureState(selectedFeature, { isSelected: true });
+      const { center, originalId, type } = parseMapFeature(selectedFeature);
+      if (center) {
+        flyTo(center, { padding: { right: !isDesktop ? 200 : 0 } });
       }
-      const center = centerOfMass(selectedFeature).geometry.coordinates;
-      if (originalId && type) {
-        moveMapTo(center, undefined, !isDesktop ? 250 : undefined);
+      if (originalId && type && center && props.showInfoPopup) {
         setPopup({
           feature: selectedFeature,
           type,
@@ -175,25 +192,22 @@ export const WorldMap = (props: Props) => {
       }
     }
     return () => {
-      if (selectedFeature) {
-        map?.removeFeatureState(selectedFeature, 'isSelected');
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      const map = mapRef.current?.getMap();
+      if (selectedFeature && map) {
+        map.removeFeatureState(selectedFeature, 'isSelected');
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDesktop, selectedFeature]);
 
-  const onMapMoveEnd = (event: ViewStateChangeEvent) => {
-    if (props.syncMapLocationToUrlParams) {
-      const { longitude, latitude, zoom } = event.viewState;
-      searchParams.set(
-        'map',
-        mapUrlSearchParams.stringify(longitude, latitude, zoom),
-      );
-      setSearchParams(searchParams, { replace: true });
-    }
-  };
+  const onMapLoad = useCallback(() => {
+    setIsMapLoaded(true);
+  }, []);
 
   const onMouseMove = (event: MapLayerMouseEvent) => {
     if (!isMapLoaded) return;
+
     const feature = event.features?.[0];
     if (!feature) {
       setHoveredFeature(undefined);
@@ -201,7 +215,7 @@ export const WorldMap = (props: Props) => {
       return;
     }
 
-    if (cursorInteractiveleLayers.includes(feature.layer.id)) {
+    if (cursorInteractableLayers.includes(feature.layer.id)) {
       setCursor('pointer');
     }
 
@@ -212,6 +226,7 @@ export const WorldMap = (props: Props) => {
 
   const onClick = (event: MapLayerMouseEvent) => {
     if (!isMapLoaded) return;
+
     const feature = event.features?.[0];
     if (!feature) {
       setSelectedFeature(undefined);
@@ -227,13 +242,18 @@ export const WorldMap = (props: Props) => {
           return;
         }
         const coordinates = (feature.geometry as Point).coordinates;
-        moveMapTo([coordinates[0], coordinates[1]], zoom);
+        flyTo([coordinates[0], coordinates[1]], { zoom });
       });
       return;
     }
     if (feature.layer.id === unclusteredPointLayer.id) {
-      const coordinates = (feature.geometry as Point).coordinates;
-      moveMapTo([coordinates[0], coordinates[1]], 16);
+      const { marginedBounds } = calculateBounds(
+        feature.geometry,
+        feature.properties?.l,
+      );
+      mapRef.current?.fitBounds(marginedBounds, {});
+
+      // flyTo(coordinates, { zoom: 16 });
       return;
     }
     if (mouseHoverableLayers.includes(feature.layer.id)) {
@@ -242,81 +262,98 @@ export const WorldMap = (props: Props) => {
   };
 
   return (
-    <ReactMapGL
-      initialViewState={props.initialViewState || defaultMapState}
-      mapStyle={mapStyle}
-      mapboxAccessToken={MAPBOX_TOKEN}
-      interactiveLayerIds={[
-        clusterLayer.id!,
-        polygonLayer.id!,
-        polygonLabelLayer.id!,
-        lineLabelLayer.id!,
-        lineLayer.id!,
-        unclusteredPointLayer.id!,
-      ]}
-      attributionControl={false}
-      onLoad={onMapLoad}
-      onClick={onClick}
-      onMoveEnd={onMapMoveEnd}
-      onMouseMove={onMouseMove}
-      cursor={cursor}
-      onSourceData={onSourceData}
-      onZoom={e => {
-        setZoomLevel(e.viewState.zoom);
-      }}
-      reuseMaps
-      ref={mapRef}
-      // projection="globe"
-    >
-      <GeolocateControl />
-      <AttributionControl
-        compact
-        customAttribution="International Slackline Association"
-      />
-      <ScaleControl />
-      <NavigationControl />
-      <MapImage name={'marker'} url={'/images/line-marker.png'} />
-      {popup && (
-        <CustomPopup
-          longitude={popup.position[0]}
-          latitude={popup.position[1]}
-          anchor="left"
-          onClose={() => setPopup(undefined)}
-          maxWidth="none"
+    <>
+      {!isMapLoaded && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 1,
+            backgroundColor: theme => theme.palette.background.paper,
+          }}
         >
-          <InfoPopup
-            id={popup.id}
-            type={popup.type}
-            onDetailsClick={props.onDetailsClick}
-          />
-        </CustomPopup>
+          <div>asdasdasdsa</div>
+        </Box>
       )}
+      <ReactMapGL
+        initialViewState={props.initialViewState || defaultMapViewState}
+        mapStyle={mapStyle}
+        mapboxAccessToken={MAPBOX_TOKEN}
+        interactiveLayerIds={[
+          clusterLayer.id!,
+          polygonLayer.id!,
+          polygonLabelLayer.id!,
+          lineLabelLayer.id!,
+          lineLayer.id!,
+          unclusteredPointLayer.id!,
+        ]}
+        attributionControl={false}
+        onLoad={onMapLoad}
+        onClick={onClick}
+        onMoveEnd={props.onMapMoveEnd}
+        onMouseMove={onMouseMove}
+        cursor={cursor}
+        onZoom={e => {
+          setZoomLevel(e.viewState.zoom);
+        }}
+        pitchWithRotate={false}
+        maxPitch={0}
+        reuseMaps
+        ref={mapRef}
+      >
+        <GeolocateControl />
+        <AttributionControl
+          compact
+          customAttribution="International Slackline Association"
+        />
+        <ScaleControl />
+        <NavigationControl />
+        <MapImage name={'marker'} url={'/images/line-marker.png'} />
+        {popup && (
+          <CustomPopup
+            longitude={popup.position[0]}
+            latitude={popup.position[1]}
+            anchor="left"
+            onClose={() => setPopup(undefined)}
+            maxWidth="none"
+          >
+            <InfoPopup
+              id={popup.id}
+              type={popup.type}
+              onDetailsClick={props.onPopupDetailsClick ?? (() => {})}
+            />
+          </CustomPopup>
+        )}
 
-      <Source
-        id="points"
-        type="geojson"
-        data="https://d1hbfm0s717r1n.cloudfront.net/geojson/points.geojson"
-        cluster={true}
-        clusterMaxZoom={13}
-        clusterRadius={50}
-      >
-        <Layer {...clusterLayer} />
-        <Layer {...clusterCountLayer} />
-        <Layer {...unclusteredPointLayer} />
-      </Source>
-      <Source
-        id="main"
-        type="geojson"
-        data="https://d1hbfm0s717r1n.cloudfront.net/geojson/main.geojson"
-        generateId={true}
-      >
-        <Layer {...polygonLayer} />
-        <Layer {...polygonOutlineLayer} />
-        <Layer {...polygonLabelLayer} />
-        <Layer {...lineLayer} />
-        <Layer {...lineLabelLayer} />
-      </Source>
-    </ReactMapGL>
+        <Source
+          id="points"
+          type="geojson"
+          data="https://d1hbfm0s717r1n.cloudfront.net/geojson/points.geojson"
+          cluster={true}
+          clusterMaxZoom={13}
+          clusterRadius={50}
+        >
+          <Layer {...clusterLayer} />
+          <Layer {...clusterCountLayer} />
+          <Layer {...unclusteredPointLayer} />
+        </Source>
+        <Source
+          id="main"
+          type="geojson"
+          data="https://d1hbfm0s717r1n.cloudfront.net/geojson/main.geojson"
+          generateId={true}
+        >
+          <Layer {...polygonLayer} />
+          <Layer {...polygonOutlineLayer} />
+          <Layer {...polygonLabelLayer} />
+          <Layer {...lineLayer} />
+          <Layer {...lineLabelLayer} />
+        </Source>
+      </ReactMapGL>
+    </>
   );
 };
 

@@ -1,16 +1,6 @@
 import { colors } from '@mui/material';
-import type { LayerProps, SkyLayer } from 'react-map-gl';
+import type { LayerProps } from 'react-map-gl';
 import { appColors } from 'styles/theme/colors';
-
-export const skyLayer: SkyLayer = {
-  id: 'sky',
-  type: 'sky',
-  paint: {
-    'sky-type': 'atmosphere',
-    'sky-atmosphere-sun': [0.0, 0.0],
-    'sky-atmosphere-sun-intensity': 15,
-  },
-};
 
 export const lineLayerFocused: LayerProps = {
   id: 'lineFocused',
@@ -27,17 +17,17 @@ export const lineLayerFocused: LayerProps = {
   },
 };
 
-export const lineLayer: LayerProps = {
-  id: 'line',
-  type: 'line',
-  source: 'world',
-  filter: ['==', ['geometry-type'], 'LineString'],
-  paint: {
-    'line-color': appColors.lineStrokeColor,
-    'line-width': 2,
-    'line-opacity': 0.5,
-  },
-};
+// export const lineLayer: LayerProps = {
+//   id: 'line',
+//   type: 'line',
+//   source: 'world',
+//   filter: ['==', ['geometry-type'], 'LineString'],
+//   paint: {
+//     'line-color': appColors.lineStrokeColor,
+//     'line-width': 2,
+//     'line-opacity': 0.5,
+//   },
+// };
 
 export const polygonLayerFocused: LayerProps = {
   id: 'spotFocused',
@@ -50,16 +40,16 @@ export const polygonLayerFocused: LayerProps = {
   },
 };
 
-export const polygonLayer: LayerProps = {
-  id: 'spot',
-  type: 'fill',
-  source: 'main',
-  filter: ['==', ['geometry-type'], 'Polygon'],
-  paint: {
-    'fill-color': appColors.spotFillColor,
-    'fill-opacity': 0.5,
-  },
-};
+// export const polygonLayer: LayerProps = {
+//   id: 'spot',
+//   type: 'fill',
+//   source: 'main',
+//   filter: ['==', ['geometry-type'], 'Polygon'],
+//   paint: {
+//     'fill-color': appColors.spotFillColor,
+//     'fill-opacity': 0.5,
+//   },
+// };
 
 export const lineLabelLayerFocused: LayerProps = {
   id: 'lineLabelFocused',
@@ -74,6 +64,8 @@ export const lineLabelLayerFocused: LayerProps = {
     'text-size': 12,
     'icon-text-fit': 'both',
     'icon-text-fit-padding': [8, 8, 8, 8],
+    'icon-allow-overlap': true,
+    'text-allow-overlap': true,
   },
   paint: {
     'text-color': 'white',
@@ -82,23 +74,25 @@ export const lineLabelLayerFocused: LayerProps = {
   },
 };
 
-export const lineLabelLayer: LayerProps = {
-  id: 'lineLabel',
-  type: 'symbol',
-  source: 'main',
-  filter: ['==', ['geometry-type'], 'LineString'],
-  layout: {
-    'icon-image': 'marker',
-    'symbol-placement': 'line-center',
-    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-    'text-field': '{l}m',
-    'text-size': 12,
-    'icon-text-fit': 'both',
-    'icon-text-fit-padding': [8, 8, 8, 8],
-  },
-  paint: {
-    'text-color': 'white',
-    'icon-color': appColors.lineStrokeColor,
-    'icon-opacity': 0.5,
-  },
-};
+// export const lineLabelLayer: LayerProps = {
+//   id: 'lineLabel',
+//   type: 'symbol',
+//   source: 'main',
+//   filter: ['==', ['geometry-type'], 'LineString'],
+//   layout: {
+//     'icon-image': 'marker',
+//     'symbol-placement': 'line-center',
+//     'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+//     'text-field': '{l}m',
+//     'text-size': 12,
+//     'icon-text-fit': 'both',
+//     'icon-text-fit-padding': [8, 8, 8, 8],
+//     'icon-allow-overlap': true,
+//     'text-allow-overlap': true,
+//   },
+//   paint: {
+//     'text-color': 'white',
+//     'icon-color': appColors.lineStrokeColor,
+//     'icon-opacity': 0.5,
+//   },
+// };

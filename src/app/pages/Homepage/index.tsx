@@ -4,17 +4,27 @@ import { Box } from '@mui/system';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { mapUrlSearchParams } from 'app/components/WorldMap/mapUtils';
 import { Button } from '@mui/material';
+import { ViewStateChangeEvent } from 'react-map-gl';
 
 interface Props {}
 
 export function Homepage(props: Props) {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const navigate = useNavigate();
 
   const onDetailsClick = (id: string, type: MapSlacklineFeatureType) => {
     if (type === 'line') {
       navigate(`/line/${id}`);
     }
+  };
+  const onMapMoveEnd = (event: ViewStateChangeEvent) => {
+    const { longitude, latitude, zoom } = event.viewState;
+    searchParams.set(
+      'map',
+      mapUrlSearchParams.stringify(longitude, latitude, zoom),
+    );
+    setSearchParams(searchParams, { replace: true });
   };
 
   return (
@@ -27,9 +37,11 @@ export function Homepage(props: Props) {
     >
       {/* <Button></Button> */}
       <WorldMap
-        syncMapLocationToUrlParams
+        onPopupDetailsClick={onDetailsClick}
+        onMapMoveEnd={onMapMoveEnd}
         initialViewState={mapUrlSearchParams.parse(searchParams)}
-        onDetailsClick={onDetailsClick}
+        showInfoPopup
+        zoomToUserLocation
       />
     </Box>
   );

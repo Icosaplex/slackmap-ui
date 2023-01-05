@@ -9,7 +9,7 @@ import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
 
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 
 import FontFaceObserver from 'fontfaceobserver';
@@ -39,19 +39,20 @@ openSansObserver.load().then(() => {
 });
 
 const store = configureAppStore();
-const MOUNT_NODE = document.getElementById('root') as HTMLElement;
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement,
+);
 
-ReactDOM.render(
+root.render(
   <Provider store={store}>
-    <HelmetProvider>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <HelmetProvider>
         <React.StrictMode>
           <App />
         </React.StrictMode>
-      </ThemeProvider>
-    </HelmetProvider>
+      </HelmetProvider>
+    </ThemeProvider>
   </Provider>,
-  MOUNT_NODE,
 );
 
 // If you want to start measuring performance in your app, pass a function

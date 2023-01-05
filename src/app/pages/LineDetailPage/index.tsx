@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { WorldMap } from 'app/components/WorldMap';
 import { Box, Stack } from '@mui/system';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { mapUrlSearchParams } from 'app/components/WorldMap/mapUtils';
 import {
   Button,
@@ -23,10 +23,17 @@ interface Props {}
 export function LineDetailPage(props: Props) {
   const { lineId } = useParams();
   const { isDesktop } = useMediaQuery();
+  const navigate = useNavigate();
 
   const { data: lineGeoJson, isFetching } = lineApi.useGetLineGeoJsonQuery(
     lineId!,
   );
+
+  const onFeatureClick = (id: string, type: MapSlacklineFeatureType) => {
+    if (type === 'line') {
+      navigate(`/line/${id}`);
+    }
+  };
 
   return (
     <Stack
@@ -37,12 +44,12 @@ export function LineDetailPage(props: Props) {
     >
       <Box
         sx={{
-          height: isDesktop ? '100vh' : '33vh',
+          height: isDesktop ? '100vh' : '50vh',
           width: isDesktop ? '67%' : '100%',
           position: 'relative',
         }}
       >
-        <FocusedMap geoJson={lineGeoJson} />
+        <FocusedMap geoJson={lineGeoJson} onFeatureClick={onFeatureClick} />
       </Box>
 
       <Box
