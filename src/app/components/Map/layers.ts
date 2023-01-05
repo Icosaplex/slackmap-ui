@@ -1,4 +1,4 @@
-import { colors } from '@mui/material';
+import { colors, darken, lighten } from '@mui/material';
 import type { LayerProps } from 'react-map-gl';
 import { appColors } from 'styles/theme/colors';
 
@@ -195,11 +195,11 @@ export const clusterLayer: LayerProps = {
     'circle-color': [
       'step',
       ['get', 'point_count'],
-      colors.green[300],
+      lighten(appColors.slackmapGreen, 0.2),
       50,
-      colors.green[600],
+      lighten(appColors.slackmapGreen, 0),
       200,
-      colors.green[900],
+      darken(appColors.slackmapGreen, 0.2),
     ],
     'circle-radius': [
       'step',

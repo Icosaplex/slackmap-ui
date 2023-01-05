@@ -1,7 +1,14 @@
-import { colors as muiColors } from '@mui/material';
+import { colors as muiColors, darken } from '@mui/material';
+
+export const isaBlue = '#00A099';
+export const slackmapGreen = '#84B53E';
+export const slackmapBlue = '#4187C5';
 
 export const appColors = {
-  slacklinePoint: muiColors.green[400],
+  slacklinePoint: slackmapGreen,
   lineStrokeColor: muiColors.red[400],
-  spotFillColor: muiColors.green[700],
+  spotFillColor: darken(slackmapGreen, 0.1),
+  slackmapGreen,
+  slackmapBlue,
+  isaBlue,
 };
