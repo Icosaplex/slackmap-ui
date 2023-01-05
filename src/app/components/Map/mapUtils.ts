@@ -24,18 +24,27 @@ mapboxgl.workerClass =
 export const mapUrlSearchParams = {
   parse: (searchParams: URLSearchParams) => {
     const [longitude, latitude, zoom] =
-      searchParams.get('map')?.split(',').map(Number) ?? [];
-    if (!longitude || !latitude || !zoom) {
+      searchParams
+        .get('map')
+        ?.split(',')
+        .map(p => {
+          const parsed = parseFloat(p);
+          return isNaN(parsed) ? undefined : parsed;
+        }) ?? [];
+
+    if (longitude === undefined || latitude === undefined) {
       return undefined;
     }
     return {
       longitude,
       latitude,
-      zoom,
+      zoom: zoom || 0,
     };
   },
   stringify: (longitude: number, latitude: number, zoom: number) => {
-    return `${round(longitude, 5)},${round(latitude, 5)},${round(zoom, 5)}`;
+    return `${round(longitude, 5)},${round(latitude, 5)}${
+      zoom ? `,${round(zoom, 5)}` : ''
+    }`;
   },
 };
 
@@ -58,18 +67,21 @@ export const parseMapFeature = (feature: MapboxGeoJSONFeature) => {
   return { originalId, type, center };
 };
 
-export const calculateBounds = (geojson: any, length?: number) => {
-  const radius = length ? length / 1000 : 0.5;
-  console.log(radius);
+export const calculateBounds = (
+  geojson: any,
+  length?: number,
+  pad?: number,
+) => {
+  const radius = length ? (length * (pad ?? 1)) / 1000 : 0.5;
   const exactBounds = bbox(geojson) as [number, number, number, number];
   const marginedBounds = bbox(
-    circle(centerOfMass(bboxPolygon(exactBounds)), radius, { steps: 4 }),
+    circle(center(bboxPolygon(exactBounds)), radius, { steps: 4 }),
   ) as [number, number, number, number];
 
-  console.log(
-    JSON.stringify(
-      circle(centerOfMass(bboxPolygon(exactBounds)), radius, { steps: 4 }),
-    ),
-  );
+  // console.log(
+  //   JSON.stringify(
+  //     circle(center(bboxPolygon(exactBounds)), radius, { steps: 4 }),
+  //   ),
+  // );
   return { exactBounds, marginedBounds };
 };

@@ -216,8 +216,9 @@ export const WorldMap = (props: Props) => {
       const { marginedBounds } = calculateBounds(
         feature.geometry,
         feature.properties?.l,
+        2,
       );
-      mapRef.current?.fitBounds(marginedBounds, {});
+      mapRef.current?.fitBounds(marginedBounds);
 
       // flyTo(coordinates, { zoom: 16 });
       return;
