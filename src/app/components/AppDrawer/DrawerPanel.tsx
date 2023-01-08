@@ -12,20 +12,20 @@ import {
   Link,
   Avatar,
   Button,
+  Grid,
+  Tooltip,
+  styled,
+  IconButtonProps,
 } from '@mui/material';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Link as RouterLink, NavLink } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import InputIcon from '@mui/icons-material/Input';
+import PublicIcon from '@mui/icons-material/Public';
+import { Profile } from './Profile';
 
 export const DrawerPanel = () => {
-  const userInfo: any = {};
-
-  const dispatch = useDispatch();
-
-  const name: string = userInfo?.name ?? 'Can';
-  const surname: string = (userInfo || {})['surname'] || 'Sahin';
 
   return (
     <Box
@@ -34,8 +34,8 @@ export const DrawerPanel = () => {
         flexDirection: 'column',
         height: '100%',
         padding: 2,
-        backgroundColor: t => t.palette.primary.dark,
-        color: t => t.palette.primary.contrastText,
+        // backgroundColor: t => t.palette.primary.dark,
+        // color: t => t.palette.primary.contrastText,
       }}
     >
       <Stack spacing={2} alignItems={'strech'}>
@@ -47,61 +47,13 @@ export const DrawerPanel = () => {
           />
         </Link>
         <Divider sx={{ borderColor: 'inherit', opacity: 0.3 }} />
-        <Stack direction={'row'} spacing={2}>
-          <Avatar
-            sx={{
-              width: '48px',
-              height: '48px',
-              borderStyle: 'solid',
-              borderColor: t => t.palette.primary.contrastText,
-            }}
-            alt="Profile Picture"
-            src={userInfo?.profilePictureUrl || ''}
-          >
-            {name.substring(0, 1)} {surname?.substring(0, 1)}
-          </Avatar>
-
-          <Stack spacing={0} justifyContent={'center'} alignItems={'baseline'}>
-            <Typography variant="h6">{name}</Typography>
-            <Typography variant="h6">{surname}</Typography>
-          </Stack>
-        </Stack>
+        <Profile />
         <List>
           <ListItem disableGutters sx={{ alignItems: 'flex-start' }}>
-            <IconButton
-              sx={{
-                borderRadius: 1,
-                justifyContent: 'flex-start',
-                width: '100%',
-              }}
-              color="inherit"
-              to={'/'}
-              component={NavLink}
-              size="small"
-            >
-              <AccountCircleIcon />
-              <Typography sx={{ marginLeft: 2, fontSize: '0.8rem' }}>
-                View Account
-              </Typography>
-            </IconButton>
-          </ListItem>
-          <ListItem disableGutters sx={{ alignItems: 'flex-start' }}>
-            <IconButton
-              sx={{
-                borderRadius: 1,
-                justifyContent: 'flex-start',
-                width: '100%',
-              }}
-              color="inherit"
-              to={'/'}
-              component={NavLink}
-              size="small"
-            >
-              <InputIcon />
-              <Typography sx={{ marginLeft: 2, fontSize: '0.8rem' }}>
-                Logout
-              </Typography>
-            </IconButton>
+            <NavigationIcon to="/">
+              <PublicIcon />
+              <Typography>World Map</Typography>
+            </NavigationIcon>
           </ListItem>
         </List>
       </Stack>
@@ -109,3 +61,37 @@ export const DrawerPanel = () => {
     </Box>
   );
 };
+
+const NavigationIcon = (props: { to: string; children: ReactNode }) => {
+  return (
+    <IconButton
+      color="inherit"
+      to={'/'}
+      component={NavLink}
+      size="small"
+      sx={{
+        borderRadius: 1,
+        justifyContent: 'flex-start',
+        width: '100%',
+        color: 'inherit',
+        '& .MuiTypography-body1': {
+          marginLeft: 2,
+        },
+      }}
+    >
+      {props.children}
+    </IconButton>
+  );
+};
+
+// const PanelItem = styled(NavigationIcon)({
+//   borderRadius: 1,
+//   justifyContent: 'flex-start',
+//   width: '100%',
+//   color: 'inherit',
+
+//   '& .': {
+//     '&:hover, &.Mui-focusVisible': {},
+//     '&.Mui-active': {},
+//   },
+// });

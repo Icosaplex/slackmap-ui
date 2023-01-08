@@ -29,6 +29,7 @@ export type StaticReducersType = {
 */
 export interface RootState {
   api: any;
+  isaAccountApi: any;
   app?: AppState;
   // [INSERT NEW REDUCER KEY ABOVE] < Needed for generating containers seamlessly
 }

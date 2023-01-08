@@ -70,7 +70,7 @@ export function App() {
     } else if (authState === AuthState.SigningOut) {
       Auth.signOut();
     }
-  }, [authState]);
+  }, [authState, dispatch]);
 
   const extractCurrentPathAndSearch = () => {
     if (
@@ -81,11 +81,6 @@ export function App() {
       return window.location.pathname + window.location.search;
     }
     return undefined;
-  };
-
-  const signInClicked = () => {
-    dispatch(appActions.updateAuthState(AuthState.SigningIn));
-    Auth.federatedSignIn();
   };
 
   const onSnackbarClose = () => {

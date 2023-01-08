@@ -23,11 +23,11 @@ fi
 export AWS_PROFILE=$aws_profile
 
 echo Synching Build Folder: $s3_bucket...
-aws s3 sync build/ s3://$s3_bucket --delete --cache-control max-age=31536000,public
+aws s3 sync build/ s3://$s3_bucket --delete --cache-control max-age=86400,public
 
 echo Adjusting cache...
 # aws s3 cp s3://$s3_bucket/sw.js s3://$s3_bucket/sw.js --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate --content-type application/javascript --acl public-read
-aws s3 cp s3://$s3_bucket/index.html s3://$s3_bucket/index.html --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate --content-type text/html --acl public-read
+aws s3 cp s3://$s3_bucket/index.html s3://$s3_bucket/index.html --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate --content-type text/html
 
 if [ ! -z "$cf_id" ]; then
     echo Invalidating cloudfront cache

@@ -27,7 +27,9 @@ import {
 } from './layers';
 import { calculateBounds, parseMapFeature } from './mapUtils';
 import { FeatureCollection } from '@turf/turf';
-import { defaultMapViewState, MAPBOX_TOKEN } from './constants';
+import { defaultMapViewState, geoJsonURL, MAPBOX_TOKEN } from './constants';
+import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
+import { FocusedButton } from './Components/FocusButton';
 
 // FIX: https://github.com/visgl/react-map-gl/issues/1266
 // @ts-ignore
@@ -48,20 +50,28 @@ export const FocusedMap = (props: Props) => {
   const [cursor, setCursor] = useState('auto');
   const [hoveredFeature, setHoveredFeature] = useState<MapboxGeoJSONFeature>();
 
+  const fitMapToCurrentGeoJson = useCallback(
+    (opts: { animate?: boolean } = {}) => {
+      if (!isMapLoaded || !props.geoJson || !mapRef.current) return;
+      const map = mapRef.current;
+
+      const { marginedBounds } = calculateBounds(
+        props.geoJson,
+        props.geoJson.features[0].properties?.l,
+      );
+      map.fitBounds(marginedBounds, {
+        animate: opts.animate || map.getZoom() > 10,
+      });
+    },
+    [isMapLoaded, props.geoJson],
+  );
+
   useEffect(() => {
     if (!isMapLoaded || !props.geoJson || !mapRef.current) return;
-    const map = mapRef.current;
 
-    const { marginedBounds } = calculateBounds(
-      props.geoJson,
-      props.geoJson.features[0].properties?.l,
-    );
-    map.fitBounds(marginedBounds, {
-      // padding: isDesktop ? 100 : 50,
-      animate: map.getZoom() > 10,
-    });
+    fitMapToCurrentGeoJson();
     setIsMapReady(true);
-  }, [isDesktop, isMapLoaded, props.geoJson]);
+  }, [fitMapToCurrentGeoJson, isDesktop, isMapLoaded, props.geoJson]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -118,6 +128,12 @@ export const FocusedMap = (props: Props) => {
     }
   };
 
+  const onFocusClick = () => {
+    if (!isMapLoaded || !props.geoJson || !mapRef.current) return;
+
+    fitMapToCurrentGeoJson({ animate: true });
+  };
+
   return (
     <>
       {!isMapReady && (
@@ -135,6 +151,7 @@ export const FocusedMap = (props: Props) => {
           }}
         />
       )}
+      <FocusedButton onFocusClick={onFocusClick} />
       <ReactMapGL
         initialViewState={defaultMapViewState}
         mapStyle={'mapbox://styles/mapbox/satellite-streets-v11'}
@@ -160,7 +177,7 @@ export const FocusedMap = (props: Props) => {
         <Source
           id="world"
           type="geojson"
-          data="https://d1hbfm0s717r1n.cloudfront.net/geojson/main.geojson"
+          data={geoJsonURL.main}
           generateId={true}
         >
           <Layer {...polygonLayer} />

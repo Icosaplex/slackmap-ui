@@ -7,3 +7,8 @@ export const defaultMapViewState = {
   bearing: 0,
   pitch: 0,
 };
+
+export const geoJsonURL = {
+  points: 'https://d1hbfm0s717r1n.cloudfront.net/geojson/points.geojson',
+  main: 'https://d1hbfm0s717r1n.cloudfront.net/geojson/main.geojson',
+};

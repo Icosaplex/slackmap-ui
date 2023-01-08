@@ -3,15 +3,15 @@
     "Amplify": {
       "Auth": {
         "userPoolId": "eu-central-1_iGaYGKeyJ",
-        "userPoolWebClientId": "59gg1oof4ik4nk46entj56lnnq",
+        "userPoolWebClientId": "4f7vphq9s9ava93irhh2e7pieh",
         "identityPoolId": "eu-central-1:e77377fc-74a7-49f3-bba9-0c137f8ed9ef",
         "identityPoolRegion": "eu-central-1",
         "region": "eu-central-1",
         "oauth": {
           "domain": "auth.slacklineinternational.org",
-          "scope": ["email", "openid", ""],
-          "redirectSignIn": "https://account.slacklineinternational.org",
-          "redirectSignOut": "https://account.slacklineinternational.org",
+          "scope": ["email", "openid", "aws.cognito.signin.user.admin"],
+          "redirectSignIn": "https://map.slacklineinternational.org",
+          "redirectSignOut": "https://map.slacklineinternational.org",
           "responseType": "code"
         }
       },

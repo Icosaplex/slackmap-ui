@@ -16,14 +16,14 @@ export const SlacklineDetailSpecsField = (props: Props) => {
         <Typography variant="h6"> {props.header} </Typography>
         {props.isAccurate ? (
           <Tooltip
-            title="The specs are marked as accurate!"
+            title="The specs are marked as measured!"
             enterTouchDelay={0}
           >
             <CheckCircleIcon color="primary" />
           </Tooltip>
         ) : (
           <Tooltip
-            title="The specs are NOT marked as accurate!"
+            title="The specs are NOT marked as measured. They might be NOT accurate!"
             enterTouchDelay={0}
           >
             <HelpIcon color="primary" />

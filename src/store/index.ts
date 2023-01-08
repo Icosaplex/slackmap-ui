@@ -5,15 +5,20 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
-import { baseApi, rtkQueryErrorLogger } from './rtk-query';
+import { baseApi, isaAccountApi, rtkQueryErrorLogger } from './rtk-query';
 import { InjectedReducersType, StaticReducersType } from './types';
 
 const staticReducers: StaticReducersType = {
   api: baseApi.reducer,
+  isaAccountApi: isaAccountApi.reducer,
 };
 
 export function configureAppStore() {
-  const middlewares = [baseApi.middleware, rtkQueryErrorLogger];
+  const middlewares = [
+    baseApi.middleware,
+    isaAccountApi.middleware,
+    rtkQueryErrorLogger,
+  ];
 
   const store = configureStore({
     reducer: createReducer(staticReducers),

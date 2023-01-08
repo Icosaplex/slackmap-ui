@@ -1,12 +1,11 @@
 import React from 'react';
-import { CircularProgress, Typography } from '@mui/material';
+import { CircularProgress, styled, Typography } from '@mui/material';
 import { Stack, SxProps } from '@mui/system';
 
 interface Props {
   loadingText?: string;
-  sx?: SxProps;
 }
-export const LoadingIndicator = (props: Props) => {
+export const LoadingIndicator = styled((props: Props) => {
   return (
     <Stack
       spacing={1}
@@ -17,7 +16,7 @@ export const LoadingIndicator = (props: Props) => {
         height: '100%',
         width: '100%',
         flex: 1,
-        ...props.sx,
+        // ...props.sx,
       }}
     >
       <CircularProgress />
@@ -26,4 +25,4 @@ export const LoadingIndicator = (props: Props) => {
       </Typography>
     </Stack>
   );
-};
+})();

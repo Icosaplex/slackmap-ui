@@ -52,6 +52,8 @@ export const AppDrawer = (props: Props) => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
+              backgroundColor: t => t.palette.primary.dark,
+              color: t => t.palette.primary.contrastText,
             },
           }}
         >
@@ -64,6 +66,8 @@ export const AppDrawer = (props: Props) => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
+              backgroundColor: t => t.palette.primary.dark,
+              color: t => t.palette.primary.contrastText,
             },
           }}
           open

@@ -3,11 +3,10 @@
     "Amplify": {
       "Auth": {
         "userPoolId": "eu-central-1_iGaYGKeyJ",
-        "userPoolWebClientId": "3hksael6658jtn4rhqnra7pmqs",
+        "userPoolWebClientId": "4f7vphq9s9ava93irhh2e7pieh",
         "identityPoolId": "eu-central-1:e77377fc-74a7-49f3-bba9-0c137f8ed9ef",
         "identityPoolRegion": "eu-central-1",
         "region": "eu-central-1",
-        "mandatorySignIn": true,
         "oauth": {
           "domain": "auth.slacklineinternational.org",
           "scope": ["email", "openid", "aws.cognito.signin.user.admin"],

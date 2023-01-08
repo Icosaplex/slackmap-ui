@@ -4,19 +4,42 @@ import {
   MiddlewareAPI,
 } from '@reduxjs/toolkit';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { AuthState } from 'app/slices/app/types';
 import { Auth } from 'aws-amplify';
 import { showErrorNotification } from 'utils';
+import { RootState } from './types';
+
+export const isaAccountApi = createApi({
+  reducerPath: 'isaAccountApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://qvjz6zmwx1.execute-api.eu-central-1.amazonaws.com/prod/',
+    prepareHeaders: async headers => {
+      const token = await Auth.currentSession().then(s =>
+        s.getIdToken().getJwtToken(),
+      );
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+
+      return headers;
+    },
+  }),
+  endpoints: () => ({}),
+});
 
 const baseQuery = fetchBaseQuery({
   baseUrl: 'https://wt5d2cy2w1.execute-api.eu-central-1.amazonaws.com/dev/',
   prepareHeaders: async (headers, { getState }) => {
-    const token = await Auth.currentSession()
-      .then(s => s.getIdToken().getJwtToken())
-      .catch(() => null);
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
+    const isSignedIn =
+      (getState() as RootState).app?.authState === AuthState.SignedIn;
+    if (isSignedIn) {
+      const token = await Auth.currentSession()
+        .then(s => s.getIdToken().getJwtToken())
+        .catch(() => null);
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
     }
-
     return headers;
   },
 });

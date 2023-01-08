@@ -34,3 +34,10 @@ export interface GetSpotDetailsAPIResponse {
   lastModifiedDateTime?: string;
   restrictionInfo?: string;
 }
+
+export interface GetUserBasicDetailsAPIResponse {
+  name: string;
+  surnam?: string;
+  email: string;
+  profilePictureUrl?: string;
+}

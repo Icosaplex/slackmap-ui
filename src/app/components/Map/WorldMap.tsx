@@ -33,13 +33,18 @@ import {
 import { useMapStyle } from './useMapStyle';
 import { MapImage } from './Components/MapImage';
 import { InfoPopup } from './Components/InfoPopup';
-import { FlyToOptions, PaddingOptions } from 'mapbox-gl';
-import { calculateBounds, parseMapFeature } from './mapUtils';
+import { FlyToOptions, MapSourceDataEvent, PaddingOptions } from 'mapbox-gl';
+import {
+  cachePointsGeoJson,
+  calculateBounds,
+  parseMapFeature,
+  pointsGeoJsonDict,
+} from './mapUtils';
 import { FeatureCollection } from '@turf/turf';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { styled } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
-import { defaultMapViewState, MAPBOX_TOKEN } from './constants';
+import { defaultMapViewState, geoJsonURL, MAPBOX_TOKEN } from './constants';
 import { MapLogo } from './Components/Logo';
 
 interface Props {
@@ -66,6 +71,7 @@ export const WorldMap = (props: Props) => {
     id: string;
     position: Position;
   }>();
+  const [isPointsLoaded, setIsPointsLoaded] = useState(false);
   const { isDesktop } = useMediaQuery();
 
   const flyTo = (
@@ -121,6 +127,11 @@ export const WorldMap = (props: Props) => {
     zoomToUserLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMapLoaded, props.zoomToUserLocation, props.initialViewState]);
+
+  useEffect(() => {
+    if (!isPointsLoaded) return;
+    cachePointsGeoJson();
+  }, [isPointsLoaded]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -190,6 +201,12 @@ export const WorldMap = (props: Props) => {
     }
   };
 
+  const onSourceData = (event: MapSourceDataEvent) => {
+    if (event.sourceId === 'points' && event.isSourceLoaded) {
+      setIsPointsLoaded(true);
+    }
+  };
+
   const onClick = (event: MapLayerMouseEvent) => {
     if (!isMapLoaded) return;
 
@@ -213,12 +230,14 @@ export const WorldMap = (props: Props) => {
       return;
     }
     if (feature.layer.id === unclusteredPointLayer.id) {
-      const { marginedBounds } = calculateBounds(
-        feature.geometry,
-        feature.properties?.l,
-        2,
-      );
-      mapRef.current?.fitBounds(marginedBounds);
+      const pointFeature = pointsGeoJsonDict[feature.properties?.id];
+      if (pointFeature) {
+        const { marginedBounds } = calculateBounds(
+          pointFeature.geometry,
+          feature.properties?.l,
+        );
+        mapRef.current?.fitBounds(marginedBounds);
+      }
 
       // flyTo(coordinates, { zoom: 16 });
       return;
@@ -275,6 +294,7 @@ export const WorldMap = (props: Props) => {
         ]}
         attributionControl={false}
         onLoad={onMapLoad}
+        onSourceData={onSourceData}
         onClick={onClick}
         onMoveEnd={props.onMapMoveEnd}
         onMouseMove={onMouseMove}
@@ -286,6 +306,7 @@ export const WorldMap = (props: Props) => {
         maxPitch={0}
         reuseMaps
         ref={mapRef}
+        // projection="globe"
       >
         <GeolocateControl />
         <AttributionControl
@@ -314,10 +335,12 @@ export const WorldMap = (props: Props) => {
         <Source
           id="points"
           type="geojson"
-          data="https://d1hbfm0s717r1n.cloudfront.net/geojson/points.geojson"
+          data={geoJsonURL.points}
           cluster={true}
           clusterMaxZoom={13}
+          clusterMinPoints={3}
           clusterRadius={50}
+          generateId={true}
         >
           <Layer {...clusterLayer} />
           <Layer {...clusterCountLayer} />
@@ -326,7 +349,7 @@ export const WorldMap = (props: Props) => {
         <Source
           id="main"
           type="geojson"
-          data="https://d1hbfm0s717r1n.cloudfront.net/geojson/main.geojson"
+          data={geoJsonURL.main}
           generateId={true}
         >
           <Layer {...polygonLayer} />
