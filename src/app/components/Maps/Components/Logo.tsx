@@ -14,6 +14,7 @@ export const MapLogo = () => {
         alignItems: 'center',
         flexDirection: 'column',
         display: { xs: 'flex', lg: 'none' },
+        pointerEvents: 'none',
       }}
     >
       <img

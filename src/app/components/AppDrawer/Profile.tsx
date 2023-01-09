@@ -15,7 +15,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useDispatch } from 'react-redux';
 import InputIcon from '@mui/icons-material/Input';
 import { useSelector } from 'react-redux';
-import { selectIsUserLoggedIn } from 'app/slices/app/selectors';
+import { selectIsUserSignedIn } from 'app/slices/app/selectors';
 import { appActions } from 'app/slices/app';
 import { AuthState } from 'app/slices/app/types';
 import { Auth } from 'aws-amplify';
@@ -24,7 +24,7 @@ import { accountApi } from 'app/api/account-api';
 import { LoadingIndicator } from '../LoadingIndicator';
 
 export const Profile = () => {
-  const isSignedIn = useSelector(selectIsUserLoggedIn);
+  const isSignedIn = useSelector(selectIsUserSignedIn);
 
   const { data: userInfo, isFetching } = accountApi.useGetBasicDetailsQuery(
     undefined,

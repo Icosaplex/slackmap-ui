@@ -10,32 +10,21 @@ import {
 } from 'react-map-gl';
 import type { MapRef } from 'react-map-gl';
 import {
-  lineLayerFocused,
-  lineLabelLayerFocused,
-  polygonLayerFocused,
+  cursorInteractableLayerIds,
+  layers,
+  mouseHoverableLayersIds,
 } from './layers';
 import { MapImage } from './Components/MapImage';
-import mapboxgl from 'mapbox-gl';
-import { useMediaQuery } from 'utils/hooks/useMediaQuery';
-import { Skeleton } from '@mui/material';
-import {
-  cursorInteractableLayers,
-  lineLabelLayer,
-  lineLayer,
-  mouseHoverableLayers,
-  polygonLayer,
-} from './layers';
 import { calculateBounds, parseMapFeature } from './mapUtils';
 import { FeatureCollection } from '@turf/turf';
-import { defaultMapViewState, geoJsonURL, MAPBOX_TOKEN } from './constants';
-import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
+import {
+  defaultMapViewState,
+  geoJsonURL,
+  MAPBOX_TOKEN,
+  mapStyles,
+} from './constants';
 import { FocusedButton } from './Components/FocusButton';
-
-// FIX: https://github.com/visgl/react-map-gl/issues/1266
-// @ts-ignore
-mapboxgl.workerClass =
-  // eslint-disable-next-line import/no-webpack-loader-syntax
-  require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
+import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
 
 interface Props {
   onFeatureClick: (id: string, type: MapSlacklineFeatureType) => void;
@@ -44,7 +33,6 @@ interface Props {
 
 export const FocusedMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
-  const { isDesktop } = useMediaQuery();
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isMapReady, setIsMapReady] = useState(false);
   const [cursor, setCursor] = useState('auto');
@@ -68,10 +56,9 @@ export const FocusedMap = (props: Props) => {
 
   useEffect(() => {
     if (!isMapLoaded || !props.geoJson || !mapRef.current) return;
-
     fitMapToCurrentGeoJson();
     setIsMapReady(true);
-  }, [fitMapToCurrentGeoJson, isDesktop, isMapLoaded, props.geoJson]);
+  }, [fitMapToCurrentGeoJson, isMapLoaded, props.geoJson]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -104,11 +91,11 @@ export const FocusedMap = (props: Props) => {
       return;
     }
 
-    if (cursorInteractableLayers.includes(feature.layer.id)) {
+    if (cursorInteractableLayerIds.includes(feature.layer.id)) {
       setCursor('pointer');
     }
 
-    if (mouseHoverableLayers.includes(feature.layer.id)) {
+    if (mouseHoverableLayersIds.includes(feature.layer.id)) {
       setHoveredFeature(feature);
     }
   };
@@ -120,7 +107,7 @@ export const FocusedMap = (props: Props) => {
     if (!feature) {
       return;
     }
-    if (mouseHoverableLayers.includes(feature.layer.id)) {
+    if (mouseHoverableLayersIds.includes(feature.layer.id)) {
       const { originalId, type } = parseMapFeature(feature);
       if (originalId && type) {
         props.onFeatureClick(originalId, type);
@@ -136,25 +123,11 @@ export const FocusedMap = (props: Props) => {
 
   return (
     <>
-      {!isMapReady && (
-        <Skeleton
-          variant="rectangular"
-          animation="wave"
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 1,
-            backgroundColor: 'grey.600',
-          }}
-        />
-      )}
+      {!isMapReady && <MapLoadingPlaceholder />}
       <FocusedButton onFocusClick={onFocusClick} />
       <ReactMapGL
         initialViewState={defaultMapViewState}
-        mapStyle={'mapbox://styles/mapbox/satellite-streets-v11'}
+        mapStyle={mapStyles.satelliteStreets}
         mapboxAccessToken={MAPBOX_TOKEN}
         attributionControl={false}
         onLoad={onMapLoad}
@@ -163,9 +136,9 @@ export const FocusedMap = (props: Props) => {
         onMouseMove={onMouseMove}
         onClick={onMapClick}
         interactiveLayerIds={[
-          polygonLayer.id!,
-          lineLabelLayer.id!,
-          lineLayer.id!,
+          layers.polygon.id!,
+          layers.lineLabel.id!,
+          layers.line.id!,
         ]}
         cursor={cursor}
         pitchWithRotate={false}
@@ -180,9 +153,9 @@ export const FocusedMap = (props: Props) => {
           data={geoJsonURL.main}
           generateId={true}
         >
-          <Layer {...polygonLayer} />
-          <Layer {...lineLayer} />
-          <Layer {...lineLabelLayer} />
+          <Layer {...layers.polygon} />
+          <Layer {...layers.line} />
+          <Layer {...layers.lineLabel} />
         </Source>
         <Source
           id="focused"
@@ -195,9 +168,9 @@ export const FocusedMap = (props: Props) => {
           }
           generateId
         >
-          <Layer {...polygonLayerFocused} />
-          <Layer {...lineLayerFocused} />
-          <Layer {...lineLabelLayerFocused} />
+          <Layer {...layers.spotFocused} />
+          <Layer {...layers.lineFocused} />
+          <Layer {...layers.lineLabelFocused} />
         </Source>
       </ReactMapGL>
     </>

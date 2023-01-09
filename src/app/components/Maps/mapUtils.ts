@@ -10,12 +10,6 @@ import {
   round,
 } from '@turf/turf';
 import { MapboxGeoJSONFeature } from 'mapbox-gl';
-import {
-  lineLayer,
-  lineLabelLayer,
-  polygonLayer,
-  polygonLabelLayer,
-} from './layers';
 import mapboxgl from 'mapbox-gl';
 import { geoJsonURL } from './constants';
 
@@ -67,13 +61,11 @@ export const mapUrlSearchParams = {
 export const parseMapFeature = (feature: MapboxGeoJSONFeature) => {
   const originalId = feature.properties?.id;
   let type: MapSlacklineFeatureType | undefined;
-  switch (feature.layer.id) {
-    case lineLayer.id:
-    case lineLabelLayer.id:
+  switch (feature.geometry.type) {
+    case 'LineString':
       type = 'line';
       break;
-    case polygonLayer.id:
-    case polygonLabelLayer.id:
+    case 'Polygon':
       type = 'spot';
       break;
     default:
@@ -82,7 +74,6 @@ export const parseMapFeature = (feature: MapboxGeoJSONFeature) => {
   const center = centerOfMass(feature).geometry.coordinates;
   return { originalId, type, center };
 };
-
 
 export const calculateBounds = (
   geojson: any,

@@ -19,33 +19,26 @@ import type { Point, Position } from 'geojson';
 import type { MapRef } from 'react-map-gl';
 import type { GeoJSONSource } from 'react-map-gl';
 import {
-  clusterCountLayer,
-  clusterLayer,
-  lineLabelLayer,
-  lineLayer,
-  polygonLayer,
-  polygonOutlineLayer,
-  unclusteredPointLayer,
-  polygonLabelLayer,
-  cursorInteractableLayers,
-  mouseHoverableLayers,
-} from './layers';
-import { useMapStyle } from './useMapStyle';
-import { MapImage } from './Components/MapImage';
-import { InfoPopup } from './Components/InfoPopup';
+  layers,
+  cursorInteractableLayerIds,
+  mouseHoverableLayersIds,
+} from '../layers';
+import { useMapStyle } from '../useMapStyle';
+import { MapImage } from '../Components/MapImage';
+import { InfoPopup } from '../Components/InfoPopup';
 import { FlyToOptions, MapSourceDataEvent, PaddingOptions } from 'mapbox-gl';
 import {
   cachePointsGeoJson,
   calculateBounds,
   parseMapFeature,
   pointsGeoJsonDict,
-} from './mapUtils';
+} from '../mapUtils';
 import { FeatureCollection } from '@turf/turf';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { styled } from '@mui/material/styles';
-import { Box, Typography } from '@mui/material';
-import { defaultMapViewState, geoJsonURL, MAPBOX_TOKEN } from './constants';
-import { MapLogo } from './Components/Logo';
+import { defaultMapViewState, geoJsonURL, MAPBOX_TOKEN } from '../constants';
+import { MapLogo } from '../Components/Logo';
+import { MapLoadingPlaceholder } from '../Components/MapLoadingPlaceholder';
 
 interface Props {
   onPopupDetailsClick?: (id: string, type: MapSlacklineFeatureType) => void;
@@ -192,11 +185,14 @@ export const WorldMap = (props: Props) => {
       return;
     }
 
-    if (cursorInteractableLayers.includes(feature.layer.id)) {
+    if (cursorInteractableLayerIds.includes(feature.layer.id)) {
       setCursor('pointer');
     }
 
-    if (mouseHoverableLayers.includes(feature.layer.id) && !selectedFeature) {
+    if (
+      mouseHoverableLayersIds.includes(feature.layer.id) &&
+      !selectedFeature
+    ) {
       setHoveredFeature(feature);
     }
   };
@@ -229,7 +225,7 @@ export const WorldMap = (props: Props) => {
       });
       return;
     }
-    if (feature.layer.id === unclusteredPointLayer.id) {
+    if (feature.layer.id === layers.unclusteredPoint.id) {
       const pointFeature = pointsGeoJsonDict[feature.properties?.id];
       if (pointFeature) {
         const { marginedBounds } = calculateBounds(
@@ -242,55 +238,25 @@ export const WorldMap = (props: Props) => {
       // flyTo(coordinates, { zoom: 16 });
       return;
     }
-    if (mouseHoverableLayers.includes(feature.layer.id)) {
+    if (mouseHoverableLayersIds.includes(feature.layer.id)) {
       setSelectedFeature(feature);
     }
   };
 
   return (
     <>
-      {!isMapLoaded && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 2,
-            backgroundColor: theme => theme.palette.background.paper,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexDirection: 'column',
-            padding: 10,
-          }}
-        >
-          <img
-            style={{ maxWidth: '100%', maxHeight: '100%' }}
-            src={'/images/slackmapLogo.png'}
-            alt=""
-          />
-          <Typography
-            variant="h6"
-            sx={{ color: t => t.palette.text.secondary }}
-          >
-            Loading Map...
-          </Typography>
-        </Box>
-      )}
+      {!isMapLoaded && <MapLoadingPlaceholder />}
       <MapLogo />
       <ReactMapGL
         initialViewState={props.initialViewState || defaultMapViewState}
         mapStyle={mapStyle}
         mapboxAccessToken={MAPBOX_TOKEN}
         interactiveLayerIds={[
-          clusterLayer.id!,
-          polygonLayer.id!,
-          polygonLabelLayer.id!,
-          lineLabelLayer.id!,
-          lineLayer.id!,
-          unclusteredPointLayer.id!,
+          layers.polygon.id!,
+          layers.lineLabel.id!,
+          layers.line.id!,
+          layers.unclusteredPoint.id!,
+          layers.cluster.id!,
         ]}
         attributionControl={false}
         onLoad={onMapLoad}
@@ -342,9 +308,9 @@ export const WorldMap = (props: Props) => {
           clusterRadius={50}
           generateId={true}
         >
-          <Layer {...clusterLayer} />
-          <Layer {...clusterCountLayer} />
-          <Layer {...unclusteredPointLayer} />
+          <Layer {...layers.cluster} />
+          <Layer {...layers.clusterCount} />
+          <Layer {...layers.unclusteredPoint} />
         </Source>
         <Source
           id="main"
@@ -352,18 +318,18 @@ export const WorldMap = (props: Props) => {
           data={geoJsonURL.main}
           generateId={true}
         >
-          <Layer {...polygonLayer} />
-          <Layer {...polygonOutlineLayer} />
-          <Layer {...polygonLabelLayer} />
-          <Layer {...lineLayer} />
-          <Layer {...lineLabelLayer} />
+          <Layer {...layers.polygon} />
+          <Layer {...layers.polygonOutline} />
+          <Layer {...layers.polygonLabel} />
+          <Layer {...layers.line} />
+          <Layer {...layers.lineLabel} />
         </Source>
       </ReactMapGL>
     </>
   );
 };
 
-const CustomPopup = styled(Popup)<PopupProps>(({ theme }) => ({
+const CustomPopup = styled(Popup)<PopupProps>({
   '.mapboxgl-popup-content': {
     padding: 4,
     background: 'transparent',
@@ -372,4 +338,4 @@ const CustomPopup = styled(Popup)<PopupProps>(({ theme }) => ({
   '.mapboxgl-popup-close-button': {
     display: 'none',
   },
-}));
+});

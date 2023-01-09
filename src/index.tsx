@@ -29,6 +29,7 @@ import reportWebVitals from 'reportWebVitals';
 // Initialize languages
 import { ThemeProvider } from '@mui/material';
 import { theme } from 'styles/theme';
+import { ConfirmProvider } from 'material-ui-confirm';
 
 // the index.html file and this observer)
 const openSansObserver = new FontFaceObserver('Inter');
@@ -46,11 +47,13 @@ const root = ReactDOM.createRoot(
 root.render(
   <Provider store={store}>
     <ThemeProvider theme={theme}>
-      <HelmetProvider>
-        <React.StrictMode>
-          <App />
-        </React.StrictMode>
-      </HelmetProvider>
+      <ConfirmProvider>
+        <HelmetProvider>
+          <React.StrictMode>
+            <App />
+          </React.StrictMode>
+        </HelmetProvider>
+      </ConfirmProvider>
     </ThemeProvider>
   </Provider>,
 );

@@ -83,15 +83,3 @@ const NavigationIcon = (props: { to: string; children: ReactNode }) => {
     </IconButton>
   );
 };
-
-// const PanelItem = styled(NavigationIcon)({
-//   borderRadius: 1,
-//   justifyContent: 'flex-start',
-//   width: '100%',
-//   color: 'inherit',
-
-//   '& .': {
-//     '&:hover, &.Mui-focusVisible': {},
-//     '&.Mui-active': {},
-//   },
-// });

@@ -19,29 +19,24 @@ import { Stack } from '@mui/system';
 import { SlacklineDetailInfoField } from 'app/components/TextFields/SlacklineDetailInfoField';
 import { SlacklineDetailRestrictionField } from 'app/components/TextFields/SlacklineDetailRestrictionField';
 import { SlacklineDetailSpecsField } from 'app/components/TextFields/SlacklineDetailSpecsField';
+import {
+  usePopupState,
+  bindTrigger,
+  bindMenu,
+} from 'material-ui-popup-state/hooks';
 
 interface Props {
   lineId: string;
 }
 
 export const LineDetailCard = (props: Props) => {
-  const [cardHeaderMenuAnchorEl, setCardHeaderMenuAnchorEl] =
-    useState<null | HTMLElement>(null);
-  const openCardHeaderMenu = Boolean(cardHeaderMenuAnchorEl);
-
+  const cardHeaderPopupState = usePopupState({
+    variant: 'popover',
+    popupId: 'cardHeaderMenu',
+  });
   const { data: lineDetails, isFetching } = lineApi.useGetLineDetailsQuery(
     props.lineId,
   );
-
-  const onCardHeaderMenuClick = (
-    event: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    setCardHeaderMenuAnchorEl(event.currentTarget);
-  };
-
-  const onCardHeaderMenuClose = () => {
-    setCardHeaderMenuAnchorEl(null);
-  };
 
   return (
     <Card
@@ -61,16 +56,14 @@ export const LineDetailCard = (props: Props) => {
             avatar={<Avatar sx={{}}>{lineDetails.type || '?'}</Avatar>}
             action={
               <>
-                <IconButton onClick={onCardHeaderMenuClick}>
+                <IconButton {...bindTrigger(cardHeaderPopupState)}>
                   <MoreVertIcon />
                 </IconButton>
-                <Menu
-                  anchorEl={cardHeaderMenuAnchorEl}
-                  open={openCardHeaderMenu}
-                  onClose={onCardHeaderMenuClose}
-                >
-                  <MenuItem onClick={onCardHeaderMenuClose}>Edit</MenuItem>
-                  <MenuItem onClick={onCardHeaderMenuClose}>Delete</MenuItem>
+                <Menu {...bindMenu(cardHeaderPopupState)}>
+                  <MenuItem onClick={cardHeaderPopupState.close}>Edit</MenuItem>
+                  <MenuItem onClick={cardHeaderPopupState.close}>
+                    Delete
+                  </MenuItem>
                 </Menu>
               </>
             }

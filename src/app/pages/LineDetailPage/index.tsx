@@ -4,13 +4,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { lineApi } from 'app/api/line-api';
 import { LineDetailCard } from './LineDetailCard';
-import { FocusedMap } from 'app/components/Map/FocusedMap';
+import { FocusedMap } from 'app/components/Maps/FocusedMap';
 
 interface Props {}
 
 export function LineDetailPage(props: Props) {
   const { lineId } = useParams();
-  const { isDesktop } = useMediaQuery();
   const navigate = useNavigate();
 
   const { data: lineGeoJson, isFetching } = lineApi.useGetLineGeoJsonQuery(
@@ -25,15 +24,15 @@ export function LineDetailPage(props: Props) {
 
   return (
     <Stack
-      direction={isDesktop ? 'row' : 'column'}
+      direction={{ xs: 'column', lg: 'row' }}
       sx={{
         minHeight: '100%',
       }}
     >
       <Box
         sx={{
-          height: isDesktop ? '100vh' : '50vh',
-          width: isDesktop ? '67%' : '100%',
+          height: { xs: '50vh', lg: '100vh' },
+          width: { xs: '100%', lg: '67%' },
           position: 'relative',
         }}
       >
@@ -43,7 +42,7 @@ export function LineDetailPage(props: Props) {
       <Box
         sx={{
           flex: 1,
-          height: isDesktop ? '100vh' : 'auto',
+          height: { xs: 'auto', lg: '100vh' },
         }}
       >
         {lineId && <LineDetailCard lineId={lineId} />}

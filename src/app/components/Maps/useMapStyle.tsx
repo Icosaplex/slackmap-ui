@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react';
-
-const satellite = 'mapbox://styles/mapbox/satellite-v9';
-const light = 'mapbox://styles/mapbox/light-v10';
+import { mapStyles } from './constants';
 
 export const useMapStyle = (zoomLevel?: number) => {
-  const [mapStyle, setMapStyle] = useState(light);
+  const [mapStyle, setMapStyle] = useState(mapStyles.light);
 
   useEffect(() => {
     if (!zoomLevel) {
       return;
     }
     if (zoomLevel > 11) {
-      setMapStyle(satellite);
+      setMapStyle(mapStyles.satellite);
     } else {
-      setMapStyle(light);
+      setMapStyle(mapStyles.light);
     }
   }, [zoomLevel]);
 

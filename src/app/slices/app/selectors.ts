@@ -10,7 +10,7 @@ export const selectAuthState = createSelector(
   state => state.authState,
 );
 
-export const selectIsUserLoggedIn = createSelector(
+export const selectIsUserSignedIn = createSelector(
   [selectAuthState],
   state => state === AuthState.SignedIn,
 );

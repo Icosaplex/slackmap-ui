@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { appActions, useAppSlice } from 'app/slices/app';
 import {
   selectAuthState,
+  selectIsUserSignedIn,
   selectSnackbarNotification,
 } from 'app/slices/app/selectors';
 import { AuthState } from 'app/slices/app/types';
@@ -20,6 +21,7 @@ import { LoadingIndicator } from './components/LoadingIndicator';
 import { Homepage } from './pages/Homepage/Loadable';
 import { LineDetailPage } from './pages/LineDetailPage/Loadable';
 import { AppDrawer } from './components/AppDrawer';
+import { CreateLinePage } from './pages/Create/Line/Loadable';
 
 export function App() {
   useAppSlice();
@@ -27,6 +29,8 @@ export function App() {
   const dispatch = useDispatch();
 
   const authState = useSelector(selectAuthState);
+  const isSignedIn = useSelector(selectIsUserSignedIn);
+
   const snackbarNotification = useSelector(selectSnackbarNotification);
 
   useEffect(() => {
@@ -86,10 +90,6 @@ export function App() {
   const onSnackbarClose = () => {
     dispatch(appActions.updateSnackbarNotification(null));
   };
-  const isLoading =
-    authState === AuthState.Loading ||
-    authState === AuthState.SigningIn ||
-    authState === AuthState.SigningOut;
 
   return (
     <BrowserRouter>
@@ -105,6 +105,9 @@ export function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/line/:lineId" element={<LineDetailPage />} />
+          {isSignedIn && (
+            <Route path="/create/line" element={<CreateLinePage />} />
+          )}
           <Route path="*" element={<Homepage />} />
         </Routes>
       </AppDrawer>
