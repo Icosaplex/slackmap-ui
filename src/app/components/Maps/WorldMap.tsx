@@ -22,6 +22,13 @@ import {
   layers,
   cursorInteractableLayerIds,
   mouseHoverableLayersIds,
+  unclusteredPointLayer,
+  lineLayer,
+  lineLabelLayer,
+  polygonLayer,
+  clusterLayer,
+  polygonLabelLayer,
+  polygonOutlineLayer,
 } from './layers';
 import { useMapStyle } from './useMapStyle';
 import { MapImage } from './Components/MapImage';
@@ -35,12 +42,12 @@ import {
 } from './mapUtils';
 import { FeatureCollection } from '@turf/turf';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
-import { styled } from '@mui/material/styles';
-import { defaultMapViewState, geoJsonURL, MAPBOX_TOKEN } from './constants';
+import { defaultMapViewState, MAPBOX_TOKEN } from './constants';
 import { MapLogo } from './Components/Logo';
 import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
 import { CustomPopup } from './Components/CustomPopup';
-import { appColors } from 'styles/theme/colors';
+import { LegendOptions, MapLegend } from './Components/MapLegend';
+import { MapSources } from './sources';
 
 interface Props {
   onPopupDetailsClick?: (id: string, type: MapSlacklineFeatureType) => void;
@@ -60,13 +67,24 @@ export const WorldMap = (props: Props) => {
   const [hoveredFeature, setHoveredFeature] = useState<MapboxGeoJSONFeature>();
   const [selectedFeature, setSelectedFeature] =
     useState<MapboxGeoJSONFeature>();
+  const [legendOptions, setLegendOptions] = useState<LegendOptions>({
+    lines: true,
+    spots: true,
+  });
+
+  const [interactiveLayerIds, setInteractiveLayerIds] = useState<string[]>([
+    lineLayer.id!,
+    lineLabelLayer.id!,
+    unclusteredPointLayer.id!,
+    clusterLayer.id!,
+  ]);
   const [popup, setPopup] = useState<{
     feature: MapboxGeoJSONFeature;
     type: MapSlacklineFeatureType;
     id: string;
     position: Position;
   }>();
-  const [isPointsLoaded, setIsPointsLoaded] = useState(false);
+  const [loadedSourceId, setLoadedSourceId] = useState<string>();
   const { isDesktop } = useMediaQuery();
 
   const flyTo = (
@@ -113,9 +131,9 @@ export const WorldMap = (props: Props) => {
   }, [isMapLoaded, props.zoomToUserLocation, props.initialViewState]);
 
   useEffect(() => {
-    if (!isPointsLoaded) return;
-    cachePointsGeoJson();
-  }, [isPointsLoaded]);
+    if (!loadedSourceId) return;
+    cachePointsGeoJson(loadedSourceId);
+  }, [loadedSourceId]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -166,6 +184,15 @@ export const WorldMap = (props: Props) => {
     setIsMapLoaded(true);
   }, []);
 
+  const onSourceData = (event: MapSourceDataEvent) => {
+    if (
+      (event.sourceId === 'linePoints' || event.sourceId === 'spotPoints') &&
+      event.isSourceLoaded
+    ) {
+      setLoadedSourceId(event.sourceId);
+    }
+  };
+
   const onMouseMove = (event: MapLayerMouseEvent) => {
     if (!isMapLoaded) return;
 
@@ -175,7 +202,6 @@ export const WorldMap = (props: Props) => {
       setCursor('auto');
       return;
     }
-
     if (cursorInteractableLayerIds.includes(feature.layer.id)) {
       setCursor('pointer');
     }
@@ -185,12 +211,6 @@ export const WorldMap = (props: Props) => {
       !selectedFeature
     ) {
       setHoveredFeature(feature);
-    }
-  };
-
-  const onSourceData = (event: MapSourceDataEvent) => {
-    if (event.sourceId === 'points' && event.isSourceLoaded) {
-      setIsPointsLoaded(true);
     }
   };
 
@@ -216,7 +236,7 @@ export const WorldMap = (props: Props) => {
       });
       return;
     }
-    if (feature.layer.id === layers.unclusteredPoint.id) {
+    if (feature.layer.id === unclusteredPointLayer.id) {
       const pointFeature = pointsGeoJsonDict[feature.properties?.id];
       if (pointFeature) {
         const { marginedBounds } = calculateBounds(
@@ -234,21 +254,44 @@ export const WorldMap = (props: Props) => {
     }
   };
 
+  const onLegendOptionsUpdate = (options: LegendOptions) => {
+    setLegendOptions(options);
+    if (!isMapLoaded) return;
+    const interactiveLayerIds: string[] = [];
+    setInteractiveLayerIds([]);
+
+    if (options.lines || options.spots) {
+      interactiveLayerIds.push(clusterLayer.id!);
+      interactiveLayerIds.push(unclusteredPointLayer.id!);
+    }
+    if (options.lines) {
+      interactiveLayerIds.push(lineLayer.id!);
+      interactiveLayerIds.push(lineLabelLayer.id!);
+      interactiveLayerIds.push(lineLayer.id!);
+    }
+    if (options.spots) {
+      interactiveLayerIds.push(polygonLayer.id!);
+      interactiveLayerIds.push(polygonLabelLayer.id!);
+    }
+
+    setTimeout(() => {
+      setInteractiveLayerIds(interactiveLayerIds);
+    }, 500);
+  };
+
   return (
     <>
       {!isMapLoaded && <MapLoadingPlaceholder />}
       <MapLogo />
+      <MapLegend
+        options={legendOptions}
+        onOptionsChange={onLegendOptionsUpdate}
+      />
       <ReactMapGL
         initialViewState={props.initialViewState || defaultMapViewState}
         mapStyle={mapStyle}
         mapboxAccessToken={MAPBOX_TOKEN}
-        interactiveLayerIds={[
-          layers.polygon.id!,
-          layers.lineLabel.id!,
-          layers.line.id!,
-          layers.unclusteredPoint.id!,
-          layers.cluster.id!,
-        ]}
+        interactiveLayerIds={interactiveLayerIds}
         attributionControl={false}
         onLoad={onMapLoad}
         onSourceData={onSourceData}
@@ -263,8 +306,14 @@ export const WorldMap = (props: Props) => {
         maxPitch={0}
         // reuseMaps
         ref={mapRef}
-        // projection={projection}
-        // fog={fog}
+        projection={projection}
+        fog={
+          {
+            'horizon-blend': 0.1,
+            color: 'grey',
+            'high-color': 'black',
+          } as any
+        }
       >
         <GeolocateControl />
         <AttributionControl
@@ -289,33 +338,7 @@ export const WorldMap = (props: Props) => {
             />
           </CustomPopup>
         )}
-
-        <Source
-          id="points"
-          type="geojson"
-          data={geoJsonURL.points}
-          cluster={true}
-          clusterMaxZoom={13}
-          clusterMinPoints={3}
-          clusterRadius={50}
-          generateId={true}
-        >
-          <Layer {...layers.cluster} />
-          <Layer {...layers.clusterCount} />
-          <Layer {...layers.unclusteredPoint} />
-        </Source>
-        <Source
-          id="main"
-          type="geojson"
-          data={geoJsonURL.main}
-          generateId={true}
-        >
-          <Layer {...layers.polygon} />
-          <Layer {...layers.polygonOutline} />
-          <Layer {...layers.polygonLabel} />
-          <Layer {...layers.line} />
-          <Layer {...layers.lineLabel} />
-        </Source>
+        <MapSources options={legendOptions} />
       </ReactMapGL>
     </>
   );

@@ -5,7 +5,7 @@ import { mapStyles } from './constants';
 
 export const useMapStyle = (zoomLevel?: number) => {
   const [mapStyle, setMapStyle] = useState(mapStyles.light);
-  const [projection, setProjection] = useState<Projection['name']>();
+  const [projection, setProjection] = useState<Projection['name']>('globe');
 
   useEffect(() => {
     if (!zoomLevel) {

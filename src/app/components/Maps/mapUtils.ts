@@ -19,16 +19,23 @@ mapboxgl.workerClass =
   // eslint-disable-next-line import/no-webpack-loader-syntax
   require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
-export let pointsGeoJsonDict: { [key: string]: Feature<Point> } = {};
+const cachedSourceIds: Record<string, boolean> = {};
+export const pointsGeoJsonDict: { [key: string]: Feature<Point> } = {};
 // This http get will directly get from browser cache. Its only called after Mapbox Loaded the source.
 // Clustered points have buggy coordinates, so we need to get the original coordinates from the geojson.
-export const cachePointsGeoJson = async () => {
-  const response = await fetch(geoJsonURL.points).then(r => r.json());
+export const cachePointsGeoJson = async (sourceId: string) => {
+  if (cachedSourceIds[sourceId]) {
+    return;
+  }
+  const url =
+    sourceId === 'linePoints' ? geoJsonURL.linePoints : geoJsonURL.spotPoints;
+  const response = await fetch(url).then(r => r.json());
   if (response) {
     featureEach<Point>(response, pointFeature => {
       pointsGeoJsonDict[pointFeature.properties?.id] = pointFeature;
     });
   }
+  cachedSourceIds[sourceId] = true;
 };
 
 export const mapUrlSearchParams = {

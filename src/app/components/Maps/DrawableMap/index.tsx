@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Map as ReactMapGL, Source, Layer, ViewState } from 'react-map-gl';
 import type { MapRef } from 'react-map-gl';
 import { MapImage } from '../Components/MapImage';
-import { layers } from '../layers';
 import {
   defaultMapViewState,
   geoJsonURL,
@@ -14,6 +13,7 @@ import { MapLoadingPlaceholder } from '../Components/MapLoadingPlaceholder';
 import { DrawControl, MapboxDrawEvent } from './DrawControl';
 import { MapboxDrawControls } from '@mapbox/mapbox-gl-draw';
 import { Feature, FeatureCollection } from 'geojson';
+import { MapSources } from '../sources';
 
 const featuresDict = (features: Feature[]) => {
   const dict: Record<string, Feature> = {};
@@ -139,7 +139,7 @@ export const DrawableMap = (props: Props) => {
         mapboxAccessToken={MAPBOX_TOKEN}
         attributionControl={false}
         onLoad={onMapLoad}
-        reuseMaps
+        // reuseMaps
         ref={mapRef}
         cursor={cursor}
         pitchWithRotate={false}
@@ -147,17 +147,7 @@ export const DrawableMap = (props: Props) => {
         // projection="globe"
       >
         <MapImage name={'marker'} url={'/images/line-marker.png'} />
-        {/* {props.popup && (
-          <CustomPopup
-            longitude={props.popup.position[0]}
-            latitude={props.popup.position[1]}
-            anchor="bottom-left"
-            onClose={() => props.popup?.onClose()}
-            maxWidth="none"
-          >
-            {props.popup.component}
-          </CustomPopup>
-        )} */}
+
         <DrawControl
           ref={drawRef}
           // key={JSON.stringify(props.drawControls)}
@@ -170,7 +160,7 @@ export const DrawableMap = (props: Props) => {
           onSelectionChange={onSelectionChange}
           styles={props.drawControlStyles}
         />
-        {props.staticFeatures && (
+        {/* {props.staticFeatures && (
           <Source
             id="static"
             type="geojson"
@@ -183,18 +173,12 @@ export const DrawableMap = (props: Props) => {
             <Layer {...layers.point} />
             <Layer {...layers.polygon} />
             <Layer {...layers.polygonLabel} />
+            <Layer {...polygonLayer} />
+            <Layer {...lineLayer} />
+            <Layer {...lineLabelLayer} />
           </Source>
-        )}
-        <Source
-          id="world"
-          type="geojson"
-          data={geoJsonURL.main}
-          generateId={true}
-        >
-          <Layer {...layers.polygonDisabled} />
-          <Layer {...layers.lineDisabled} />
-          <Layer {...layers.lineLabelDisabled} />
-        </Source>
+        )} */}
+        <MapSources options={{ lines: true, guides: true, spots: true }} />
       </ReactMapGL>
     </>
   );
