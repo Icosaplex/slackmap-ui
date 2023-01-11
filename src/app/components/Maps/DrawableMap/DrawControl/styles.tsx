@@ -1,12 +1,18 @@
 import { appColors } from 'styles/theme/colors';
 
-export const drawControlStyles = (isDrawingExtras?: boolean) => {
-  const lineStrokeColor = isDrawingExtras
-    ? appColors.extraFeaturesColor
-    : appColors.lineStrokeColor;
-  const spotFillColor = isDrawingExtras
-    ? appColors.extraFeaturesColor
-    : appColors.spotFillColor;
+export const drawControlStyles = (
+  drawingFeatureType: 'line' | 'guide' | 'spot',
+) => {
+  const lineStrokeColor =
+    drawingFeatureType === 'guide'
+      ? appColors.guideFeaturesColor
+      : appColors.lineStrokeColor;
+  const spotFillColor =
+    drawingFeatureType === 'guide'
+      ? appColors.guideFeaturesColor
+      : appColors.spotFillColor;
+
+  const lineDash = drawingFeatureType === 'guide' ? [0.2, 2] : [1];
 
   const styles = [
     {
@@ -52,7 +58,7 @@ export const drawControlStyles = (isDrawingExtras?: boolean) => {
       },
       paint: {
         'line-color': lineStrokeColor,
-        'line-dasharray': isDrawingExtras ? [0.2, 2] : [1],
+        'line-dasharray': lineDash,
         'line-width': 2,
         'line-opacity': 1,
       },

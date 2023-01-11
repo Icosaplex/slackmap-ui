@@ -3,36 +3,27 @@ import { Box, Stack } from '@mui/system';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DrawableMap } from 'app/components/Maps/DrawableMap';
 import { mapUrlSearchParams } from 'app/components/Maps/mapUtils';
-import { LineEditCard } from './LineEditCard';
+import { DrawingMode, GuideEditCard } from './GuideEditCard';
 import { MapboxDrawControls } from '@mapbox/mapbox-gl-draw';
-import { Feature, FeatureCollection, Position } from 'geojson';
-import { validateLineFeatures } from './validations';
+import { Feature } from 'geojson';
+import { validateGuideFeatures } from './validations';
 import { showErrorNotification } from 'utils';
 import { useDispatch } from 'react-redux';
 import { drawControlStyles } from 'app/components/Maps/DrawableMap/DrawControl/styles';
 import { ExtrasPopup } from 'app/components/Maps/DrawableMap/ExtrasPopup';
-import { LineDetailsForm } from './types';
-import { lineApi } from 'app/api/line-api';
 
 interface Props {}
 
-export function CreateLinePage(props: Props) {
+export function CreateGuidePage(props: Props) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
   const [features, setFeatures] = useState<Feature[]>([]);
+
   const [mapErrors, setMapErrors] = useState<string[]>([]);
 
-  const [updateLine, { isLoading: isSaving, isSuccess: isSavedChanges }] =
-    lineApi.useUpdateLineMutation();
-
   useEffect(() => {
-    if (isSavedChanges) {
-      navigate({ pathname: '/', search: searchParams.toString() });
-    }
-  }, [isSavedChanges]);
-
-  useEffect(() => {
-    const errors = validateLineFeatures(features);
+    const errors = validateGuideFeatures(features);
     if (errors.length > 0) {
       setMapErrors(errors);
       return;
@@ -43,16 +34,9 @@ export function CreateLinePage(props: Props) {
 
   const onDrawingFeaturesChanged = (features: Feature[]) => {
     setFeatures(features);
+    console.log('features', features);
   };
 
-  const onDetailsSubmit = (values: LineDetailsForm) => {
-    const geoJson: FeatureCollection = {
-      type: 'FeatureCollection',
-      features,
-    };
-    updateLine({ ...values, geoJson });
-    console.log('save');
-  };
   return (
     <Stack
       direction={{ xs: 'column', lg: 'row' }}
@@ -70,13 +54,13 @@ export function CreateLinePage(props: Props) {
         <DrawableMap
           initialViewState={mapUrlSearchParams.parse(searchParams)}
           drawControls={{
-            polygon: false,
+            polygon: true,
             line_string: true,
+            point: true,
             trash: true,
           }}
           onDrawingFeaturesChanged={onDrawingFeaturesChanged}
-          drawControlStyles={drawControlStyles('line')}
-          // onSelectionChanged={onSelectionChanged}
+          drawControlStyles={drawControlStyles('guide')}
         />
       </Box>
 
@@ -86,12 +70,7 @@ export function CreateLinePage(props: Props) {
           height: { xs: 'auto', lg: '100vh' },
         }}
       >
-        <LineEditCard
-          mapErrors={mapErrors}
-          onSubmit={onDetailsSubmit}
-          disableSubmit={features.length === 0 || mapErrors.length > 0}
-          isSubmitting={isSaving}
-        />
+        <GuideEditCard mode="create" mapErrors={mapErrors} />
       </Box>
     </Stack>
   );

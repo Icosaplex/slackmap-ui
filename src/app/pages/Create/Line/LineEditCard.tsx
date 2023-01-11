@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { HTMLInputTypeAttribute, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
@@ -17,49 +17,73 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
+  FormControlLabel,
   Menu,
   MenuItem,
+  OutlinedTextFieldProps,
   Paper,
+  Stack,
+  StandardTextFieldProps,
+  styled,
   Tab,
   Tabs,
+  TextField,
+  TextFieldProps,
+  Theme,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { Stack } from '@mui/system';
-import { SlacklineDetailInfoField } from 'app/components/TextFields/SlacklineDetailInfoField';
-import { SlacklineDetailRestrictionField } from 'app/components/TextFields/SlacklineDetailRestrictionField';
-import { SlacklineDetailSpecsField } from 'app/components/TextFields/SlacklineDetailSpecsField';
-import { bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
-import PublicIcon from '@mui/icons-material/Public';
-import DescriptionIcon from '@mui/icons-material/Description';
+
 import AddIcon from '@mui/icons-material/Add';
-import TuneIcon from '@mui/icons-material/Tune';
+import { useFormik } from 'formik';
+import { z } from 'zod';
+import { toFormikValidationSchema } from 'zod-formik-adapter';
+import { LineDetailsForm } from './types';
+import LoadingButton from '@mui/lab/LoadingButton';
 
-export type DrawingMode = 'line' | 'extras';
-
+const lineTypes: { value: SlacklineType; label: string }[] = [
+  {
+    value: 'highline',
+    label: 'Highline',
+  },
+  {
+    value: 'waterline',
+    label: 'Waterline',
+  },
+  {
+    value: 'other',
+    label: 'Other',
+  },
+];
 interface Props {
-  lineId?: string;
-  mode: 'edit' | 'create';
-  onDrawingModeChange: (mode: DrawingMode) => void;
-  drawingMode: DrawingMode;
+  initialValues?: LineDetailsForm;
+  isInitialValuesLoading?: boolean;
   mapErrors?: string[];
+  onSubmit: (values: LineDetailsForm) => void;
+  disableSubmit?: boolean;
+  isSubmitting?: boolean;
 }
 
 export const LineEditCard = (props: Props) => {
-  const { data: lineDetails, isFetching } = lineApi.useGetLineDetailsQuery(
-    props?.lineId || '',
-    { skip: !props?.lineId },
-  );
+  const isCreateMode = !props.initialValues && !props.isInitialValuesLoading;
 
-  const isCreateMode = props.mode === 'create';
+  // const validationSchema = z.object({
+  //   // name: z.string().min(2),
+  // });
 
-  const onDrawingModeChange = (_: any, mode: DrawingMode) => {
-    if (mode !== null) {
-      props.onDrawingModeChange(mode);
-    }
-  };
+  const formik = useFormik<LineDetailsForm>({
+    initialValues: props.initialValues ?? {
+      isMeasured: false,
+      type: '',
+    },
+    // validationSchema: toFormikValidationSchema(validationSchema),
+    onSubmit: values => {
+      props.onSubmit(values);
+    },
+  });
 
   return (
     <Card
@@ -71,7 +95,7 @@ export const LineEditCard = (props: Props) => {
         overflow: 'scroll',
       }}
     >
-      {isFetching || (!isCreateMode && !lineDetails) ? (
+      {props.isInitialValuesLoading ? (
         <LoadingIndicator />
       ) : (
         <>
@@ -83,97 +107,144 @@ export const LineEditCard = (props: Props) => {
             }
             title={
               <Typography variant="h5">
-                {isCreateMode
-                  ? 'Create New Line'
-                  : lineDetails?.name || 'Unknown Name?'}
+                {isCreateMode ? 'Create New Line' : 'Edit Line'}
               </Typography>
-            }
-            subheader={
-              !isCreateMode &&
-              `Last updated: ${format(
-                new Date(
-                  lineDetails?.lastModifiedDateTime ??
-                    lineDetails!.createdDateTime,
-                ),
-                'dd MMM yyy',
-              )}`
             }
           />
           <CardContent component={Stack} spacing={1} sx={{}}>
             <Stack spacing={1}>
-              <Typography
-                variant="h6"
-                component={'div'}
-                sx={{ color: t => t.palette.primary.main }}
-              >
-                <TuneIcon sx={{ mr: 1 }} />
-                Map Controls
-              </Typography>
-              <Paper
-                variant="outlined"
-                sx={{ p: 1, display: 'flex', justifyContent: 'space-between' }}
-              >
-                <Box sx={{ width: '50%' }}>
-                  <Typography variant="subtitle2">Drawing Mode</Typography>
-                  <Typography
-                    variant="caption"
-                    gutterBottom
-                    sx={{
-                      display: 'block',
-                      fontSize: '0.5rem',
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    Extras Mode can draw additional features that will be
-                    displayed along with the line, like parking lot, hiking
-                    path, connection points...
-                  </Typography>
-                </Box>
-                <ToggleButtonGroup
-                  value={props.drawingMode}
-                  exclusive
-                  onChange={onDrawingModeChange}
-                  size="small"
-                  color="primary"
-                >
-                  <ToggleButton value="line">Line</ToggleButton>
-                  <ToggleButton value="extras">Extras</ToggleButton>
-                </ToggleButtonGroup>
-              </Paper>
               {props.mapErrors?.map(e => (
                 <Alert key={e} severity="error">
                   {e}
                 </Alert>
               ))}
             </Stack>
-            <Stack spacing={1}>
-              <Typography
-                variant="h6"
-                component={'div'}
-                sx={{ color: t => t.palette.primary.main }}
-              >
-                <DescriptionIcon sx={{ mr: 1 }} />
-                Line Details
-              </Typography>
-            </Stack>
-            <CardActions>
-              <Button
-                variant="contained"
-                // startIcon={<AccountCircleIcon />}
-                // onClick={}
-              >
-                Submit
-              </Button>
-              <IconButton>
-                <MapIcon color="primary" />
-              </IconButton>
-              <IconButton>
-                <ShareIcon color="primary" />
-              </IconButton>
-            </CardActions>
+            <form onSubmit={formik.handleSubmit}>
+              <Stack spacing={1}>
+                <Typography
+                  variant="h5"
+                  sx={{ color: t => t.palette.primary.main, mb: 1 }}
+                >
+                  Specs
+                </Typography>
+
+                <CustomTextField
+                  formik={formik}
+                  select
+                  field="type"
+                  label="Type"
+                  required
+                >
+                  <MenuItem value={''}></MenuItem>
+                  {lineTypes.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </CustomTextField>
+
+                <CustomTextField
+                  formik={formik}
+                  field="length"
+                  label="Length (meters)"
+                  type="number"
+                  required
+                />
+
+                <CustomTextField
+                  formik={formik}
+                  field="height"
+                  label="Height (meters)"
+                  type="number"
+                />
+
+                <FormControlLabel
+                  control={<Checkbox />}
+                  label="Is Measured?"
+                  checked={formik.values.isMeasured}
+                  name="isMeasured"
+                  onChange={formik.handleChange}
+                />
+
+                <Typography
+                  variant="h5"
+                  sx={{ color: t => t.palette.primary.main, mb: 1 }}
+                >
+                  Details
+                </Typography>
+
+                <CustomTextField
+                  formik={formik}
+                  field={'name'}
+                  label={'Name'}
+                />
+                <CustomTextField
+                  formik={formik}
+                  field={'description'}
+                  label={'Description'}
+                  multiline
+                />
+                <CustomTextField
+                  formik={formik}
+                  field={'anchorsInfo'}
+                  label={'Anchor Information'}
+                  multiline
+                />
+                <CustomTextField
+                  formik={formik}
+                  field={'accessInfo'}
+                  label={'Access Information'}
+                  multiline
+                />
+                <CustomTextField
+                  formik={formik}
+                  field={'contactInfo'}
+                  label={'Contact Information'}
+                  multiline
+                />
+                <CustomTextField
+                  formik={formik}
+                  field={'extraInfo'}
+                  label={'Extra Information'}
+                  multiline
+                />
+
+                <LoadingButton
+                  color="primary"
+                  variant="contained"
+                  fullWidth
+                  type="submit"
+                  disabled={props.disableSubmit}
+                  loading={props.isSubmitting}
+                >
+                  Submit
+                </LoadingButton>
+              </Stack>
+            </form>
           </CardContent>
         </>
       )}
     </Card>
+  );
+};
+
+interface CustomTextFieldProps extends StandardTextFieldProps {
+  formik: any;
+  field: keyof LineDetailsForm;
+}
+
+const CustomTextField = (props: CustomTextFieldProps) => {
+  const { formik, field, ...rest } = props;
+
+  return (
+    <TextField
+      fullWidth
+      name={field}
+      value={formik.values[field]}
+      onChange={formik.handleChange}
+      error={formik.touched[field] && Boolean(formik.errors[field])}
+      helperText={formik.touched[field] && formik.errors[field]}
+      {...rest}
+    />
   );
 };

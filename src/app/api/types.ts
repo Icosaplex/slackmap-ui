@@ -1,3 +1,5 @@
+import { FeatureCollection } from 'geojson';
+
 export interface GetLineDetailsAPIResponse {
   id: string;
   type?: SlacklineType;
@@ -17,7 +19,25 @@ export interface GetLineDetailsAPIResponse {
   createdDateTime: string;
   lastModifiedDateTime?: string;
   restrictionInfo?: string;
-  isMeasurementAccurate?: boolean;
+  isMeasured?: boolean;
+}
+
+export interface UpdateLineDetailsPayload {
+  geoJson: FeatureCollection;
+  id?: string;
+  type?: SlacklineType | '';
+  name?: string;
+  description?: string;
+  length?: number;
+  height?: number;
+  accessInfo?: string;
+  anchorsInfo?: string;
+  gearInfo?: string;
+  contactInfo?: string;
+  restrictionLevel?: SlacklineRestrictionLevel;
+  extraInfo?: string;
+  restrictionInfo?: string;
+  isMeasured?: boolean;
 }
 
 export interface GetSpotDetailsAPIResponse {

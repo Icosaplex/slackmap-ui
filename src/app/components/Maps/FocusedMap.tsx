@@ -143,7 +143,6 @@ export const FocusedMap = (props: Props) => {
         cursor={cursor}
         pitchWithRotate={false}
         maxPitch={0}
-        projection="globe"
       >
         <ScaleControl />
         <MapImage name={'marker'} url={'/images/line-marker.png'} />

@@ -13,9 +13,7 @@ import {
 import { MapLoadingPlaceholder } from '../Components/MapLoadingPlaceholder';
 import { DrawControl, MapboxDrawEvent } from './DrawControl';
 import { MapboxDrawControls } from '@mapbox/mapbox-gl-draw';
-import { centerOfMass, Feature, FeatureCollection, Position } from '@turf/turf';
-import { CustomPopup } from '../Components/CustomPopup';
-import { ExtrasPopup } from './ExtrasPopup';
+import { Feature, FeatureCollection } from 'geojson';
 
 const featuresDict = (features: Feature[]) => {
   const dict: Record<string, Feature> = {};
@@ -49,14 +47,9 @@ interface Props {
   drawControls: MapboxDrawControls;
   onDrawingFeaturesChanged: (features: Feature[]) => void;
   onSelectionChanged?: (feature?: Feature) => void;
-  drawingFeatures: Feature[];
-  staticFeatures: Feature[];
+  drawingFeatures?: Feature[];
+  staticFeatures?: Feature[];
   drawControlStyles: object[];
-  popup?: {
-    component: React.ReactNode;
-    position: Position;
-    onClose: () => void;
-  };
 }
 
 export const DrawableMap = (props: Props) => {
@@ -65,7 +58,7 @@ export const DrawableMap = (props: Props) => {
 
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [cursor, setCursor] = useState('auto');
-  const [, setDrawingFeatures] = useState<Feature[]>([]);
+  const [features, setFeatures] = useState<Feature[]>([]);
   const [, setSelectedFeature] = useState<Feature>();
 
   const onMapLoad = () => {
@@ -74,67 +67,68 @@ export const DrawableMap = (props: Props) => {
   };
 
   useEffect(() => {
-    if (props.drawingFeatures?.length > 0) {
-      setDrawingFeatures(props.drawingFeatures);
-
-      setTimeout(() => {
-        drawRef.current?.set({
-          type: 'FeatureCollection',
-          features: props.drawingFeatures as any,
-        });
-      }, 100);
+    if (!props.drawingFeatures) {
+      return;
+    }
+    if (props.drawingFeatures?.length > 0 && drawRef.current) {
+      const dict = featuresDict(props.drawingFeatures);
+      const currentFeatures = drawRef.current?.getAll();
+      for (const feature of currentFeatures?.features || []) {
+        if (feature.id) {
+          dict[feature.id] = feature;
+        }
+      }
+      drawRef.current?.set({
+        type: 'FeatureCollection',
+        features: featuresArray(dict),
+      });
     } else {
-      setDrawingFeatures([]);
       drawRef.current?.deleteAll();
     }
-  }, [props.drawControls]);
+  }, [props.drawingFeatures]);
 
-  const onSelectionChange = useCallback(
-    (e: MapboxDrawEvent) => {
-      if (e.features.length === 1) {
-        props.onSelectionChanged?.(e.features[0]);
-        return e.features[0];
-      } else {
-        props.onSelectionChanged?.(undefined);
-        return undefined;
-      }
-    },
-    [props.drawControls],
-  );
+  const onSelectionChange = useCallback((e: MapboxDrawEvent) => {
+    if (e.features.length === 1) {
+      // props.onSelectionChanged?.(e.features[0]);
+      // return e.features[0];
+    } else {
+      props.onSelectionChanged?.(undefined);
+      return undefined;
+    }
+  }, []);
 
-  const onUpdate = useCallback(
-    (e: MapboxDrawEvent) => {
-      setDrawingFeatures(currentFeatures => {
-        const newFeaturesDict = featuresDict(currentFeatures);
-        for (const f of e.features) {
-          if (f.id) {
-            newFeaturesDict[f.id] = f;
-          }
-        }
-        const newFeatures = featuresArray(newFeaturesDict);
-        props.onDrawingFeaturesChanged(newFeatures);
-        return newFeatures;
-      });
-    },
-    [props.drawControls],
-  );
+  const onUpdate = useCallback((e: MapboxDrawEvent) => {
+    const currentFeatures = drawRef.current?.getAll();
+    props.onDrawingFeaturesChanged(currentFeatures?.features || []);
 
-  const onDelete = useCallback(
-    (e: MapboxDrawEvent) => {
-      setDrawingFeatures(currentFeatures => {
-        const newFeaturesDict = featuresDict(currentFeatures);
-        for (const f of e.features) {
-          if (f.id) {
-            delete newFeaturesDict[f.id];
-          }
-        }
-        const newFeatures = featuresArray(newFeaturesDict);
-        props.onDrawingFeaturesChanged(newFeatures);
-        return newFeatures;
-      });
-    },
-    [props.drawControls],
-  );
+    // setDrawingFeatures(currentFeatures => {
+    //   const newFeaturesDict = featuresDict(currentFeatures);
+    //   for (const f of e.features) {
+    //     if (f.id) {
+    //       newFeaturesDict[f.id] = f;
+    //     }
+    //   }
+    //   const newFeatures = featuresArray(newFeaturesDict);
+    //   return newFeatures;
+    // });
+  }, []);
+
+  const onDelete = useCallback((e: MapboxDrawEvent) => {
+    const currentFeatures = drawRef.current?.getAll();
+    props.onDrawingFeaturesChanged(currentFeatures?.features || []);
+
+    // setDrawingFeatures(currentFeatures => {
+    //   const newFeaturesDict = featuresDict(currentFeatures);
+    //   for (const f of e.features) {
+    //     if (f.id) {
+    //       delete newFeaturesDict[f.id];
+    //     }
+    //   }
+    //   const newFeatures = featuresArray(newFeaturesDict);
+    //   props.onDrawingFeaturesChanged(newFeatures);
+    //   return newFeatures;
+    // });
+  }, []);
 
   return (
     <>
@@ -153,7 +147,7 @@ export const DrawableMap = (props: Props) => {
         // projection="globe"
       >
         <MapImage name={'marker'} url={'/images/line-marker.png'} />
-        {props.popup && (
+        {/* {props.popup && (
           <CustomPopup
             longitude={props.popup.position[0]}
             latitude={props.popup.position[1]}
@@ -163,10 +157,10 @@ export const DrawableMap = (props: Props) => {
           >
             {props.popup.component}
           </CustomPopup>
-        )}
+        )} */}
         <DrawControl
           ref={drawRef}
-          key={JSON.stringify(props.drawControls)}
+          // key={JSON.stringify(props.drawControls)}
           displayControlsDefault={false}
           controls={props.drawControls}
           defaultMode="simple_select"
@@ -176,19 +170,21 @@ export const DrawableMap = (props: Props) => {
           onSelectionChange={onSelectionChange}
           styles={props.drawControlStyles}
         />
-        <Source
-          id="static"
-          type="geojson"
-          data={featureCollection(props.staticFeatures) as any}
-          generateId
-        >
-          <Layer {...layers.pointLabel} />
-          <Layer {...layers.line} />
-          <Layer {...layers.lineLabel} />
-          <Layer {...layers.point} />
-          <Layer {...layers.polygon} />
-          <Layer {...layers.polygonLabel} />
-        </Source>
+        {props.staticFeatures && (
+          <Source
+            id="static"
+            type="geojson"
+            data={featureCollection(props.staticFeatures) as any}
+            generateId
+          >
+            <Layer {...layers.pointLabel} />
+            <Layer {...layers.line} />
+            <Layer {...layers.lineLabel} />
+            <Layer {...layers.point} />
+            <Layer {...layers.polygon} />
+            <Layer {...layers.polygonLabel} />
+          </Source>
+        )}
         <Source
           id="world"
           type="geojson"

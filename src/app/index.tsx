@@ -22,6 +22,7 @@ import { Homepage } from './pages/Homepage/Loadable';
 import { LineDetailPage } from './pages/LineDetailPage/Loadable';
 import { AppDrawer } from './components/AppDrawer';
 import { CreateLinePage } from './pages/Create/Line/Loadable';
+import { CreateGuidePage } from './pages/Create/Guide/Loadable';
 
 export function App() {
   useAppSlice();
@@ -106,7 +107,10 @@ export function App() {
           <Route path="/" element={<Homepage />} />
           <Route path="/line/:lineId" element={<LineDetailPage />} />
           {isSignedIn && (
-            <Route path="/create/line" element={<CreateLinePage />} />
+            <>
+              <Route path="/create/line" element={<CreateLinePage />} />
+              <Route path="/create/guide" element={<CreateGuidePage />} />
+            </>
           )}
           <Route path="*" element={<Homepage />} />
         </Routes>

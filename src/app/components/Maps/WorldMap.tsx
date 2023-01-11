@@ -40,6 +40,7 @@ import { defaultMapViewState, geoJsonURL, MAPBOX_TOKEN } from './constants';
 import { MapLogo } from './Components/Logo';
 import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
 import { CustomPopup } from './Components/CustomPopup';
+import { appColors } from 'styles/theme/colors';
 
 interface Props {
   onPopupDetailsClick?: (id: string, type: MapSlacklineFeatureType) => void;
@@ -54,7 +55,7 @@ export const WorldMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
   const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
   const [zoomLevel, setZoomLevel] = useState(props.initialViewState?.zoom);
-  const mapStyle = useMapStyle(zoomLevel);
+  const { mapStyle, projection } = useMapStyle(zoomLevel);
   const [cursor, setCursor] = useState('auto');
   const [hoveredFeature, setHoveredFeature] = useState<MapboxGeoJSONFeature>();
   const [selectedFeature, setSelectedFeature] =
@@ -89,17 +90,6 @@ export const WorldMap = (props: Props) => {
     map?.flyTo(params);
   };
 
-  const padMap = (padding?: Partial<PaddingOptions>) => {
-    const map = mapRef.current;
-    if (padding) {
-      map?.easeTo({
-        padding: { top: 0, left: 0, bottom: 0, right: 0, ...padding },
-      });
-    } else {
-      map?.easeTo({ padding: { top: 0, left: 0, bottom: 0, right: 0 } });
-    }
-  };
-
   useEffect(() => {
     if (!isMapLoaded || !props.zoomToUserLocation || props.initialViewState)
       return;
@@ -110,7 +100,7 @@ export const WorldMap = (props: Props) => {
           r.json().then(data => ({
             longitude: data.longitude as number,
             latitude: data.latitude as number,
-            zoom: 6,
+            zoom: 2.5,
           })),
         )
         .catch(err => undefined);
@@ -271,9 +261,10 @@ export const WorldMap = (props: Props) => {
         }}
         pitchWithRotate={false}
         maxPitch={0}
-        reuseMaps
+        // reuseMaps
         ref={mapRef}
-        // projection="globe"
+        // projection={projection}
+        // fog={fog}
       >
         <GeolocateControl />
         <AttributionControl
@@ -329,4 +320,3 @@ export const WorldMap = (props: Props) => {
     </>
   );
 };
-

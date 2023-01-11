@@ -14,7 +14,9 @@ export const geoJsonURL = {
 };
 
 export const mapStyles = {
-  satelliteStreets: 'mapbox://styles/mapbox/satellite-streets-v11',
+  satelliteStreets: 'mapbox://styles/mapbox/satellite-streets-v12',
   satellite: 'mapbox://styles/mapbox/satellite-v9',
-  light: 'mapbox://styles/mapbox/light-v10',
+  light: 'mapbox://styles/mapbox/light-v11',
+  dark: 'mapbox://styles/mapbox/dark-v11',
+  outdoors: 'mapbox://styles/mapbox/outdoors-v12',
 };

@@ -3,12 +3,12 @@ import { WorldMap } from 'app/components/Maps/WorldMap';
 import { Box } from '@mui/system';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { mapUrlSearchParams } from 'app/components/Maps/mapUtils';
-
 import { ViewStateChangeEvent } from 'react-map-gl';
 import { SpeedDial, SpeedDialAction } from '@mui/material';
 import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import AddIcon from '@mui/icons-material/Add';
 import PentagonIcon from '@mui/icons-material/Pentagon';
+import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
 import { useSignInAlert } from 'utils/hooks/useSignInAlert';
 
 interface Props {}
@@ -32,11 +32,19 @@ export function Homepage(props: Props) {
     }
   };
 
+  const onAddGuideClick = async () => {
+    const signedIn = await checkUserSignIn();
+    if (signedIn) {
+      navigate({ pathname: '/create/guide', search: searchParams.toString() });
+    }
+  };
+
   const onDetailsClick = (id: string, type: MapSlacklineFeatureType) => {
     if (type === 'line') {
       navigate(`/line/${id}`);
     }
   };
+
   const onMapMoveEnd = (event: ViewStateChangeEvent) => {
     const { longitude, latitude, zoom } = event.viewState;
     searchParams.set(
@@ -75,6 +83,14 @@ export function Homepage(props: Props) {
           icon={<PentagonIcon />}
           tooltipTitle={'Add a new spot'}
           onClick={onAddSpotClick}
+          sx={{
+            color: t => t.palette.primary.main,
+          }}
+        />
+        <SpeedDialAction
+          icon={<FollowTheSignsIcon />}
+          tooltipTitle={'Add a new guide'}
+          onClick={onAddGuideClick}
           sx={{
             color: t => t.palette.primary.main,
           }}

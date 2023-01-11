@@ -185,8 +185,8 @@ export const layers = {
     const layer = cloneDeep(pointLayerBase);
     layer.paint!['circle-color'] = [
       'case',
-      ['==', ['get', 'ft'], 'extra'],
-      appColors.extraFeaturesColor,
+      ['==', ['get', 'ft'], 'g'],
+      appColors.guideFeaturesColor,
       appColors.lineStrokeColor,
     ];
     return layer;
@@ -207,8 +207,8 @@ export const layers = {
     ];
     layer.paint!['icon-color'] = [
       'case',
-      ['==', ['get', 'ft'], 'extra'],
-      appColors.extraFeaturesColor,
+      ['==', ['get', 'ft'], 'g'],
+      appColors.guideFeaturesColor,
       appColors.lineStrokeColor,
     ];
     return layer;
@@ -222,7 +222,7 @@ export const layers = {
       6,
       ['boolean', ['feature-state', 'hover'], false],
       4,
-      ['==', ['get', 'ft'], 'extra'],
+      ['==', ['get', 'ft'], 'g'],
       3,
       2,
     ];
@@ -232,7 +232,7 @@ export const layers = {
         'boolean',
         ['feature-state', 'hover'],
         ['feature-state', 'isSelected'],
-        ['==', ['get', 'ft'], 'extra'],
+        ['==', ['get', 'ft'], 'g'],
         false,
       ],
       1,
@@ -240,13 +240,13 @@ export const layers = {
     ];
     layer.paint!['line-color'] = [
       'case',
-      ['==', ['get', 'ft'], 'extra'],
-      appColors.extraFeaturesColor,
+      ['==', ['get', 'ft'], 'g'],
+      appColors.guideFeaturesColor,
       appColors.lineStrokeColor,
     ];
     layer.paint!['line-dasharray'] = [
       'case',
-      ['==', ['get', 'ft'], 'extra'],
+      ['==', ['get', 'ft'], 'g'],
       ['literal', [0.4, 2]],
       ['literal', [1]],
     ];
@@ -275,8 +275,8 @@ export const layers = {
     ];
     layer.paint!['icon-color'] = [
       'case',
-      ['==', ['get', 'ft'], 'extra'],
-      appColors.extraFeaturesColor,
+      ['==', ['get', 'ft'], 'g'],
+      appColors.guideFeaturesColor,
       appColors.lineStrokeColor,
     ];
     return layer;
@@ -301,8 +301,8 @@ export const layers = {
     ];
     layer.paint!['fill-color'] = [
       'case',
-      ['==', ['get', 'ft'], 'extra'],
-      appColors.extraFeaturesColor,
+      ['==', ['get', 'ft'], 'g'],
+      appColors.guideFeaturesColor,
       appColors.spotFillColor,
     ];
     return layer;
@@ -320,8 +320,8 @@ export const layers = {
     layer.id = 'polygonLabel';
     layer.paint!['icon-color'] = [
       'case',
-      ['==', ['get', 'ft'], 'extra'],
-      appColors.extraFeaturesColor,
+      ['==', ['get', 'ft'], 'g'],
+      appColors.guideFeaturesColor,
       appColors.spotFillColor,
     ];
     return layer;
@@ -362,6 +362,7 @@ export const cursorInteractableLayerIds = [
   layers.lineLabel.id!,
   layers.polygon.id!,
   layers.unclusteredPoint.id!,
+  layers.cluster.id!,
 ];
 
 export const mouseHoverableLayersIds = [

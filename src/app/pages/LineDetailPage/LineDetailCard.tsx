@@ -91,7 +91,7 @@ export const LineDetailCard = (props: Props) => {
             )}
             <SlacklineDetailSpecsField
               header="Specs"
-              isAccurate={lineDetails.isMeasurementAccurate}
+              isAccurate={lineDetails.isMeasured}
               content={[
                 {
                   label: 'Length',
