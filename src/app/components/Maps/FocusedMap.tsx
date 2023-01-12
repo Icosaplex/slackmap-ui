@@ -41,6 +41,7 @@ export const FocusedMap = (props: Props) => {
   const [isMapReady, setIsMapReady] = useState(false);
   const [cursor, setCursor] = useState('auto');
   const [hoveredFeature, setHoveredFeature] = useState<MapboxGeoJSONFeature>();
+  const [selectedFeatureId, setSelectedFeatureId] = useState<string>();
 
   const fitMapToCurrentGeoJson = useCallback(
     (opts: { animate?: boolean } = {}) => {
@@ -62,7 +63,15 @@ export const FocusedMap = (props: Props) => {
     if (!isMapLoaded || !props.geoJson || !mapRef.current) return;
     fitMapToCurrentGeoJson();
     setIsMapReady(true);
+    setSelectedFeatureId(props.geoJson.features[0].id as string);
   }, [fitMapToCurrentGeoJson, isMapLoaded, props.geoJson]);
+
+  useEffect(() => {
+    mapRef.current?.setFeatureState(
+      { id: selectedFeatureId, source: 'focused' },
+      { isSelected: true },
+    );
+  }, [selectedFeatureId]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -121,7 +130,6 @@ export const FocusedMap = (props: Props) => {
 
   const onFocusClick = () => {
     if (!isMapLoaded || !props.geoJson || !mapRef.current) return;
-
     fitMapToCurrentGeoJson({ animate: true });
   };
 
@@ -150,7 +158,11 @@ export const FocusedMap = (props: Props) => {
       >
         <ScaleControl />
         <MapImage name={'marker'} url={'/images/line-marker.png'} />
-        <MapSources options={{ lines: true, guides: true, spots: true }} />
+        <MapSources
+          options={{ lines: true, guides: true, spots: true }}
+          disableClustering
+          // excludeId={selectedFeatureId}
+        />
         <Source
           id="focused"
           type="geojson"
@@ -160,11 +172,11 @@ export const FocusedMap = (props: Props) => {
               features: [],
             }
           }
-          generateId
+          promoteId="id"
         >
-          <Layer {...polygonLayer} />
-          <Layer {...lineLayer} />
-          <Layer {...lineLabelLayer} />
+          <Layer {...polygonLayer} id="polygonFocused" />
+          <Layer {...lineLayer} id="lineFocused" />
+          <Layer {...lineLabelLayer} id="lineLabelFocused" />
         </Source>
       </ReactMapGL>
     </>

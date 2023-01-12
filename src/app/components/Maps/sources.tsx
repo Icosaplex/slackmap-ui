@@ -1,5 +1,5 @@
-import React from 'react';
-import { Source, Layer } from 'react-map-gl';
+import React, { useEffect } from 'react';
+import { Source, Layer, useMap } from 'react-map-gl';
 import { LegendOptions } from './Components/MapLegend';
 import { geoJsonURL } from './constants';
 import {
@@ -15,13 +15,17 @@ import {
 
 interface Props {
   options: LegendOptions;
+  //   excludeId?: string;
+  disableClustering?: boolean;
 }
 
 export const MapSources = (props: Props) => {
-  const isJoinedClusters = props.options.lines && props.options.spots;
+  const { disableClustering, options } = props;
+  const isJoinedClusters = options.lines && options.spots;
+
   return (
     <>
-      {isJoinedClusters && (
+      {isJoinedClusters && !disableClustering && (
         <Source
           id="linePoints"
           type="geojson"
@@ -38,9 +42,9 @@ export const MapSources = (props: Props) => {
         </Source>
       )}
 
-      {props.options.spots && (
+      {options.spots && (
         <>
-          {!isJoinedClusters && (
+          {!isJoinedClusters && !disableClustering && (
             <Source
               id="spotPoints"
               type="geojson"
@@ -49,38 +53,35 @@ export const MapSources = (props: Props) => {
               clusterMaxZoom={13}
               clusterMinPoints={3}
               clusterRadius={50}
-              generateId={true}
               clusterProperties={{
                 ft: [
                   ['get', 'ft'],
                   ['get', 'ft'],
                 ],
               }}
+              generateId={true}
             >
               <Layer {...clusterLayer} />
               <Layer {...clusterCountLayer} />
               <Layer {...unclusteredPointLayer} />
             </Source>
           )}
+
           <Source
             id="spots"
             type="geojson"
             data={geoJsonURL.spots}
             generateId={true}
-            filter={false}
           >
-            <Layer
-              {...polygonLayer}
-              //   beforeId={props.options.lines ? 'line' : undefined}
-            />
+            <Layer {...polygonLayer} />
             <Layer {...polygonOutlineLayer} />
             <Layer {...polygonLabelLayer} />
           </Source>
         </>
       )}
-      {props.options.lines && (
+      {options.lines && (
         <>
-          {!isJoinedClusters && (
+          {!isJoinedClusters && !disableClustering && (
             <Source
               id="linePoints"
               type="geojson"
@@ -102,12 +103,7 @@ export const MapSources = (props: Props) => {
               <Layer {...unclusteredPointLayer} />
             </Source>
           )}
-          <Source
-            id="lines"
-            type="geojson"
-            data={geoJsonURL.lines}
-            generateId={true}
-          >
+          <Source id="lines" type="geojson" data={geoJsonURL.lines}>
             <Layer {...lineLayer} />
             <Layer {...lineLabelLayer} />
           </Source>

@@ -1,12 +1,12 @@
 import { PaletteOptions } from '@mui/material';
-import { slackmapBlue, slackmapGreen } from './colors';
+import { appColors } from './colors';
 
 export const palette: PaletteOptions = {
   mode: 'light',
   primary: {
-    main: slackmapBlue,
+    main: appColors.slackmapBlue,
   },
   secondary: {
-    main: slackmapGreen,
+    main: appColors.slackmapGreen,
   },
 };

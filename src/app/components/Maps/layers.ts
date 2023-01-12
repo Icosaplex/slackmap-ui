@@ -1,11 +1,10 @@
 import { darken, lighten } from '@mui/material';
-import type { LayerProps } from 'react-map-gl';
+import type { LayerProps, LineLayer } from 'react-map-gl';
 import { appColors } from 'styles/theme/colors';
 
 export const pointLayer: LayerProps = {
   id: 'point',
   type: 'circle',
-  // source: 'main',
   filter: ['==', ['geometry-type'], 'Point'],
   paint: {
     'circle-radius': 7,
@@ -22,7 +21,6 @@ export const pointLayer: LayerProps = {
 export const pointLabelLayer: LayerProps = {
   id: 'pointLabel',
   type: 'symbol',
-  // source: 'main',
   minzoom: 13,
   filter: ['all', ['==', ['geometry-type'], 'Point'], ['has', 'l']],
   layout: {
@@ -57,10 +55,9 @@ export const pointLabelLayer: LayerProps = {
   },
 };
 
-export const lineLayer: LayerProps = {
+export const lineLayer: LineLayer = {
   id: 'line',
   type: 'line',
-  // source: 'main',
   minzoom: 12,
   filter: ['==', ['geometry-type'], 'LineString'],
   layout: {
@@ -113,7 +110,6 @@ export const lineLayer: LayerProps = {
 export const lineLabelLayer: LayerProps = {
   id: 'lineLabel',
   type: 'symbol',
-  // source: 'main',
   minzoom: 14,
   filter: ['all', ['==', ['geometry-type'], 'LineString'], ['has', 'l']],
   layout: {
@@ -151,10 +147,8 @@ export const lineLabelLayer: LayerProps = {
 };
 
 export const polygonLayer: LayerProps = {
-  // beforeId: 'line',
   id: 'polygon',
   type: 'fill',
-  // source: 'main',
   minzoom: 12,
   filter: ['==', ['geometry-type'], 'Polygon'],
   paint: {
@@ -182,7 +176,6 @@ export const polygonLayer: LayerProps = {
 export const polygonOutlineLayer: LayerProps = {
   id: 'polygonOutline',
   type: 'line',
-  // source: 'main',
   minzoom: 13,
   maxzoom: 15,
   filter: ['==', ['geometry-type'], 'Polygon'],
@@ -196,7 +189,6 @@ export const polygonOutlineLayer: LayerProps = {
 export const polygonLabelLayer: LayerProps = {
   id: 'polygonLabel',
   type: 'symbol',
-  // source: 'main',
   minzoom: 13,
   filter: ['all', ['==', ['geometry-type'], 'Polygon'], ['has', 'l']],
   layout: {
@@ -237,7 +229,7 @@ export const clusterLayer: LayerProps = {
         lighten(appColors.spotFillColor, 0.2),
         ['==', ['get', 'ft'], 'l'],
         lighten(appColors.lineStrokeColor, 0.2),
-        lighten(appColors.slackmapGreen, 0.2),
+        lighten(appColors.mainClusterColor, 0.2),
       ],
       50,
       [
@@ -248,7 +240,7 @@ export const clusterLayer: LayerProps = {
         appColors.spotFillColor,
         ['==', ['get', 'ft'], 'l'],
         appColors.lineStrokeColor,
-        appColors.slackmapGreen,
+        appColors.mainClusterColor,
       ],
       200,
       [
@@ -259,7 +251,7 @@ export const clusterLayer: LayerProps = {
         darken(appColors.spotFillColor, 0.2),
         ['==', ['get', 'ft'], 'l'],
         darken(appColors.lineStrokeColor, 0.2),
-        darken(appColors.slackmapGreen, 0.2),
+        darken(appColors.mainClusterColor, 0.2),
       ],
     ],
     'circle-radius': [
@@ -275,8 +267,6 @@ export const clusterLayer: LayerProps = {
     ],
   },
 };
-
-
 
 export const clusterCountLayer: LayerProps = {
   id: 'clusterCount',
