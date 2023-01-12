@@ -27,12 +27,14 @@ export const cachePointsGeoJson = async (sourceId: string) => {
   if (cachedSourceIds[sourceId]) {
     return;
   }
-  const url =
-    sourceId === 'linePoints' ? geoJsonURL.linePoints : geoJsonURL.spotPoints;
+
+  const url = geoJsonURL.clustersMain;
   const response = await fetch(url).then(r => r.json());
   if (response) {
     featureEach<Point>(response, pointFeature => {
-      pointsGeoJsonDict[pointFeature.properties?.id] = pointFeature;
+      if (pointFeature.id) {
+        pointsGeoJsonDict[pointFeature.id] = pointFeature;
+      }
     });
   }
   cachedSourceIds[sourceId] = true;
@@ -66,7 +68,6 @@ export const mapUrlSearchParams = {
 };
 
 export const parseMapFeature = (feature: MapboxGeoJSONFeature) => {
-  const originalId = feature.properties?.id;
   let type: MapSlacklineFeatureType | undefined;
   switch (feature.geometry.type) {
     case 'LineString':
@@ -79,7 +80,7 @@ export const parseMapFeature = (feature: MapboxGeoJSONFeature) => {
       break;
   }
   const center = centerOfMass(feature).geometry.coordinates;
-  return { originalId, type, center };
+  return { id: feature.id, type, center };
 };
 
 export const calculateBounds = (

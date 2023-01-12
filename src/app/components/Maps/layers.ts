@@ -1,5 +1,10 @@
 import { darken, lighten } from '@mui/material';
-import type { LayerProps, LineLayer } from 'react-map-gl';
+import type {
+  FillLayer,
+  LayerProps,
+  LineLayer,
+  SymbolLayer,
+} from 'react-map-gl';
 import { appColors } from 'styles/theme/colors';
 
 export const pointLayer: LayerProps = {
@@ -107,7 +112,7 @@ export const lineLayer: LineLayer = {
   },
 };
 
-export const lineLabelLayer: LayerProps = {
+export const lineLabelLayer: SymbolLayer = {
   id: 'lineLabel',
   type: 'symbol',
   minzoom: 14,
@@ -146,7 +151,7 @@ export const lineLabelLayer: LayerProps = {
   },
 };
 
-export const polygonLayer: LayerProps = {
+export const polygonLayer: FillLayer = {
   id: 'polygon',
   type: 'fill',
   minzoom: 12,
@@ -173,7 +178,7 @@ export const polygonLayer: LayerProps = {
   },
 };
 
-export const polygonOutlineLayer: LayerProps = {
+export const polygonOutlineLayer: LineLayer = {
   id: 'polygonOutline',
   type: 'line',
   minzoom: 13,
@@ -186,7 +191,7 @@ export const polygonOutlineLayer: LayerProps = {
   },
 };
 
-export const polygonLabelLayer: LayerProps = {
+export const polygonLabelLayer: SymbolLayer = {
   id: 'polygonLabel',
   type: 'symbol',
   minzoom: 13,

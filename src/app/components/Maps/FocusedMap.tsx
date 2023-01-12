@@ -29,6 +29,7 @@ import {
 import { FocusedButton } from './Components/FocusButton';
 import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
 import { MapSources } from './sources';
+import { LegendOptions, MapLegend } from './Components/MapLegend';
 
 interface Props {
   onFeatureClick: (id: string, type: MapSlacklineFeatureType) => void;
@@ -41,7 +42,10 @@ export const FocusedMap = (props: Props) => {
   const [isMapReady, setIsMapReady] = useState(false);
   const [cursor, setCursor] = useState('auto');
   const [hoveredFeature, setHoveredFeature] = useState<MapboxGeoJSONFeature>();
-  const [selectedFeatureId, setSelectedFeatureId] = useState<string>();
+  const [legendOptions, setLegendOptions] = useState<LegendOptions>({
+    lines: true,
+    spots: true,
+  });
 
   const fitMapToCurrentGeoJson = useCallback(
     (opts: { animate?: boolean } = {}) => {
@@ -63,15 +67,40 @@ export const FocusedMap = (props: Props) => {
     if (!isMapLoaded || !props.geoJson || !mapRef.current) return;
     fitMapToCurrentGeoJson();
     setIsMapReady(true);
-    setSelectedFeatureId(props.geoJson.features[0].id as string);
+    const geoJson = props.geoJson;
+    for (const feature of geoJson.features) {
+      if (feature.geometry.type === 'LineString') {
+        mapRef.current?.setFeatureState(
+          { id: feature.properties?.id, source: 'lines' },
+          { isSelected: true },
+        );
+      }
+      if (feature.geometry.type === 'Polygon') {
+        mapRef.current?.setFeatureState(
+          { id: feature.properties?.id, source: 'spots' },
+          { isSelected: true },
+        );
+      }
+    }
+    return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      const map = mapRef.current;
+      for (const feature of geoJson.features) {
+        if (feature.geometry.type === 'LineString') {
+          map?.removeFeatureState(
+            { id: feature.properties?.id, source: 'lines' },
+            'isSelected',
+          );
+        }
+        if (feature.geometry.type === 'Polygon') {
+          map?.removeFeatureState(
+            { id: feature.properties?.id, source: 'spots' },
+            'isSelected',
+          );
+        }
+      }
+    };
   }, [fitMapToCurrentGeoJson, isMapLoaded, props.geoJson]);
-
-  useEffect(() => {
-    mapRef.current?.setFeatureState(
-      { id: selectedFeatureId, source: 'focused' },
-      { isSelected: true },
-    );
-  }, [selectedFeatureId]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -121,9 +150,9 @@ export const FocusedMap = (props: Props) => {
       return;
     }
     if (mouseHoverableLayersIds.includes(feature.layer.id)) {
-      const { originalId, type } = parseMapFeature(feature);
-      if (originalId && type) {
-        props.onFeatureClick(originalId, type);
+      const { id, type } = parseMapFeature(feature);
+      if (id && typeof id === 'string' && type) {
+        props.onFeatureClick(id, type);
       }
     }
   };
@@ -133,10 +162,18 @@ export const FocusedMap = (props: Props) => {
     fitMapToCurrentGeoJson({ animate: true });
   };
 
+  const onLegendOptionsUpdate = (options: LegendOptions) => {
+    setLegendOptions(options);
+  };
+
   return (
     <>
       {!isMapReady && <MapLoadingPlaceholder />}
       <FocusedButton onFocusClick={onFocusClick} />
+      <MapLegend
+        options={legendOptions}
+        onOptionsChange={onLegendOptionsUpdate}
+      />
       <ReactMapGL
         initialViewState={defaultMapViewState}
         mapStyle={mapStyles.satelliteStreets}
@@ -158,26 +195,7 @@ export const FocusedMap = (props: Props) => {
       >
         <ScaleControl />
         <MapImage name={'marker'} url={'/images/line-marker.png'} />
-        <MapSources
-          options={{ lines: true, guides: true, spots: true }}
-          disableClustering
-          // excludeId={selectedFeatureId}
-        />
-        <Source
-          id="focused"
-          type="geojson"
-          data={
-            (props.geoJson as any) || {
-              type: 'FeatureCollection',
-              features: [],
-            }
-          }
-          promoteId="id"
-        >
-          <Layer {...polygonLayer} id="polygonFocused" />
-          <Layer {...lineLayer} id="lineFocused" />
-          <Layer {...lineLabelLayer} id="lineLabelFocused" />
-        </Source>
+        <MapSources options={legendOptions} disableClustering />
       </ReactMapGL>
     </>
   );

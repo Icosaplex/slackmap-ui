@@ -20,11 +20,29 @@ export interface GetLineDetailsAPIResponse {
   lastModifiedDateTime?: string;
   restrictionInfo?: string;
   isMeasured?: boolean;
+  isUserEditor?: boolean;
 }
 
 export interface UpdateLineDetailsPayload {
   geoJson: FeatureCollection;
   id?: string;
+  type?: SlacklineType | '';
+  name?: string;
+  description?: string;
+  length?: number;
+  height?: number;
+  accessInfo?: string;
+  anchorsInfo?: string;
+  gearInfo?: string;
+  contactInfo?: string;
+  restrictionLevel?: SlacklineRestrictionLevel;
+  extraInfo?: string;
+  restrictionInfo?: string;
+  isMeasured?: boolean;
+}
+
+export interface CreateLineDetailsPayload {
+  geoJson: FeatureCollection;
   type?: SlacklineType | '';
   name?: string;
   description?: string;

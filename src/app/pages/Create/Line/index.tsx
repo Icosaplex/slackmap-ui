@@ -7,7 +7,7 @@ import { LineEditCard } from './LineEditCard';
 import { MapboxDrawControls } from '@mapbox/mapbox-gl-draw';
 import { Feature, FeatureCollection, Position } from 'geojson';
 import { validateLineFeatures } from './validations';
-import { showErrorNotification } from 'utils';
+import { showErrorNotification, showInfoNotification } from 'utils';
 import { useDispatch } from 'react-redux';
 import { drawControlStyles } from 'app/components/Maps/DrawableMap/DrawControl/styles';
 import { ExtrasPopup } from 'app/components/Maps/DrawableMap/ExtrasPopup';
@@ -19,11 +19,13 @@ interface Props {}
 export function CreateLinePage(props: Props) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [features, setFeatures] = useState<Feature[]>([]);
   const [mapErrors, setMapErrors] = useState<string[]>([]);
 
-  const [updateLine, { isLoading: isSaving, isSuccess: isSavedChanges }] =
-    lineApi.useUpdateLineMutation();
+  const [createLine, { isLoading: isSaving, isSuccess: isSavedChanges }] =
+    lineApi.useCreateLineMutation();
 
   useEffect(() => {
     if (isSavedChanges) {
@@ -50,8 +52,7 @@ export function CreateLinePage(props: Props) {
       type: 'FeatureCollection',
       features,
     };
-    updateLine({ ...values, geoJson });
-    console.log('save');
+    createLine({ ...values, geoJson });
   };
   return (
     <Stack

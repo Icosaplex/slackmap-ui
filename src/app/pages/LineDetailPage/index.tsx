@@ -12,9 +12,15 @@ export function LineDetailPage(props: Props) {
   const { lineId } = useParams();
   const navigate = useNavigate();
 
-  const { data: lineGeoJson, isFetching } = lineApi.useGetLineGeoJsonQuery(
+  const { data: lineGeoJson, isError } = lineApi.useGetLineGeoJsonQuery(
     lineId!,
   );
+
+  useEffect(() => {
+    if (isError) {
+      navigate('/');
+    }
+  }, [isError]);
 
   const onFeatureClick = (id: string, type: MapSlacklineFeatureType) => {
     if (type === 'line') {

@@ -1,10 +1,11 @@
 import type {
+  CreateLineDetailsPayload,
   GetLineDetailsAPIResponse,
   UpdateLineDetailsPayload,
 } from './types';
 import { baseApi } from 'store/rtk-query';
 import { FeatureCollection } from '@turf/turf';
-import { showSuccessNotification } from 'utils';
+import { showInfoNotification, showSuccessNotification } from 'utils';
 
 export const lineApi = baseApi
   .enhanceEndpoints({
@@ -20,6 +21,25 @@ export const lineApi = baseApi
         query: id => ({ url: `line/${id}/geojson` }),
         providesTags: ['lineDetails'],
       }),
+      createLine: builder.mutation<
+        GetLineDetailsAPIResponse,
+        CreateLineDetailsPayload
+      >({
+        query: body => ({
+          url: `line`,
+          method: 'POST',
+          body: body,
+        }),
+        async onQueryStarted(_, { dispatch, queryFulfilled }) {
+          await queryFulfilled.then(() => {
+            dispatch(
+              showInfoNotification(
+                'It can take about 3 minutes to see on the map',
+              ),
+            );
+          });
+        },
+      }),
       updateLine: builder.mutation<
         GetLineDetailsAPIResponse,
         UpdateLineDetailsPayload
@@ -31,8 +51,24 @@ export const lineApi = baseApi
         }),
         invalidatesTags: ['lineDetails'],
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
-          await queryFulfilled;
-          dispatch(showSuccessNotification('Changes Saved'));
+          await queryFulfilled.then(() => {
+            dispatch(showSuccessNotification('Changes Saved'));
+          });
+        },
+      }),
+      deleteLine: builder.mutation<void, string>({
+        query: id => ({
+          url: `line/${id}`,
+          method: 'DELETE',
+        }),
+        async onQueryStarted(_, { dispatch, queryFulfilled }) {
+          await queryFulfilled.then(() => {
+            dispatch(
+              showInfoNotification(
+                'It can take about 3 minutes to see on the map',
+              ),
+            );
+          });
         },
       }),
     }),

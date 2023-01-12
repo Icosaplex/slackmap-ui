@@ -24,5 +24,5 @@ export const mapStyles = {
   satellite: 'mapbox://styles/mapbox/satellite-v9',
   light: 'mapbox://styles/mapbox/light-v11',
   dark: 'mapbox://styles/mapbox/dark-v11',
-  outdoors: 'mapbox://styles/mapbox/outdoors-v12',
+  outdoors: 'mapbox://styles/mapbox/outdoors-v11',
 };

@@ -72,12 +72,6 @@ export const WorldMap = (props: Props) => {
     spots: true,
   });
 
-  const [interactiveLayerIds, setInteractiveLayerIds] = useState<string[]>([
-    lineLayer.id!,
-    lineLabelLayer.id!,
-    unclusteredPointLayer.id!,
-    clusterLayer.id!,
-  ]);
   const [popup, setPopup] = useState<{
     feature: MapboxGeoJSONFeature;
     type: MapSlacklineFeatureType;
@@ -111,14 +105,13 @@ export const WorldMap = (props: Props) => {
   useEffect(() => {
     if (!isMapLoaded || !props.zoomToUserLocation || props.initialViewState)
       return;
-
     const zoomToUserLocation = async () => {
       const response = await fetch('https://ipapi.co/json/')
         .then(r =>
           r.json().then(data => ({
             longitude: data.longitude as number,
             latitude: data.latitude as number,
-            zoom: 2.5,
+            zoom: isDesktop ? 2.5 : 1.5,
           })),
         )
         .catch(err => undefined);
@@ -126,6 +119,7 @@ export const WorldMap = (props: Props) => {
         flyTo([response.longitude, response.latitude], { zoom: response.zoom });
       }
     };
+    setPopup(undefined);
     zoomToUserLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMapLoaded, props.zoomToUserLocation, props.initialViewState]);
@@ -157,15 +151,21 @@ export const WorldMap = (props: Props) => {
 
     if (selectedFeature) {
       map.setFeatureState(selectedFeature, { isSelected: true });
-      const { center, originalId, type } = parseMapFeature(selectedFeature);
+      const { center, id, type } = parseMapFeature(selectedFeature);
       if (center) {
         flyTo(center, { padding: { right: !isDesktop ? 200 : 0 } });
       }
-      if (originalId && type && center && props.showInfoPopup) {
+      if (
+        id &&
+        typeof id === 'string' &&
+        type &&
+        center &&
+        props.showInfoPopup
+      ) {
         setPopup({
           feature: selectedFeature,
           type,
-          id: originalId,
+          id,
           position: center,
         });
       }
@@ -185,10 +185,7 @@ export const WorldMap = (props: Props) => {
   }, []);
 
   const onSourceData = (event: MapSourceDataEvent) => {
-    if (
-      (event.sourceId === 'linePoints' || event.sourceId === 'spotPoints') &&
-      event.isSourceLoaded
-    ) {
+    if (event.sourceId === 'clusterPoints' && event.isSourceLoaded) {
       setLoadedSourceId(event.sourceId);
     }
   };
@@ -225,8 +222,9 @@ export const WorldMap = (props: Props) => {
 
     const clusterId = feature?.properties?.cluster_id;
     if (clusterId) {
-      const mapboxSource = mapRef.current?.getSource('points') as GeoJSONSource;
-
+      const mapboxSource = mapRef.current?.getSource(
+        'clusterPoints',
+      ) as GeoJSONSource;
       mapboxSource.getClusterExpansionZoom(clusterId, (err, zoom) => {
         if (err) {
           return;
@@ -241,12 +239,10 @@ export const WorldMap = (props: Props) => {
       if (pointFeature) {
         const { marginedBounds } = calculateBounds(
           pointFeature.geometry,
-          feature.properties?.l,
+          parseFloat(feature.properties?.l),
         );
         mapRef.current?.fitBounds(marginedBounds);
       }
-
-      // flyTo(coordinates, { zoom: 16 });
       return;
     }
     if (mouseHoverableLayersIds.includes(feature.layer.id)) {
@@ -256,27 +252,6 @@ export const WorldMap = (props: Props) => {
 
   const onLegendOptionsUpdate = (options: LegendOptions) => {
     setLegendOptions(options);
-    if (!isMapLoaded) return;
-    const interactiveLayerIds: string[] = [];
-    setInteractiveLayerIds([]);
-
-    if (options.lines || options.spots) {
-      interactiveLayerIds.push(clusterLayer.id!);
-      interactiveLayerIds.push(unclusteredPointLayer.id!);
-    }
-    if (options.lines) {
-      interactiveLayerIds.push(lineLayer.id!);
-      interactiveLayerIds.push(lineLabelLayer.id!);
-      interactiveLayerIds.push(lineLayer.id!);
-    }
-    if (options.spots) {
-      interactiveLayerIds.push(polygonLayer.id!);
-      interactiveLayerIds.push(polygonLabelLayer.id!);
-    }
-
-    setTimeout(() => {
-      setInteractiveLayerIds(interactiveLayerIds);
-    }, 500);
   };
 
   return (
@@ -291,7 +266,14 @@ export const WorldMap = (props: Props) => {
         initialViewState={props.initialViewState || defaultMapViewState}
         mapStyle={mapStyle}
         mapboxAccessToken={MAPBOX_TOKEN}
-        interactiveLayerIds={interactiveLayerIds}
+        interactiveLayerIds={[
+          lineLayer.id!,
+          lineLabelLayer.id!,
+          polygonLayer.id!,
+          polygonLabelLayer.id!,
+          unclusteredPointLayer.id!,
+          clusterLayer.id!,
+        ]}
         attributionControl={false}
         onLoad={onMapLoad}
         onSourceData={onSourceData}

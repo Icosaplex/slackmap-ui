@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
@@ -24,19 +24,43 @@ import {
   bindTrigger,
   bindMenu,
 } from 'material-ui-popup-state/hooks';
+import { useConfirmDialog } from 'utils/hooks/useConfirmDialog';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   lineId: string;
 }
 
 export const LineDetailCard = (props: Props) => {
+  const navigate = useNavigate();
+
   const cardHeaderPopupState = usePopupState({
     variant: 'popover',
     popupId: 'cardHeaderMenu',
   });
+  const confirmDialog = useConfirmDialog();
+
   const { data: lineDetails, isFetching } = lineApi.useGetLineDetailsQuery(
     props.lineId,
   );
+  const [deleteLine, { isSuccess: isDeleted }] =
+    lineApi.useDeleteLineMutation();
+
+  useEffect(() => {
+    if (isDeleted) {
+      navigate('/');
+    }
+  }, [isDeleted]);
+
+  const onDeleteClick = async () => {
+    cardHeaderPopupState.close();
+    await confirmDialog({
+      title: 'Delete line?',
+      content: 'Are you sure you want to delete this line?',
+    }).then(() => {
+      deleteLine(props.lineId);
+    });
+  };
 
   return (
     <Card
@@ -60,8 +84,16 @@ export const LineDetailCard = (props: Props) => {
                   <MoreVertIcon />
                 </IconButton>
                 <Menu {...bindMenu(cardHeaderPopupState)}>
-                  <MenuItem onClick={cardHeaderPopupState.close}>Edit</MenuItem>
-                  <MenuItem onClick={cardHeaderPopupState.close}>
+                  <MenuItem
+                    onClick={onDeleteClick}
+                    disabled={!lineDetails.isUserEditor}
+                  >
+                    Edit
+                  </MenuItem>
+                  <MenuItem
+                    onClick={onDeleteClick}
+                    disabled={!lineDetails.isUserEditor}
+                  >
                     Delete
                   </MenuItem>
                 </Menu>

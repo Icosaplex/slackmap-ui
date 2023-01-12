@@ -13,7 +13,6 @@ export interface LegendOptions {
   spots?: boolean;
   lines?: boolean;
   guides?: boolean;
-  communities?: boolean;
 }
 interface Props {
   options: LegendOptions;
@@ -92,23 +91,9 @@ export const MapLegend = (props: Props) => {
             label="Guides"
             disabled
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={props.options.communities}
-                onChange={e => {
-                  onChange('communities', e.target.checked);
-                }}
-              />
-            }
-            label="Communities"
-            disabled
-          />
         </FormGroup>
       </Paper>
 
-      {/* </Stack> */}
     </Box>
   );
 };

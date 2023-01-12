@@ -57,9 +57,6 @@ export const DrawableMap = (props: Props) => {
   const drawRef = React.useRef<MapboxDraw>();
 
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [cursor, setCursor] = useState('auto');
-  const [features, setFeatures] = useState<Feature[]>([]);
-  const [, setSelectedFeature] = useState<Feature>();
 
   const onMapLoad = () => {
     setIsMapLoaded(true);
@@ -100,34 +97,11 @@ export const DrawableMap = (props: Props) => {
   const onUpdate = useCallback((e: MapboxDrawEvent) => {
     const currentFeatures = drawRef.current?.getAll();
     props.onDrawingFeaturesChanged(currentFeatures?.features || []);
-
-    // setDrawingFeatures(currentFeatures => {
-    //   const newFeaturesDict = featuresDict(currentFeatures);
-    //   for (const f of e.features) {
-    //     if (f.id) {
-    //       newFeaturesDict[f.id] = f;
-    //     }
-    //   }
-    //   const newFeatures = featuresArray(newFeaturesDict);
-    //   return newFeatures;
-    // });
   }, []);
 
   const onDelete = useCallback((e: MapboxDrawEvent) => {
     const currentFeatures = drawRef.current?.getAll();
     props.onDrawingFeaturesChanged(currentFeatures?.features || []);
-
-    // setDrawingFeatures(currentFeatures => {
-    //   const newFeaturesDict = featuresDict(currentFeatures);
-    //   for (const f of e.features) {
-    //     if (f.id) {
-    //       delete newFeaturesDict[f.id];
-    //     }
-    //   }
-    //   const newFeatures = featuresArray(newFeaturesDict);
-    //   props.onDrawingFeaturesChanged(newFeatures);
-    //   return newFeatures;
-    // });
   }, []);
 
   return (
@@ -141,43 +115,24 @@ export const DrawableMap = (props: Props) => {
         onLoad={onMapLoad}
         // reuseMaps
         ref={mapRef}
-        cursor={cursor}
         pitchWithRotate={false}
         maxPitch={0}
         // projection="globe"
       >
         <MapImage name={'marker'} url={'/images/line-marker.png'} />
-
-        <DrawControl
-          ref={drawRef}
-          // key={JSON.stringify(props.drawControls)}
-          displayControlsDefault={false}
-          controls={props.drawControls}
-          defaultMode="simple_select"
-          onCreate={onUpdate}
-          onUpdate={onUpdate}
-          onDelete={onDelete}
-          onSelectionChange={onSelectionChange}
-          styles={props.drawControlStyles}
-        />
-        {/* {props.staticFeatures && (
-          <Source
-            id="static"
-            type="geojson"
-            data={featureCollection(props.staticFeatures) as any}
-            generateId
-          >
-            <Layer {...layers.pointLabel} />
-            <Layer {...layers.line} />
-            <Layer {...layers.lineLabel} />
-            <Layer {...layers.point} />
-            <Layer {...layers.polygon} />
-            <Layer {...layers.polygonLabel} />
-            <Layer {...polygonLayer} />
-            <Layer {...lineLayer} />
-            <Layer {...lineLabelLayer} />
-          </Source>
-        )} */}
+        {isMapLoaded && (
+          <DrawControl
+            ref={drawRef}
+            displayControlsDefault={false}
+            controls={props.drawControls}
+            defaultMode="simple_select"
+            onCreate={onUpdate}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+            onSelectionChange={onSelectionChange}
+            styles={props.drawControlStyles}
+          />
+        )}
         <MapSources options={{ lines: true, guides: true, spots: true }} />
       </ReactMapGL>
     </>

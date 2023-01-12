@@ -67,12 +67,18 @@ interface Props {
   isSubmitting?: boolean;
 }
 
+const cleanValues = (values: LineDetailsForm): LineDetailsForm => {
+  return {
+    ...values,
+    length: values.length || undefined, // avoid empty string
+    height: values.height || undefined,
+  };
+};
+
 export const LineEditCard = (props: Props) => {
   const isCreateMode = !props.initialValues && !props.isInitialValuesLoading;
 
-  // const validationSchema = z.object({
-  //   // name: z.string().min(2),
-  // });
+  // const validationSchema = z.object({});
 
   const formik = useFormik<LineDetailsForm>({
     initialValues: props.initialValues ?? {
@@ -80,8 +86,9 @@ export const LineEditCard = (props: Props) => {
       type: '',
     },
     // validationSchema: toFormikValidationSchema(validationSchema),
+    // validateOnChange: true,
     onSubmit: values => {
-      props.onSubmit(values);
+      props.onSubmit(cleanValues(values));
     },
   });
 
@@ -148,7 +155,6 @@ export const LineEditCard = (props: Props) => {
                   field="length"
                   label="Length (meters)"
                   type="number"
-                  required
                 />
 
                 <CustomTextField

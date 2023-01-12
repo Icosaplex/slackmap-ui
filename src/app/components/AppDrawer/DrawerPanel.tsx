@@ -24,9 +24,9 @@ import { useDispatch } from 'react-redux';
 import InputIcon from '@mui/icons-material/Input';
 import PublicIcon from '@mui/icons-material/Public';
 import { Profile } from './Profile';
+import PeopleIcon from '@mui/icons-material/People';
 
 export const DrawerPanel = () => {
-
   return (
     <Box
       sx={{
@@ -55,6 +55,12 @@ export const DrawerPanel = () => {
               <Typography>World Map</Typography>
             </NavigationIcon>
           </ListItem>
+          <ListItem disableGutters sx={{ alignItems: 'flex-start' }}>
+            <NavigationIcon to="/" disabled>
+              <PeopleIcon />
+              <Typography>Communities</Typography>
+            </NavigationIcon>
+          </ListItem>
         </List>
       </Stack>
       <Box sx={{ mt: 'auto' }}>{/* <Footer /> */}</Box>
@@ -62,7 +68,11 @@ export const DrawerPanel = () => {
   );
 };
 
-const NavigationIcon = (props: { to: string; children: ReactNode }) => {
+const NavigationIcon = (props: {
+  to: string;
+  children: ReactNode;
+  disabled?: boolean;
+}) => {
   return (
     <IconButton
       color="inherit"
@@ -78,6 +88,7 @@ const NavigationIcon = (props: { to: string; children: ReactNode }) => {
           marginLeft: 2,
         },
       }}
+      disabled={props.disabled}
     >
       {props.children}
     </IconButton>
