@@ -8,15 +8,14 @@ export const defaultMapViewState = {
   pitch: 0,
 };
 
+const baseUrl = 'https://d1hbfm0s717r1n.cloudfront.net';
+
 export const geoJsonURL = {
-  linePoints:
-    'https://d1hbfm0s717r1n.cloudfront.net/geojson/lines/points.geojson',
-  lines: 'https://d1hbfm0s717r1n.cloudfront.net/geojson/lines/main.geojson',
-  spotPoints:
-    'https://d1hbfm0s717r1n.cloudfront.net/geojson/spots/points.geojson',
-  spots: 'https://d1hbfm0s717r1n.cloudfront.net/geojson/spots/main.geojson',
-  clustersMain:
-    'https://d1hbfm0s717r1n.cloudfront.net/geojson/clusters/main.geojson',
+  linePoints: baseUrl + '/geojson/lines/points.geojson',
+  lines: baseUrl + '/geojson/lines/main.geojson',
+  spotPoints: baseUrl + '/geojson/spots/points.geojson',
+  spots: baseUrl + '/geojson/spots/main.geojson',
+  clustersMain: baseUrl + '/geojson/clusters/main.geojson',
 };
 
 export const mapStyles = {

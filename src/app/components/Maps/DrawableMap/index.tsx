@@ -14,6 +14,7 @@ import { DrawControl, MapboxDrawEvent } from './DrawControl';
 import { MapboxDrawControls } from '@mapbox/mapbox-gl-draw';
 import { Feature, FeatureCollection } from 'geojson';
 import { MapSources } from '../sources';
+import { calculateBounds } from '../mapUtils';
 
 const featuresDict = (features: Feature[]) => {
   const dict: Record<string, Feature> = {};
@@ -35,7 +36,7 @@ const featuresArray = (features: Record<string, Feature>) => {
   return array;
 };
 
-const featureCollection = (features: Feature[]) => {
+const featureCollection = (features: Feature[]): FeatureCollection => {
   return {
     type: 'FeatureCollection',
     features,
@@ -55,8 +56,21 @@ interface Props {
 export const DrawableMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
   const drawRef = React.useRef<MapboxDraw>();
-
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+
+  const fitMapToCurrentGeoJson = useCallback(
+    (opts: { animate?: boolean } = {}) => {
+      if (!isMapLoaded || !props.drawingFeatures || !mapRef.current) return;
+      const map = mapRef.current;
+
+      const { marginedBounds } = calculateBounds(
+        featureCollection(props.drawingFeatures),
+        parseFloat(props.drawingFeatures[0].properties?.l),
+      );
+      map.fitBounds(marginedBounds, { animate: false });
+    },
+    [isMapLoaded, props.drawingFeatures],
+  );
 
   const onMapLoad = () => {
     setIsMapLoaded(true);
@@ -64,35 +78,30 @@ export const DrawableMap = (props: Props) => {
   };
 
   useEffect(() => {
-    if (!props.drawingFeatures) {
-      return;
-    }
+    if (!isMapLoaded || !props.drawingFeatures || !mapRef.current) return;
+    fitMapToCurrentGeoJson();
+
+    const features = props.drawingFeatures.map(f => {
+      return {
+        ...f,
+        id: f.properties?.id,
+      };
+    });
     if (props.drawingFeatures?.length > 0 && drawRef.current) {
-      const dict = featuresDict(props.drawingFeatures);
+      const dict = featuresDict(features);
       const currentFeatures = drawRef.current?.getAll();
       for (const feature of currentFeatures?.features || []) {
         if (feature.id) {
           dict[feature.id] = feature;
         }
       }
-      drawRef.current?.set({
-        type: 'FeatureCollection',
-        features: featuresArray(dict),
-      });
+      setTimeout(() => {
+        drawRef.current?.set(featureCollection(featuresArray(dict)));
+      }, 100);
     } else {
       drawRef.current?.deleteAll();
     }
-  }, [props.drawingFeatures]);
-
-  const onSelectionChange = useCallback((e: MapboxDrawEvent) => {
-    if (e.features.length === 1) {
-      // props.onSelectionChanged?.(e.features[0]);
-      // return e.features[0];
-    } else {
-      props.onSelectionChanged?.(undefined);
-      return undefined;
-    }
-  }, []);
+  }, [isMapLoaded, props.drawingFeatures]);
 
   const onUpdate = useCallback((e: MapboxDrawEvent) => {
     const currentFeatures = drawRef.current?.getAll();
@@ -113,11 +122,9 @@ export const DrawableMap = (props: Props) => {
         mapboxAccessToken={MAPBOX_TOKEN}
         attributionControl={false}
         onLoad={onMapLoad}
-        // reuseMaps
         ref={mapRef}
         pitchWithRotate={false}
         maxPitch={0}
-        // projection="globe"
       >
         <MapImage name={'marker'} url={'/images/line-marker.png'} />
         {isMapLoaded && (
@@ -129,11 +136,13 @@ export const DrawableMap = (props: Props) => {
             onCreate={onUpdate}
             onUpdate={onUpdate}
             onDelete={onDelete}
-            onSelectionChange={onSelectionChange}
             styles={props.drawControlStyles}
           />
         )}
-        <MapSources options={{ lines: true, guides: true, spots: true }} />
+        <MapSources
+          options={{ lines: true, guides: true, spots: true }}
+          filterId={(props.drawingFeatures || [])[0]?.properties?.id}
+        />
       </ReactMapGL>
     </>
   );

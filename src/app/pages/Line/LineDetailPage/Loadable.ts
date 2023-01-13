@@ -1,6 +1,6 @@
 import { lazyLoad } from 'utils/loadable';
 
 export const LineDetailPage = lazyLoad(
-  () => import('./index'),
+  () => import('.'),
   module => module.LineDetailPage,
 );

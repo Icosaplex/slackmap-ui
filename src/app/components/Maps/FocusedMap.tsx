@@ -54,7 +54,7 @@ export const FocusedMap = (props: Props) => {
 
       const { marginedBounds } = calculateBounds(
         props.geoJson,
-        props.geoJson.features[0].properties?.l,
+        parseFloat(props.geoJson.features[0].properties?.l),
       );
       map.fitBounds(marginedBounds, {
         animate: opts.animate || map.getZoom() > 10,

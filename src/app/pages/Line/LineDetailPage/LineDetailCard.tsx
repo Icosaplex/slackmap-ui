@@ -52,6 +52,11 @@ export const LineDetailCard = (props: Props) => {
     }
   }, [isDeleted]);
 
+  const onEditClick = async () => {
+    cardHeaderPopupState.close();
+    navigate(`/line/${props.lineId}/edit`);
+  };
+
   const onDeleteClick = async () => {
     cardHeaderPopupState.close();
     await confirmDialog({
@@ -85,7 +90,7 @@ export const LineDetailCard = (props: Props) => {
                 </IconButton>
                 <Menu {...bindMenu(cardHeaderPopupState)}>
                   <MenuItem
-                    onClick={onDeleteClick}
+                    onClick={onEditClick}
                     disabled={!lineDetails.isUserEditor}
                   >
                     Edit

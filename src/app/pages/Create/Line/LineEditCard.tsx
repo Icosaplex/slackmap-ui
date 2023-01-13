@@ -250,6 +250,7 @@ const CustomTextField = (props: CustomTextFieldProps) => {
       onChange={formik.handleChange}
       error={formik.touched[field] && Boolean(formik.errors[field])}
       helperText={formik.touched[field] && formik.errors[field]}
+      autoComplete="off"
       {...rest}
     />
   );

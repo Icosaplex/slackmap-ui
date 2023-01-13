@@ -33,21 +33,19 @@ export const lineApi = baseApi
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
           await queryFulfilled.then(() => {
             dispatch(
-              showInfoNotification(
-                'It can take about 3 minutes to see on the map',
-              ),
+              showInfoNotification('Refresh the page after few seconds', 5000),
             );
           });
         },
       }),
       updateLine: builder.mutation<
         GetLineDetailsAPIResponse,
-        UpdateLineDetailsPayload
+        { id: string; payload: UpdateLineDetailsPayload }
       >({
-        query: body => ({
-          url: `line/${body.id}`,
+        query: ({ id, payload }) => ({
+          url: `line/${id}`,
           method: 'PUT',
-          body: body,
+          body: payload,
         }),
         invalidatesTags: ['lineDetails'],
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
@@ -63,11 +61,7 @@ export const lineApi = baseApi
         }),
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
           await queryFulfilled.then(() => {
-            dispatch(
-              showInfoNotification(
-                'It can take about 3 minutes to see on the map',
-              ),
-            );
+            dispatch(showSuccessNotification('Line Deleted'));
           });
         },
       }),

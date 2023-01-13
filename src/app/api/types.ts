@@ -25,7 +25,6 @@ export interface GetLineDetailsAPIResponse {
 
 export interface UpdateLineDetailsPayload {
   geoJson: FeatureCollection;
-  id?: string;
   type?: SlacklineType | '';
   name?: string;
   description?: string;

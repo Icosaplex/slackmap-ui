@@ -32,8 +32,8 @@ export const cachePointsGeoJson = async (sourceId: string) => {
   const response = await fetch(url).then(r => r.json());
   if (response) {
     featureEach<Point>(response, pointFeature => {
-      if (pointFeature.id) {
-        pointsGeoJsonDict[pointFeature.id] = pointFeature;
+      if (pointFeature.properties?.id) {
+        pointsGeoJsonDict[pointFeature.properties?.id] = pointFeature;
       }
     });
   }

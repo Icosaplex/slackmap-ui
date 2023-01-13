@@ -16,10 +16,11 @@ import {
 interface Props {
   options: LegendOptions;
   disableClustering?: boolean;
+  filterId?: string;
 }
 
 export const MapSources = (props: Props) => {
-  const { disableClustering, options } = props;
+  const { disableClustering, options, filterId } = props;
   let clusterGeoJsonUrl = '';
   const isJoinedClustering = options.lines && options.spots;
 
@@ -101,6 +102,7 @@ export const MapSources = (props: Props) => {
         data={geoJsonURL.lines}
         generateId
         promoteId="id"
+        filter={filterId ? ['!=', ['get', 'id'], filterId] : undefined}
       >
         <Layer
           {...lineLayer}

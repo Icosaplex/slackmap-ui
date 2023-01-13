@@ -19,10 +19,11 @@ import NotificationSnackbar from 'app/components/NotificationSnackbar';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import { LoadingIndicator } from './components/LoadingIndicator';
 import { Homepage } from './pages/Homepage/Loadable';
-import { LineDetailPage } from './pages/LineDetailPage/Loadable';
+import { LineDetailPage } from './pages/Line/LineDetailPage/Loadable';
 import { AppDrawer } from './components/AppDrawer';
 import { CreateLinePage } from './pages/Create/Line/Loadable';
 import { CreateGuidePage } from './pages/Create/Guide/Loadable';
+import { LineEditPage } from './pages/Line/LineEditPage/Loadable';
 
 export function App() {
   useAppSlice();
@@ -108,6 +109,7 @@ export function App() {
           <Route path="/line/:lineId" element={<LineDetailPage />} />
           {isSignedIn && (
             <>
+              <Route path="/line/:lineId/edit" element={<LineEditPage />} />
               <Route path="/create/line" element={<CreateLinePage />} />
               <Route path="/create/guide" element={<CreateGuidePage />} />
             </>

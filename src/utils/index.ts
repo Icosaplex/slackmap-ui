@@ -21,9 +21,10 @@ export function showWarningNotification(message: string) {
   });
 }
 
-export function showInfoNotification(message: string) {
+export function showInfoNotification(message: string, duration?: number) {
   return appActions.updateSnackbarNotification({
     message: message,
     severity: 'info',
+    duration,
   });
 }
