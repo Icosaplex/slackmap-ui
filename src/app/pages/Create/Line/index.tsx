@@ -77,7 +77,6 @@ export function CreateLinePage(props: Props) {
           }}
           onDrawingFeaturesChanged={onDrawingFeaturesChanged}
           drawControlStyles={drawControlStyles('line')}
-          // onSelectionChanged={onSelectionChanged}
         />
       </Box>
 

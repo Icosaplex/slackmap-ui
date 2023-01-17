@@ -34,7 +34,7 @@ export interface UpdateLineDetailsPayload {
   anchorsInfo?: string;
   gearInfo?: string;
   contactInfo?: string;
-  restrictionLevel?: SlacklineRestrictionLevel;
+  restrictionLevel?: SlacklineRestrictionLevel | '';
   extraInfo?: string;
   restrictionInfo?: string;
   isMeasured?: boolean;
@@ -51,7 +51,7 @@ export interface CreateLineDetailsPayload {
   anchorsInfo?: string;
   gearInfo?: string;
   contactInfo?: string;
-  restrictionLevel?: SlacklineRestrictionLevel;
+  restrictionLevel?: SlacklineRestrictionLevel | '';
   extraInfo?: string;
   restrictionInfo?: string;
   isMeasured?: boolean;

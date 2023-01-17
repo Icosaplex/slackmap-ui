@@ -9,7 +9,7 @@ export interface LineDetailsForm {
   anchorsInfo?: string;
   gearInfo?: string;
   contactInfo?: string;
-  restrictionLevel?: SlacklineRestrictionLevel;
+  restrictionLevel?: SlacklineRestrictionLevel | '';
   restrictionInfo?: string;
   extraInfo?: string;
 }

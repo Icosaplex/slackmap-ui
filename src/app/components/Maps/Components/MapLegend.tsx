@@ -31,7 +31,7 @@ export const MapLegend = (props: Props) => {
       sx={{
         position: 'absolute',
         zIndex: 1,
-        bottom: { xs: '6rem', lg: '2rem' },
+        bottom: { xs: '4rem', lg: '2rem' },
         width: '100%',
         display: 'flex',
         justifyContent: 'center',
@@ -44,7 +44,10 @@ export const MapLegend = (props: Props) => {
         sx={{
           pointerEvents: 'initial',
           '.MuiTypography-body1': {
-            fontSize: '0.8rem',
+            fontSize: { xs: '0.5rem', lg: '1rem' },
+          },
+          '.MuiCheckbox-root': {
+            padding: { xs: 0.5, lg: 1 },
           },
         }}
       >
@@ -93,7 +96,6 @@ export const MapLegend = (props: Props) => {
           />
         </FormGroup>
       </Paper>
-
     </Box>
   );
 };

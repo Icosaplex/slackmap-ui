@@ -236,7 +236,6 @@ export const WorldMap = (props: Props) => {
     }
     if (feature.layer.id === unclusteredPointLayer.id) {
       const pointFeature = pointsGeoJsonDict[feature.properties?.id];
-      console.log(pointFeature);
       if (pointFeature) {
         const { marginedBounds } = calculateBounds(
           pointFeature.geometry,

@@ -26,6 +26,8 @@ import {
 } from 'material-ui-popup-state/hooks';
 import { useConfirmDialog } from 'utils/hooks/useConfirmDialog';
 import { useNavigate } from 'react-router-dom';
+import { appColors } from 'styles/theme/colors';
+import startCase from 'lodash.startcase';
 
 interface Props {
   lineId: string;
@@ -82,7 +84,16 @@ export const LineDetailCard = (props: Props) => {
       ) : (
         <>
           <CardHeader
-            avatar={<Avatar sx={{}}>{lineDetails.type || '?'}</Avatar>}
+            avatar={
+              <Avatar
+                src=""
+                sx={{
+                  backgroundColor: appColors.lineStrokeColor,
+                }}
+              >
+                L
+              </Avatar>
+            }
             action={
               <>
                 <IconButton {...bindTrigger(cardHeaderPopupState)}>
@@ -130,6 +141,10 @@ export const LineDetailCard = (props: Props) => {
               header="Specs"
               isAccurate={lineDetails.isMeasured}
               content={[
+                {
+                  label: 'Slackline Type',
+                  value: startCase(lineDetails.type) || '?',
+                },
                 {
                   label: 'Length',
                   value: `${lineDetails.length || '?'}m`,

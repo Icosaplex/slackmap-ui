@@ -1,4 +1,4 @@
-import React, { HTMLInputTypeAttribute, useEffect } from 'react';
+import React, { HTMLInputTypeAttribute, ReactNode, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
@@ -58,6 +58,18 @@ const lineTypes: { value: SlacklineType; label: string }[] = [
     label: 'Other',
   },
 ];
+
+const restrictionTypes: { value: SlacklineRestrictionLevel; label: string }[] =
+  [
+    {
+      value: 'partial',
+      label: 'Partially Restricted',
+    },
+    {
+      value: 'full',
+      label: 'Fully Restricted',
+    },
+  ];
 interface Props {
   initialValues?: LineDetailsForm;
   isInitialValuesLoading?: boolean;
@@ -84,6 +96,7 @@ export const LineEditCard = (props: Props) => {
     initialValues: props.initialValues ?? {
       isMeasured: false,
       type: '',
+      restrictionLevel: '',
     },
     // validationSchema: toFormikValidationSchema(validationSchema),
     // validateOnChange: true,
@@ -128,12 +141,7 @@ export const LineEditCard = (props: Props) => {
             </Stack>
             <form onSubmit={formik.handleSubmit}>
               <Stack spacing={1}>
-                <Typography
-                  variant="h5"
-                  sx={{ color: t => t.palette.primary.main, mb: 1 }}
-                >
-                  Specs
-                </Typography>
+                <CustomTextFieldHeader>Specs</CustomTextFieldHeader>
 
                 <CustomTextField
                   formik={formik}
@@ -172,12 +180,7 @@ export const LineEditCard = (props: Props) => {
                   onChange={formik.handleChange}
                 />
 
-                <Typography
-                  variant="h5"
-                  sx={{ color: t => t.palette.primary.main, mb: 1 }}
-                >
-                  Details
-                </Typography>
+                <CustomTextFieldHeader>Details</CustomTextFieldHeader>
 
                 <CustomTextField
                   formik={formik}
@@ -215,6 +218,38 @@ export const LineEditCard = (props: Props) => {
                   multiline
                 />
 
+                <CustomTextFieldHeader
+                  subHeader='Access restriction warnings will be displayed to the viewers
+                  on top of the page to prevent permission problems. "Partial"
+                  restriction in just a warning and "Full" means it requires
+                  permissions.'
+                >
+                  Restriction
+                </CustomTextFieldHeader>
+
+                <CustomTextField
+                  formik={formik}
+                  select
+                  field="restrictionLevel"
+                  label="Restriction Level"
+                  required
+                >
+                  <MenuItem value={''}></MenuItem>
+                  {restrictionTypes.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </CustomTextField>
+
+                <CustomTextField
+                  formik={formik}
+                  field={'restrictionInfo'}
+                  label={'Restriction Details'}
+                  multiline
+                  placeholder="Don't forget to add your contact info for people to reach you"
+                />
+
                 <LoadingButton
                   color="primary"
                   variant="contained"
@@ -238,6 +273,32 @@ interface CustomTextFieldProps extends StandardTextFieldProps {
   formik: any;
   field: keyof LineDetailsForm;
 }
+
+const CustomTextFieldHeader = (props: {
+  children: ReactNode;
+  subHeader?: string;
+}) => {
+  const { children, subHeader } = props;
+
+  return (
+    <>
+      <Typography
+        variant="h5"
+        sx={{ color: t => t.palette.primary.main, m: 0, mb: 1 }}
+      >
+        {children}
+      </Typography>
+      {subHeader && (
+        <Typography
+          variant="caption"
+          sx={{ color: t => t.palette.text.primary, mb: 1 }}
+        >
+          {subHeader}
+        </Typography>
+      )}
+    </>
+  );
+};
 
 const CustomTextField = (props: CustomTextFieldProps) => {
   const { formik, field, ...rest } = props;
