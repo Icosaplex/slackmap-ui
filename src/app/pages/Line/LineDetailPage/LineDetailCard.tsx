@@ -28,9 +28,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { appColors } from 'styles/theme/colors';
 import startCase from 'lodash.startcase';
 import { OutdatedInfoField } from 'app/components/TextFields/OutdatedInfoField';
+import { Position } from '@turf/turf';
 
 interface Props {
   lineId: string;
+  coordinates?: Position;
 }
 
 export const LineDetailCard = (props: Props) => {
@@ -186,12 +188,14 @@ export const LineDetailCard = (props: Props) => {
             />
           </CardContent>
           <CardActions>
-            <IconButton>
-              <MapIcon color="primary" />
-            </IconButton>
-            <IconButton>
-              <ShareIcon color="primary" />
-            </IconButton>
+            {props.coordinates && (
+              <IconButton
+                href={`https://maps.google.com/maps?z=12&t=m&q=loc:${props.coordinates[1]}+${props.coordinates[0]}`}
+                target="_blank"
+              >
+                <MapIcon color="primary" />
+              </IconButton>
+            )}
           </CardActions>
         </>
       )}

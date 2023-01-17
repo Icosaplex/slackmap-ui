@@ -5,6 +5,7 @@ import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { lineApi } from 'app/api/line-api';
 import { LineDetailCard } from './LineDetailCard';
 import { FocusedMap } from 'app/components/Maps/FocusedMap';
+import { centerOfMass } from '@turf/turf';
 
 interface Props {}
 
@@ -31,6 +32,10 @@ export function LineDetailPage(props: Props) {
     }
   };
 
+  const center = lineGeoJson
+    ? centerOfMass(lineGeoJson).geometry.coordinates
+    : undefined;
+
   return (
     <Stack
       direction={{ xs: 'column', lg: 'row' }}
@@ -54,7 +59,7 @@ export function LineDetailPage(props: Props) {
           height: { xs: 'auto', lg: '100vh' },
         }}
       >
-        {lineId && <LineDetailCard lineId={lineId} />}
+        {lineId && <LineDetailCard lineId={lineId} coordinates={center} />}
       </Box>
     </Stack>
   );

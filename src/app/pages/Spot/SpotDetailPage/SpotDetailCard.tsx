@@ -28,9 +28,11 @@ import { appColors } from 'styles/theme/colors';
 import startCase from 'lodash.startcase';
 import { spotApi } from 'app/api/spot-api';
 import { OutdatedInfoField } from 'app/components/TextFields/OutdatedInfoField';
+import { Position } from 'geojson';
 
 interface Props {
   spotId: string;
+  coordinates?: Position;
 }
 
 export const SpotDetailCard = (props: Props) => {
@@ -164,12 +166,14 @@ export const SpotDetailCard = (props: Props) => {
             />
           </CardContent>
           <CardActions>
-            <IconButton>
-              <MapIcon color="primary" />
-            </IconButton>
-            <IconButton>
-              <ShareIcon color="primary" />
-            </IconButton>
+            {props.coordinates && (
+              <IconButton
+                href={`https://maps.google.com/maps?z=12&t=m&q=loc:${props.coordinates[1]}+${props.coordinates[0]}`}
+                target="_blank"
+              >
+                <MapIcon color="primary" />
+              </IconButton>
+            )}
           </CardActions>
         </>
       )}

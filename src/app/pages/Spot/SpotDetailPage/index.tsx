@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { SpotDetailCard } from './SpotDetailCard';
 import { FocusedMap } from 'app/components/Maps/FocusedMap';
 import { spotApi } from 'app/api/spot-api';
+import { centerOfMass } from '@turf/turf';
 
 interface Props {}
 
@@ -30,6 +31,10 @@ export function SpotDetailPage(props: Props) {
     }
   };
 
+  const center = spotGeoJson
+    ? centerOfMass(spotGeoJson).geometry.coordinates
+    : undefined;
+
   return (
     <Stack
       direction={{ xs: 'column', lg: 'row' }}
@@ -53,7 +58,7 @@ export function SpotDetailPage(props: Props) {
           height: { xs: 'auto', lg: '100vh' },
         }}
       >
-        {spotId && <SpotDetailCard spotId={spotId} />}
+        {spotId && <SpotDetailCard spotId={spotId} coordinates={center} />}
       </Box>
     </Stack>
   );

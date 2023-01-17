@@ -45,7 +45,7 @@ export const MapSources = (props: Props) => {
           cluster={true}
           clusterMaxZoom={13}
           clusterMinPoints={3}
-          clusterRadius={50}
+          clusterRadius={60}
           generateId={true}
           clusterProperties={
             isJoinedClustering

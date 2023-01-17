@@ -25,6 +25,7 @@ import InputIcon from '@mui/icons-material/Input';
 import PublicIcon from '@mui/icons-material/Public';
 import { Profile } from './Profile';
 import PeopleIcon from '@mui/icons-material/People';
+import { Footer } from './Footer';
 
 export const DrawerPanel = () => {
   return (
@@ -63,7 +64,9 @@ export const DrawerPanel = () => {
           </ListItem>
         </List>
       </Stack>
-      <Box sx={{ mt: 'auto' }}>{/* <Footer /> */}</Box>
+      <Box sx={{ mt: 'auto' }}>
+        <Footer />
+      </Box>
     </Box>
   );
 };

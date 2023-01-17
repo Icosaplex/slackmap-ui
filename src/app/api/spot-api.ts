@@ -1,4 +1,8 @@
-import type { CreateSpotDetailsPayload, GetSpotDetailsAPIResponse, UpdateSpotDetailsPayload } from './types';
+import type {
+  CreateSpotDetailsPayload,
+  GetSpotDetailsAPIResponse,
+  UpdateSpotDetailsPayload,
+} from './types';
 import { baseApi } from 'store/rtk-query';
 import { showInfoNotification, showSuccessNotification } from 'utils';
 
@@ -45,7 +49,9 @@ export const spotApi = baseApi
         invalidatesTags: ['spotDetails'],
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
           await queryFulfilled.then(() => {
-            dispatch(showSuccessNotification('Changes Saved'));
+            dispatch(
+              showInfoNotification('Refresh the page after few seconds', 5000),
+            );
           });
         },
       }),

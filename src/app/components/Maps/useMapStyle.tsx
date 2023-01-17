@@ -1,6 +1,5 @@
 import { Projection } from 'mapbox-gl';
 import { useEffect, useState } from 'react';
-import { ProjectionSpecification } from 'react-map-gl';
 import { mapStyles } from './constants';
 
 export const useMapStyle = (zoomLevel?: number) => {
