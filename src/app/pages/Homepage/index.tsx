@@ -24,7 +24,7 @@ export function Homepage(props: Props) {
   const onAddSpotClick = async () => {
     const signedIn = await checkUserSignIn();
     if (signedIn) {
-      navigate('/create/spot');
+      navigate({ pathname: '/create/spot', search: searchParams.toString() });
     }
   };
 
@@ -45,6 +45,8 @@ export function Homepage(props: Props) {
   const onDetailsClick = (id: string, type: MapSlacklineFeatureType) => {
     if (type === 'line') {
       navigate(`/line/${id}`);
+    } else if (type === 'spot') {
+      navigate(`/spot/${id}`);
     }
   };
 

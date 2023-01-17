@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Stack } from '@mui/system';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useMediaQuery } from 'utils/hooks/useMediaQuery';
-import { lineApi } from 'app/api/line-api';
-import { LineDetailCard } from './LineDetailCard';
+import { SpotDetailCard } from './SpotDetailCard';
 import { FocusedMap } from 'app/components/Maps/FocusedMap';
+import { spotApi } from 'app/api/spot-api';
 
 interface Props {}
 
-export function LineDetailPage(props: Props) {
-  const { lineId } = useParams();
+export function SpotDetailPage(props: Props) {
+  const { spotId } = useParams();
   const navigate = useNavigate();
 
-  const { data: lineGeoJson, isError } = lineApi.useGetLineGeoJsonQuery(
-    lineId!,
+  const { data: spotGeoJson, isError } = spotApi.useGetSpotGeoJsonQuery(
+    spotId!,
   );
 
   useEffect(() => {
@@ -45,7 +44,7 @@ export function LineDetailPage(props: Props) {
           position: 'relative',
         }}
       >
-        <FocusedMap geoJson={lineGeoJson} onFeatureClick={onFeatureClick} />
+        <FocusedMap geoJson={spotGeoJson} onFeatureClick={onFeatureClick} />
       </Box>
 
       <Box
@@ -54,7 +53,7 @@ export function LineDetailPage(props: Props) {
           height: { xs: 'auto', lg: '100vh' },
         }}
       >
-        {lineId && <LineDetailCard lineId={lineId} />}
+        {spotId && <SpotDetailCard spotId={spotId} />}
       </Box>
     </Stack>
   );

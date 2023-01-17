@@ -2,13 +2,16 @@ import React from 'react';
 import { Alert, AlertColor, AlertTitle, Box, Typography } from '@mui/material';
 
 interface Props {
-  level: SlacklineRestrictionLevel;
+  level?: SlacklineRestrictionLevel;
   restrictionInfo?: string;
 }
 
 export const SlacklineDetailRestrictionField = (props: Props) => {
   let severity: AlertColor | undefined;
   let warningText: string | undefined;
+  if (!props.level) {
+    return null;
+  }
   switch (props.level) {
     case 'partial':
       severity = 'info';
@@ -17,7 +20,6 @@ export const SlacklineDetailRestrictionField = (props: Props) => {
     case 'full':
       severity = 'warning';
       warningText = 'FULLY Restricted Access';
-
       break;
     default:
       break;

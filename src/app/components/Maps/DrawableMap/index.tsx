@@ -49,7 +49,6 @@ interface Props {
   onDrawingFeaturesChanged: (features: Feature[]) => void;
   onSelectionChanged?: (feature?: Feature) => void;
   drawingFeatures?: Feature[];
-  staticFeatures?: Feature[];
   drawControlStyles: object[];
 }
 
@@ -84,7 +83,7 @@ export const DrawableMap = (props: Props) => {
     const features = props.drawingFeatures.map(f => {
       return {
         ...f,
-        id: f.properties?.id,
+        id: (Math.random() + 1).toString(36).substring(5),
       };
     });
     if (props.drawingFeatures?.length > 0 && drawRef.current) {

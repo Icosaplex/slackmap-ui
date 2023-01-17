@@ -11,7 +11,6 @@ import {
 import type { MapRef } from 'react-map-gl';
 import {
   cursorInteractableLayerIds,
-  layers,
   lineLabelLayer,
   lineLayer,
   mouseHoverableLayersIds,

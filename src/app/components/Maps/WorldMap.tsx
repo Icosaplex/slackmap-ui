@@ -19,7 +19,6 @@ import type { Point, Position } from 'geojson';
 import type { MapRef } from 'react-map-gl';
 import type { GeoJSONSource } from 'react-map-gl';
 import {
-  layers,
   cursorInteractableLayerIds,
   mouseHoverableLayersIds,
   unclusteredPointLayer,
@@ -28,7 +27,6 @@ import {
   polygonLayer,
   clusterLayer,
   polygonLabelLayer,
-  polygonOutlineLayer,
 } from './layers';
 import { useMapStyle } from './useMapStyle';
 import { MapImage } from './Components/MapImage';
@@ -134,13 +132,25 @@ export const WorldMap = (props: Props) => {
     const map = mapRef.current;
 
     if (hoveredFeature) {
+      // const renderedFeatures = map.queryRenderedFeatures();
+      // const featuresWithId = renderedFeatures.filter(
+      //   f => f.properties?.id === hoveredFeature.properties?.id,
+      // );
+      // for (const feature of featuresWithId) {
       map.setFeatureState(hoveredFeature, { hover: true });
+      // }
     }
     return () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const map = mapRef.current;
-      if (hoveredFeature) {
+      if (hoveredFeature && map) {
+        // const renderedFeatures = map.queryRenderedFeatures();
+        // const featuresWithId = renderedFeatures.filter(
+        //   f => f.properties?.id === hoveredFeature.properties?.id,
+        // );
+        // for (const feature of featuresWithId) {
         map?.removeFeatureState(hoveredFeature, 'hover');
+        // }
       }
     };
   }, [hoveredFeature]);

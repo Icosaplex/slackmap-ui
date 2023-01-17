@@ -72,6 +72,7 @@ export const MapSources = (props: Props) => {
         data={geoJsonURL.spots}
         generateId={true}
         promoteId="id"
+        filter={filterId ? ['!=', ['get', 'id'], filterId] : undefined}
       >
         <Layer
           {...polygonLayer}

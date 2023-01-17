@@ -24,6 +24,9 @@ import { AppDrawer } from './components/AppDrawer';
 import { CreateLinePage } from './pages/Create/Line/Loadable';
 import { CreateGuidePage } from './pages/Create/Guide/Loadable';
 import { LineEditPage } from './pages/Line/LineEditPage/Loadable';
+import { SpotDetailPage } from './pages/Spot/SpotDetailPage/Loadable';
+import { CreateSpotPage } from './pages/Create/Spot/Loadable';
+import { SpotEditPage } from './pages/Spot/SpotEditPage/Loadable';
 
 export function App() {
   useAppSlice();
@@ -107,10 +110,13 @@ export function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/line/:lineId" element={<LineDetailPage />} />
+          <Route path="/spot/:spotId" element={<SpotDetailPage />} />
           {isSignedIn && (
             <>
-              <Route path="/line/:lineId/edit" element={<LineEditPage />} />
               <Route path="/create/line" element={<CreateLinePage />} />
+              <Route path="/line/:lineId/edit" element={<LineEditPage />} />
+              <Route path="/create/spot" element={<CreateSpotPage />} />
+              <Route path="/spot/:spotId/edit" element={<SpotEditPage />} />
               <Route path="/create/guide" element={<CreateGuidePage />} />
             </>
           )}

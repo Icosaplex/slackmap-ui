@@ -34,7 +34,7 @@ export interface UpdateLineDetailsPayload {
   anchorsInfo?: string;
   gearInfo?: string;
   contactInfo?: string;
-  restrictionLevel?: SlacklineRestrictionLevel | '';
+  restrictionLevel?: SlacklineRestrictionLevel;
   extraInfo?: string;
   restrictionInfo?: string;
   isMeasured?: boolean;
@@ -51,7 +51,7 @@ export interface CreateLineDetailsPayload {
   anchorsInfo?: string;
   gearInfo?: string;
   contactInfo?: string;
-  restrictionLevel?: SlacklineRestrictionLevel | '';
+  restrictionLevel?: SlacklineRestrictionLevel;
   extraInfo?: string;
   restrictionInfo?: string;
   isMeasured?: boolean;
@@ -70,6 +70,29 @@ export interface GetSpotDetailsAPIResponse {
   createdDateTime: string;
   lastModifiedDateTime?: string;
   restrictionInfo?: string;
+  isUserEditor?: boolean;
+}
+
+export interface UpdateSpotDetailsPayload {
+  geoJson: FeatureCollection;
+  name?: string;
+  description?: string;
+  accessInfo?: string;
+  contactInfo?: string;
+  restrictionLevel?: SlacklineRestrictionLevel;
+  restrictionInfo?: string;
+  extraInfo?: string;
+}
+
+export interface CreateSpotDetailsPayload {
+  geoJson: FeatureCollection;
+  name?: string;
+  description?: string;
+  accessInfo?: string;
+  contactInfo?: string;
+  restrictionLevel?: SlacklineRestrictionLevel;
+  restrictionInfo?: string;
+  extraInfo?: string;
 }
 
 export interface GetUserBasicDetailsAPIResponse {

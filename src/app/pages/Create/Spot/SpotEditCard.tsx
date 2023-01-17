@@ -18,66 +18,34 @@ import AddIcon from '@mui/icons-material/Add';
 import { useFormik } from 'formik';
 import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
-import { LineDetailsForm } from './types';
+import { SpotDetailsForm } from './types';
 import LoadingButton from '@mui/lab/LoadingButton';
+import {
+  EditingTextFieldHeader,
+  restrictionSelectOptions,
+} from '../Line/LineEditCard';
 
-const lineTypes: { value: SlacklineType; label: string }[] = [
-  {
-    value: 'other',
-    label: 'Other',
-  },
-  {
-    value: 'highline',
-    label: 'Highline',
-  },
-  {
-    value: 'waterline',
-    label: 'Waterline',
-  },
-];
-
-export const restrictionSelectOptions: {
-  value: SlacklineRestrictionLevel;
-  label: string;
-}[] = [
-  {
-    value: 'none',
-    label: 'None',
-  },
-  {
-    value: 'partial',
-    label: 'Partially Restricted',
-  },
-  {
-    value: 'full',
-    label: 'Fully Restricted',
-  },
-];
 interface Props {
-  initialValues?: LineDetailsForm;
+  initialValues?: SpotDetailsForm;
   mapErrors?: string[];
-  onSubmit: (values: LineDetailsForm) => void;
+  onSubmit: (values: SpotDetailsForm) => void;
   disableSubmit?: boolean;
   isSubmitting?: boolean;
 }
 
-const cleanValues = (values: LineDetailsForm): LineDetailsForm => {
+const cleanValues = (values: SpotDetailsForm): SpotDetailsForm => {
   return {
-    ...values,
-    length: values.length || undefined, // avoid empty string
-    height: values.height || undefined,
+    ...values, // Nothing needed
   };
 };
 
-export const LineEditCard = (props: Props) => {
+export const SpotEditCard = (props: Props) => {
   const isCreateMode = !props.initialValues;
 
   // const validationSchema = z.object({});
 
-  const formik = useFormik<LineDetailsForm>({
+  const formik = useFormik<SpotDetailsForm>({
     initialValues: props.initialValues ?? {
-      isMeasured: false,
-      type: 'other',
       restrictionLevel: 'none',
     },
     // validationSchema: toFormikValidationSchema(validationSchema),
@@ -104,9 +72,11 @@ export const LineEditCard = (props: Props) => {
           </Avatar>
         }
         title={
-          <Typography variant="h5">
-            {isCreateMode ? 'Create New Line' : 'Edit Line'}
-          </Typography>
+          <>
+            <Typography variant="h5">
+              {isCreateMode ? 'Create New Spot' : 'Edit Spot'}
+            </Typography>
+          </>
         }
       />
       <CardContent component={Stack} spacing={1} sx={{}}>
@@ -119,45 +89,6 @@ export const LineEditCard = (props: Props) => {
         </Stack>
         <form onSubmit={formik.handleSubmit}>
           <Stack spacing={1}>
-            <EditingTextFieldHeader>Specs</EditingTextFieldHeader>
-
-            <EditingTextField
-              formik={formik}
-              select
-              field="type"
-              label="Type"
-              required
-            >
-              <MenuItem value={''}></MenuItem>
-              {lineTypes.map(option => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </EditingTextField>
-
-            <EditingTextField
-              formik={formik}
-              field="length"
-              label="Length (meters)"
-              type="number"
-            />
-
-            <EditingTextField
-              formik={formik}
-              field="height"
-              label="Height (meters)"
-              type="number"
-            />
-
-            <FormControlLabel
-              control={<Checkbox />}
-              label="Is Measured?"
-              checked={formik.values.isMeasured}
-              name="isMeasured"
-              onChange={formik.handleChange}
-            />
-
             <EditingTextFieldHeader>Details</EditingTextFieldHeader>
 
             <EditingTextField formik={formik} field={'name'} label={'Name'} />
@@ -165,12 +96,6 @@ export const LineEditCard = (props: Props) => {
               formik={formik}
               field={'description'}
               label={'Description'}
-              multiline
-            />
-            <EditingTextField
-              formik={formik}
-              field={'anchorsInfo'}
-              label={'Anchor Information'}
               multiline
             />
             <EditingTextField
@@ -241,32 +166,9 @@ export const LineEditCard = (props: Props) => {
   );
 };
 
-export const EditingTextFieldHeader = (props: {
-  children: ReactNode;
-  subHeader?: string;
-}) => {
-  const { children, subHeader } = props;
-
-  return (
-    <>
-      <Typography variant="h5" sx={{ color: t => t.palette.primary.main }}>
-        {children}
-      </Typography>
-      {subHeader && (
-        <Typography
-          variant="caption"
-          sx={{ color: t => t.palette.text.primary }}
-        >
-          {subHeader}
-        </Typography>
-      )}
-    </>
-  );
-};
-
 interface EditingTextFieldProps extends StandardTextFieldProps {
   formik: any;
-  field: keyof LineDetailsForm;
+  field: keyof SpotDetailsForm;
 }
 const EditingTextField = (props: EditingTextFieldProps) => {
   const { formik, field, ...rest } = props;

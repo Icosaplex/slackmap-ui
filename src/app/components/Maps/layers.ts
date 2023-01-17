@@ -164,10 +164,10 @@ export const polygonLayer: FillLayer = {
         ['boolean', ['feature-state', 'isSelected'], false],
         ['boolean', ['feature-state', 'isFocused'], false],
       ],
-      1,
+      0.9,
       ['boolean', ['feature-state', 'hover'], false],
       0.8,
-      0.6,
+      0.5,
     ],
     'fill-color': [
       'case',
@@ -181,13 +181,12 @@ export const polygonLayer: FillLayer = {
 export const polygonOutlineLayer: LineLayer = {
   id: 'polygonOutline',
   type: 'line',
-  minzoom: 13,
-  maxzoom: 15,
+  minzoom: 12,
   filter: ['==', ['geometry-type'], 'Polygon'],
   paint: {
-    'line-color': appColors.lineStrokeColor,
+    'line-color': appColors.spotFillColor,
     'line-width': 2,
-    'line-opacity': 0.8,
+    'line-opacity': 1,
   },
 };
 
@@ -306,46 +305,6 @@ export const unclusteredPointLayer: LayerProps = {
     'circle-stroke-width': 1,
     'circle-stroke-color': 'white',
   },
-};
-
-export const layers = {
-  // lineDisabled: (() => {
-  //   const layer = cloneDeep(lineLayerBase);
-  //   layer.id = 'lineDisabled';
-  //   layer.paint!['line-opacity'] = 0.5;
-  //   return layer;
-  // })(),
-  // lineLabelDisabled: (() => {
-  //   const layer = cloneDeep(lineLabelLayerBase);
-  //   layer.id = 'lineLabelDisabled';
-  //   layer.paint!['icon-opacity'] = 0.5;
-  //   return layer;
-  // })(),
-  // polygonDisabled: (() => {
-  //   const layer = cloneDeep(polygonLayerBase);
-  //   layer.id = 'polygonDisabled';
-  //   layer.paint!['fill-opacity'] = 0.5;
-  //   return layer;
-  // })(),
-  // lineFocused: (() => {
-  //   const layer = cloneDeep(lineLayerBase);
-  //   layer.id = 'lineFocused';
-  //   layer.paint!['line-width'] = 6;
-  //   return layer;
-  // })(),
-  // lineLabelFocused: (() => {
-  //   const layer = cloneDeep(lineLabelLayerBase);
-  //   layer.id = 'lineLabelFocused';
-  //   return layer;
-  // })(),
-  // spotFocused: (() => {
-  //   const layer = cloneDeep(polygonLayerBase);
-  //   layer.id = 'polygonFocused';
-  //   return layer;
-  // })(),
-  // cluster: clusterLayer,
-  // clusterCount: clusterCountLayer,
-  // unclusteredPoint: unclusteredPointLayer,
 };
 
 export const cursorInteractableLayerIds = [

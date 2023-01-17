@@ -1,13 +1,7 @@
-export interface LineDetailsForm {
-  type?: SlacklineType;
+export interface SpotDetailsForm {
   name?: string;
   description?: string;
-  length?: number;
-  height?: number;
-  isMeasured: boolean;
   accessInfo?: string;
-  anchorsInfo?: string;
-  gearInfo?: string;
   contactInfo?: string;
   restrictionLevel?: SlacklineRestrictionLevel;
   restrictionInfo?: string;

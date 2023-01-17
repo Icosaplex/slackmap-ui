@@ -9,7 +9,6 @@ import IconButton from '@mui/material/IconButton';
 import ShareIcon from '@mui/icons-material/Share';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MapIcon from '@mui/icons-material/Map';
-import { lineApi } from 'app/api/line-api';
 import { LoadingIndicator } from 'app/components/LoadingIndicator';
 import { format } from 'date-fns';
 import { Menu, MenuItem } from '@mui/material';
@@ -27,13 +26,14 @@ import { useConfirmDialog } from 'utils/hooks/useConfirmDialog';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { appColors } from 'styles/theme/colors';
 import startCase from 'lodash.startcase';
+import { spotApi } from 'app/api/spot-api';
 import { OutdatedInfoField } from 'app/components/TextFields/OutdatedInfoField';
 
 interface Props {
-  lineId: string;
+  spotId: string;
 }
 
-export const LineDetailCard = (props: Props) => {
+export const SpotDetailCard = (props: Props) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -43,11 +43,11 @@ export const LineDetailCard = (props: Props) => {
   });
   const confirmDialog = useConfirmDialog();
 
-  const { data: lineDetails, isFetching } = lineApi.useGetLineDetailsQuery(
-    props.lineId,
+  const { data: spotDetails, isFetching } = spotApi.useGetSpotDetailsQuery(
+    props.spotId,
   );
-  const [deleteLine, { isSuccess: isDeleted }] =
-    lineApi.useDeleteLineMutation();
+  const [deleteSpot, { isSuccess: isDeleted }] =
+    spotApi.useDeleteSpotMutation();
 
   useEffect(() => {
     if (isDeleted) {
@@ -57,16 +57,16 @@ export const LineDetailCard = (props: Props) => {
 
   const onEditClick = async () => {
     cardHeaderPopupState.close();
-    navigate(`/line/${props.lineId}/edit`);
+    navigate(`/spot/${props.spotId}/edit`);
   };
 
   const onDeleteClick = async () => {
     cardHeaderPopupState.close();
     await confirmDialog({
-      title: 'Delete line?',
-      content: 'Are you sure you want to delete this line?',
+      title: 'Delete spot?',
+      content: 'Are you sure you want to delete this spot?',
     }).then(() => {
-      deleteLine(props.lineId);
+      deleteSpot(props.spotId);
     });
   };
 
@@ -80,7 +80,7 @@ export const LineDetailCard = (props: Props) => {
         overflow: 'scroll',
       }}
     >
-      {isFetching || !lineDetails ? (
+      {isFetching || !spotDetails ? (
         <LoadingIndicator />
       ) : (
         <>
@@ -89,10 +89,10 @@ export const LineDetailCard = (props: Props) => {
               <Avatar
                 src=""
                 sx={{
-                  backgroundColor: appColors.lineStrokeColor,
+                  backgroundColor: appColors.spotFillColor,
                 }}
               >
-                L
+                S
               </Avatar>
             }
             action={
@@ -103,23 +103,23 @@ export const LineDetailCard = (props: Props) => {
                 <Menu {...bindMenu(cardHeaderPopupState)}>
                   <MenuItem
                     onClick={onEditClick}
-                    disabled={!lineDetails.isUserEditor}
+                    disabled={!spotDetails.isUserEditor}
                   >
                     Edit
                   </MenuItem>
                   <MenuItem
                     onClick={onDeleteClick}
-                    disabled={!lineDetails.isUserEditor}
+                    disabled={!spotDetails.isUserEditor}
                   >
                     Delete
                   </MenuItem>
                 </Menu>
               </>
             }
-            title={lineDetails.name || 'Unknown Name'}
+            title={spotDetails.name || 'Unknown Name'}
             subheader={`Last updated: ${format(
               new Date(
-                lineDetails.lastModifiedDateTime ?? lineDetails.createdDateTime,
+                spotDetails.lastModifiedDateTime ?? spotDetails.createdDateTime,
               ),
               'dd MMM yyy',
             )}`}
@@ -128,60 +128,38 @@ export const LineDetailCard = (props: Props) => {
             component="img"
             height="194"
             image={
-              lineDetails?.coverImageUrl || '/images/coverImageFallback.png'
+              spotDetails?.coverImageUrl || '/images/coverImageFallback.png'
             }
           />
           <CardContent component={Stack} spacing={2} sx={{}}>
             <SlacklineDetailRestrictionField
-              level={lineDetails.restrictionLevel}
-              restrictionInfo={lineDetails.restrictionInfo}
+              level={spotDetails.restrictionLevel}
+              restrictionInfo={spotDetails.restrictionInfo}
             />
+
             <OutdatedInfoField
               updatedDate={new Date(
-                lineDetails.lastModifiedDateTime ?? lineDetails.createdDateTime,
+                spotDetails.lastModifiedDateTime ?? spotDetails.createdDateTime,
               )?.toISOString()}
             />
-            <SlacklineDetailSpecsField
-              header="Specs"
-              isAccurate={lineDetails.isMeasured}
-              content={[
-                {
-                  label: 'Slackline Type',
-                  value: startCase(lineDetails.type) || '?',
-                },
-                {
-                  label: 'Length',
-                  value: `${lineDetails.length || '?'}m`,
-                },
-                {
-                  label: 'Height',
-                  value: `${lineDetails.height || '?'}m`,
-                },
-              ]}
-            />
+
             <SlacklineDetailInfoField
               header="Description"
-              content={lineDetails.description || 'Unknown'}
+              content={spotDetails.description || 'Unknown'}
             />
-            <SlacklineDetailInfoField
-              header="Anchors"
-              content={lineDetails.anchorsInfo || 'Unknown'}
-            />
+
             <SlacklineDetailInfoField
               header="Access"
-              content={lineDetails.accessInfo || 'Unknown'}
+              content={spotDetails.accessInfo || 'Unknown'}
             />
-            <SlacklineDetailInfoField
-              header="Gear"
-              content={lineDetails.gearInfo || 'Unknown'}
-            />
+
             <SlacklineDetailInfoField
               header="Contact"
-              content={lineDetails.contactInfo || 'Unknown'}
+              content={spotDetails.contactInfo || 'Unknown'}
             />
             <SlacklineDetailInfoField
               header="Additional Details"
-              content={lineDetails.extraInfo}
+              content={spotDetails.extraInfo}
               skipIfEmpty
             />
           </CardContent>
