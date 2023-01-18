@@ -52,7 +52,7 @@ export const DrawerPanel = () => {
           <ListItem disableGutters sx={{ alignItems: 'flex-start' }}>
             <NavigationIcon to="/" selected={location.pathname === '/'}>
               <PublicIcon />
-              <Typography>World Map</Typography>
+              <Typography>Slackline Map</Typography>
             </NavigationIcon>
           </ListItem>
           <ListItem disableGutters sx={{ alignItems: 'flex-start' }}>
@@ -61,7 +61,7 @@ export const DrawerPanel = () => {
               selected={location.pathname === '/communities'}
             >
               <PeopleIcon />
-              <Typography>Communities</Typography>
+              <Typography>Community Map</Typography>
             </NavigationIcon>
           </ListItem>
         </List>

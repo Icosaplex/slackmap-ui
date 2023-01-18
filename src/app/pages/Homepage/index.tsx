@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { WorldMap } from 'app/components/Maps/WorldMap';
+import { SlacklineMap } from 'app/components/Maps/SlacklineMap';
 import { Box } from '@mui/system';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -138,7 +138,7 @@ export function Homepage(props: Props) {
       </SpeedDial>
 
       {/* <Button></Button> */}
-      <WorldMap
+      <SlacklineMap
         onSelectedFeatureChange={onSelectedFeatureChange}
         onMapMoveEnd={onMapMoveEnd}
         initialViewState={mapUrlSearchParams.parse(searchParams)}

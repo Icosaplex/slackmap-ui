@@ -54,7 +54,7 @@ interface Props {
   onSelectedFeatureChange?: (feature?: MapboxGeoJSONFeature) => void;
 }
 
-export const WorldMap = (props: Props) => {
+export const SlacklineMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
   const [zoomLevel, setZoomLevel] = useState(props.initialViewState?.zoom);
   const { mapStyle, projection } = useMapStyle(zoomLevel);
@@ -69,7 +69,7 @@ export const WorldMap = (props: Props) => {
   const setSelectedFeature = useSelectedFeature(mapRef);
   const { isMapLoaded, onMapLoad, onSourceData, onMouseMove, onClick, cursor } =
     useMapEvents(mapRef, {
-      clusterSourceId: 'worldMapCluster',
+      clusterSourceId: 'slacklineMapCluster',
       onMouseMovedToFeature(feature) {
         if (isMouseHoverableLayer(feature.layer.id)) {
           setHoveredFeature(feature);

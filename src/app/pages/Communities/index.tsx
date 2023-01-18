@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { WorldMap } from 'app/components/Maps/WorldMap';
 import { Box } from '@mui/system';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { mapUrlSearchParams } from 'app/components/Maps/mapUtils';

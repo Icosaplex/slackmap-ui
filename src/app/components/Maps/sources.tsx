@@ -68,7 +68,7 @@ export const MapSources = (props: Props) => {
         {clusterGeoJsonUrl && (
           <Source
             key={clusterGeoJsonUrl}
-            id="worldMapCluster"
+            id="slacklineMapCluster"
             type="geojson"
             data={clusterGeoJsonUrl}
             cluster={true}
