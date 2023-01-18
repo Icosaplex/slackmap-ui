@@ -16,6 +16,8 @@ export const geoJsonURL = {
   spotPoints: baseUrl + '/geojson/spots/points.geojson',
   spots: baseUrl + '/geojson/spots/main.geojson',
   clustersMain: baseUrl + '/geojson/clusters/main.geojson',
+  communities:
+    'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/communities.geojson',
 };
 
 export const mapStyles = {

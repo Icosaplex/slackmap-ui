@@ -152,7 +152,7 @@ export const LineEditCard = (props: Props) => {
 
             <FormControlLabel
               control={<Checkbox />}
-              label="Is Measured?"
+              label="Is Laser Measured?"
               checked={formik.values.isMeasured}
               name="isMeasured"
               onChange={formik.handleChange}
@@ -160,7 +160,11 @@ export const LineEditCard = (props: Props) => {
 
             <EditingTextFieldHeader>Details</EditingTextFieldHeader>
 
-            <EditingTextField formik={formik} field={'name'} label={'Name'} />
+            <EditingTextField
+              formik={formik}
+              field={'name'}
+              label={'Name of the line'}
+            />
             <EditingTextField
               formik={formik}
               field={'description'}

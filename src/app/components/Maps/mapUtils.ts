@@ -9,9 +9,12 @@ import {
   Point,
   round,
 } from '@turf/turf';
-import { MapboxGeoJSONFeature } from 'mapbox-gl';
+import { MapboxGeoJSONFeature, PaddingOptions, FlyToOptions } from 'mapbox-gl';
 import mapboxgl from 'mapbox-gl';
 import { geoJsonURL } from './constants';
+import { Position } from 'geojson';
+import { RefObject } from 'react';
+import { MapRef } from 'react-map-gl';
 
 // FIX: https://github.com/visgl/react-map-gl/issues/1266
 // @ts-ignore
@@ -22,17 +25,18 @@ mapboxgl.workerClass =
 export const pointsGeoJsonDict: { [key: string]: Feature<Point> } = {};
 // This http get will directly get from browser cache. Its only called after Mapbox Loaded the source.
 // Clustered points have buggy coordinates, so we need to get the original coordinates from the geojson.
-export const cacheClustersGeoJson = async () => {
-  if (Object.keys(pointsGeoJsonDict).length === 0) {
-    const url = geoJsonURL.clustersMain;
-    const response = await fetch(url).then(r => r.json());
-    if (response) {
-      featureEach<Point>(response, pointFeature => {
-        if (pointFeature.properties?.id) {
-          pointsGeoJsonDict[pointFeature.properties?.id] = pointFeature;
-        }
-      });
-    }
+export const cacheClustersGeoJson = async (sourceId: string) => {
+  let url = geoJsonURL.clustersMain;
+  if (sourceId === 'communitiesCluster') {
+    url = geoJsonURL.communities;
+  }
+  const response = await fetch(url).then(r => r.json());
+  if (response) {
+    featureEach<Point>(response, pointFeature => {
+      if (pointFeature.properties?.id) {
+        pointsGeoJsonDict[pointFeature.properties?.id] = pointFeature;
+      }
+    });
   }
 };
 
@@ -90,4 +94,46 @@ export const calculateBounds = (
     circle(center(bboxPolygon(exactBounds)), radius, { steps: 4 }),
   ) as [number, number, number, number];
   return { exactBounds, marginedBounds };
+};
+
+export const flyMapTo = (
+  mapRef: RefObject<MapRef>,
+  position: Position,
+  opts: { zoom?: number; padding?: Partial<PaddingOptions> } = {},
+) => {
+  const map = mapRef.current;
+  const params: FlyToOptions = {
+    center: [position[0], position[1]],
+    duration: 300,
+  };
+  if (opts.zoom) params.zoom = opts.zoom;
+  if (opts.padding)
+    params.padding = {
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      ...opts.padding,
+    };
+  map?.flyTo(params);
+};
+
+export const zoomToUserLocation = async (
+  mapRef: RefObject<MapRef>,
+  opts: { zoom?: number } = {},
+) => {
+  const response = await fetch('https://ipapi.co/json/')
+    .then(r =>
+      r.json().then(data => ({
+        longitude: data.longitude as number,
+        latitude: data.latitude as number,
+        zoom: opts.zoom,
+      })),
+    )
+    .catch(err => undefined);
+  if (response) {
+    flyMapTo(mapRef, [response.longitude, response.latitude], {
+      zoom: response.zoom,
+    });
+  }
 };

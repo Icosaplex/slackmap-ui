@@ -1,5 +1,6 @@
 import { darken, lighten } from '@mui/material';
 import type {
+  CircleLayer,
   FillLayer,
   LayerProps,
   LineLayer,
@@ -275,7 +276,6 @@ export const clusterLayer: LayerProps = {
 export const clusterCountLayer: LayerProps = {
   id: 'clusterCount',
   type: 'symbol',
-  source: 'points',
   filter: ['has', 'point_count'],
   layout: {
     'text-field': '{point_count_abbreviated}',
@@ -284,10 +284,9 @@ export const clusterCountLayer: LayerProps = {
   },
 };
 
-export const unclusteredPointLayer: LayerProps = {
+export const unclusteredPointLayer: CircleLayer = {
   id: 'unclusteredPoint',
   type: 'circle',
-  source: 'points',
   maxzoom: 13,
   filter: ['!', ['has', 'point_count']],
   paint: {
@@ -307,7 +306,7 @@ export const unclusteredPointLayer: LayerProps = {
   },
 };
 
-export const cursorInteractableLayerIds = [
+const cursorInteractableLayerIds = [
   lineLayer.id!,
   lineLabelLayer.id!,
   polygonLayer.id!,
@@ -315,8 +314,14 @@ export const cursorInteractableLayerIds = [
   clusterLayer.id!,
 ];
 
-export const mouseHoverableLayersIds = [
+const mouseHoverableLayersIds = [
   lineLayer.id!,
   lineLabelLayer.id!,
   polygonLayer.id!,
 ];
+
+export const isMouseHoverableLayer = (layerId: string) =>
+  mouseHoverableLayersIds.includes(layerId);
+
+export const isCursorInteractableLayer = (layerId: string) =>
+  cursorInteractableLayerIds.includes(layerId);

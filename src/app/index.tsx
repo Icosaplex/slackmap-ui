@@ -27,6 +27,7 @@ import { LineEditPage } from './pages/Line/LineEditPage/Loadable';
 import { SpotDetailPage } from './pages/Spot/SpotDetailPage/Loadable';
 import { CreateSpotPage } from './pages/Create/Spot/Loadable';
 import { SpotEditPage } from './pages/Spot/SpotEditPage/Loadable';
+import { CommunitiesPage } from './pages/Communities/Loadable';
 
 export function App() {
   useAppSlice();
@@ -109,6 +110,7 @@ export function App() {
       <AppDrawer>
         <Routes>
           <Route path="/" element={<Homepage />} />
+          <Route path="/communities" element={<CommunitiesPage />} />
           <Route path="/line/:lineId" element={<LineDetailPage />} />
           <Route path="/spot/:spotId" element={<SpotDetailPage />} />
           {isSignedIn && (

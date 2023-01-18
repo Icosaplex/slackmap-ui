@@ -10,21 +10,16 @@ import {
 } from 'react-map-gl';
 import type { MapRef } from 'react-map-gl';
 import {
-  cursorInteractableLayerIds,
+  isCursorInteractableLayer,
+  isMouseHoverableLayer,
   lineLabelLayer,
   lineLayer,
-  mouseHoverableLayersIds,
   polygonLayer,
 } from './layers';
 import { MapImage } from './Components/MapImage';
 import { calculateBounds, parseMapFeature } from './mapUtils';
 import { FeatureCollection } from '@turf/turf';
-import {
-  defaultMapViewState,
-  geoJsonURL,
-  MAPBOX_TOKEN,
-  mapStyles,
-} from './constants';
+import { defaultMapViewState, MAPBOX_TOKEN, mapStyles } from './constants';
 import { FocusedButton } from './Components/FocusButton';
 import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
 import { MapSources } from './sources';
@@ -132,11 +127,11 @@ export const FocusedMap = (props: Props) => {
       return;
     }
 
-    if (cursorInteractableLayerIds.includes(feature.layer.id)) {
+    if (isCursorInteractableLayer(feature.layer.id)) {
       setCursor('pointer');
     }
 
-    if (mouseHoverableLayersIds.includes(feature.layer.id)) {
+    if (isMouseHoverableLayer(feature.layer.id)) {
       setHoveredFeature(feature);
     }
   };
@@ -148,7 +143,7 @@ export const FocusedMap = (props: Props) => {
     if (!feature) {
       return;
     }
-    if (mouseHoverableLayersIds.includes(feature.layer.id)) {
+    if (isMouseHoverableLayer(feature.layer.id)) {
       const { id, type } = parseMapFeature(feature);
       if (id && typeof id === 'string' && type) {
         props.onFeatureClick(id, type);

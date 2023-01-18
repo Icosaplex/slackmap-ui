@@ -1,20 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { WorldMap } from 'app/components/Maps/WorldMap';
 import { Box } from '@mui/system';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { mapUrlSearchParams } from 'app/components/Maps/mapUtils';
-import { ViewStateChangeEvent } from 'react-map-gl';
+import {
+  mapUrlSearchParams,
+  parseMapFeature,
+} from 'app/components/Maps/mapUtils';
+import { MapboxGeoJSONFeature, ViewStateChangeEvent } from 'react-map-gl';
 import { SpeedDial, SpeedDialAction } from '@mui/material';
 import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import AddIcon from '@mui/icons-material/Add';
 import PentagonIcon from '@mui/icons-material/Pentagon';
 import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
 import { useSignInAlert } from 'utils/hooks/useSignInAlert';
+import { LineInfoPopup } from 'app/components/Maps/Components/Popups/LineInfoPopup';
+import { SpotInfoPopup } from 'app/components/Maps/Components/Popups/SpotInfoPopup';
 
 interface Props {}
 
 export function Homepage(props: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedFeature, setSelectedFeature] = useState<{
+    id: string;
+    type: MapSlacklineFeatureType;
+  }>();
+
   const navigate = useNavigate();
   const checkUserSignIn = useSignInAlert();
 
@@ -39,11 +49,12 @@ export function Homepage(props: Props) {
     }
   };
 
-  const onDetailsClick = (id: string, type: MapSlacklineFeatureType) => {
-    if (type === 'line') {
-      navigate(`/line/${id}`);
-    } else if (type === 'spot') {
-      navigate(`/spot/${id}`);
+  const onSelectedFeatureChange = (feature?: MapboxGeoJSONFeature) => {
+    if (!feature) return setSelectedFeature(undefined);
+
+    const { id, type } = parseMapFeature(feature);
+    if (id && typeof id === 'string' && type) {
+      setSelectedFeature({ id, type });
     }
   };
 
@@ -55,6 +66,33 @@ export function Homepage(props: Props) {
     );
     setSearchParams(searchParams, { replace: true });
   };
+
+  const Popup = useMemo(() => {
+    if (!selectedFeature) return null;
+
+    if (selectedFeature.type === 'line') {
+      return (
+        <LineInfoPopup
+          lineId={selectedFeature.id}
+          onDetailsClick={() => {
+            navigate(`/line/${selectedFeature.id}`);
+          }}
+        />
+      );
+    }
+
+    if (selectedFeature.type === 'spot') {
+      return (
+        <SpotInfoPopup
+          spotId={selectedFeature.id}
+          onDetailsClick={() => {
+            navigate(`/spot/${selectedFeature.id}`);
+          }}
+        />
+      );
+    }
+    return null;
+  }, [navigate, selectedFeature]);
 
   return (
     <Box
@@ -101,11 +139,10 @@ export function Homepage(props: Props) {
 
       {/* <Button></Button> */}
       <WorldMap
-        onPopupDetailsClick={onDetailsClick}
+        onSelectedFeatureChange={onSelectedFeatureChange}
         onMapMoveEnd={onMapMoveEnd}
         initialViewState={mapUrlSearchParams.parse(searchParams)}
-        showInfoPopup
-        zoomToUserLocation
+        popup={Popup}
       />
     </Box>
   );

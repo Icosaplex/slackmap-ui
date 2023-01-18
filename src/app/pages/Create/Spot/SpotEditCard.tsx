@@ -91,7 +91,11 @@ export const SpotEditCard = (props: Props) => {
           <Stack spacing={1}>
             <EditingTextFieldHeader>Details</EditingTextFieldHeader>
 
-            <EditingTextField formik={formik} field={'name'} label={'Name'} />
+            <EditingTextField
+              formik={formik}
+              field={'name'}
+              label={'Name of the spot'}
+            />
             <EditingTextField
               formik={formik}
               field={'description'}

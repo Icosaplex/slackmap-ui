@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import React, { ReactNode } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { Link as RouterLink, NavLink } from 'react-router-dom';
+import { Link as RouterLink, NavLink, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import InputIcon from '@mui/icons-material/Input';
 import PublicIcon from '@mui/icons-material/Public';
@@ -28,6 +28,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import { Footer } from './Footer';
 
 export const DrawerPanel = () => {
+  const location = useLocation();
   return (
     <Box
       sx={{
@@ -35,8 +36,6 @@ export const DrawerPanel = () => {
         flexDirection: 'column',
         height: '100%',
         padding: 2,
-        // backgroundColor: t => t.palette.primary.dark,
-        // color: t => t.palette.primary.contrastText,
       }}
     >
       <Stack spacing={2} alignItems={'strech'}>
@@ -51,13 +50,16 @@ export const DrawerPanel = () => {
         <Profile />
         <List>
           <ListItem disableGutters sx={{ alignItems: 'flex-start' }}>
-            <NavigationIcon to="/">
+            <NavigationIcon to="/" selected={location.pathname === '/'}>
               <PublicIcon />
               <Typography>World Map</Typography>
             </NavigationIcon>
           </ListItem>
           <ListItem disableGutters sx={{ alignItems: 'flex-start' }}>
-            <NavigationIcon to="/" disabled>
+            <NavigationIcon
+              to="/communities"
+              selected={location.pathname === '/communities'}
+            >
               <PeopleIcon />
               <Typography>Communities</Typography>
             </NavigationIcon>
@@ -75,13 +77,15 @@ const NavigationIcon = (props: {
   to: string;
   children: ReactNode;
   disabled?: boolean;
+  selected?: boolean;
 }) => {
   return (
     <IconButton
       color="inherit"
-      to={'/'}
+      to={props.to}
       component={NavLink}
       size="small"
+      disabled={props.disabled}
       sx={{
         borderRadius: 1,
         justifyContent: 'flex-start',
@@ -90,8 +94,9 @@ const NavigationIcon = (props: {
         '& .MuiTypography-body1': {
           marginLeft: 2,
         },
+        backgroundColor: t =>
+          props.selected ? t.palette.primary.main : 'none',
       }}
-      disabled={props.disabled}
     >
       {props.children}
     </IconButton>

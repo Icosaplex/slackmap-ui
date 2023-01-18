@@ -14,7 +14,12 @@ import {
 } from './layers';
 
 interface Props {
-  options: LegendOptions;
+  options: {
+    spots?: boolean;
+    lines?: boolean;
+    guides?: boolean;
+    communities?: boolean;
+  };
   disableClustering?: boolean;
   filterId?: string;
 }
@@ -34,96 +39,121 @@ export const MapSources = (props: Props) => {
     }
   }
 
-  return (
-    <>
-      {clusterGeoJsonUrl && (
+  if (options.communities) {
+    return (
+      <>
         <Source
           key={clusterGeoJsonUrl}
-          id="clusterPoints"
+          id="communitiesCluster"
           type="geojson"
-          data={clusterGeoJsonUrl}
+          data={geoJsonURL.communities}
           cluster={true}
-          clusterMaxZoom={13}
           clusterMinPoints={3}
           clusterRadius={60}
           generateId={true}
-          clusterProperties={
-            isJoinedClustering
-              ? undefined
-              : {
-                  ft: [
-                    ['get', 'ft'],
-                    ['get', 'ft'],
-                  ],
-                }
-          }
         >
           <Layer {...clusterLayer} />
           <Layer {...clusterCountLayer} />
-          <Layer {...unclusteredPointLayer} />
+          <Layer
+            {...unclusteredPointLayer}
+            maxzoom={21}
+            paint={{ ...unclusteredPointLayer.paint, 'circle-radius': 8 }}
+          />
         </Source>
-      )}
+      </>
+    );
+  } else {
+    return (
+      <>
+        {clusterGeoJsonUrl && (
+          <Source
+            key={clusterGeoJsonUrl}
+            id="worldMapCluster"
+            type="geojson"
+            data={clusterGeoJsonUrl}
+            cluster={true}
+            clusterMaxZoom={13}
+            clusterMinPoints={3}
+            clusterRadius={60}
+            generateId={true}
+            clusterProperties={
+              isJoinedClustering
+                ? undefined
+                : {
+                    ft: [
+                      ['get', 'ft'],
+                      ['get', 'ft'],
+                    ],
+                  }
+            }
+          >
+            <Layer {...clusterLayer} />
+            <Layer {...clusterCountLayer} />
+            <Layer {...unclusteredPointLayer} />
+          </Source>
+        )}
 
-      <Source
-        id="spots"
-        type="geojson"
-        data={geoJsonURL.spots}
-        generateId={true}
-        promoteId="id"
-        filter={filterId ? ['!=', ['get', 'id'], filterId] : undefined}
-      >
-        <Layer
-          {...polygonLayer}
-          layout={{
-            ...polygonLayer.layout,
-            visibility: options.spots ? 'visible' : 'none',
-          }}
-        />
-        <Layer
-          {...polygonOutlineLayer}
-          layout={{
-            ...polygonOutlineLayer.layout,
-            visibility: options.spots ? 'visible' : 'none',
-          }}
-        />
-        <Layer
-          {...polygonLabelLayer}
-          layout={{
-            ...polygonLabelLayer.layout,
-            visibility: options.spots ? 'visible' : 'none',
-          }}
-        />
-      </Source>
+        <Source
+          id="spots"
+          type="geojson"
+          data={geoJsonURL.spots}
+          generateId={true}
+          promoteId="id"
+          filter={filterId ? ['!=', ['get', 'id'], filterId] : undefined}
+        >
+          <Layer
+            {...polygonLayer}
+            layout={{
+              ...polygonLayer.layout,
+              visibility: options.spots ? 'visible' : 'none',
+            }}
+          />
+          <Layer
+            {...polygonOutlineLayer}
+            layout={{
+              ...polygonOutlineLayer.layout,
+              visibility: options.spots ? 'visible' : 'none',
+            }}
+          />
+          <Layer
+            {...polygonLabelLayer}
+            layout={{
+              ...polygonLabelLayer.layout,
+              visibility: options.spots ? 'visible' : 'none',
+            }}
+          />
+        </Source>
 
-      <Source
-        id="lines"
-        type="geojson"
-        data={geoJsonURL.lines}
-        generateId
-        promoteId="id"
-        filter={filterId ? ['!=', ['get', 'id'], filterId] : undefined}
-      >
-        <Layer
-          {...lineLayer}
-          layout={{
-            ...lineLayer.layout,
-            visibility: options.lines ? 'visible' : 'none',
-          }}
-          // filter={['all', lineLayer.filter, ['!=', ['id'], excludeId || null]]}
-        />
-        <Layer
-          {...lineLabelLayer}
-          layout={{
-            ...lineLabelLayer.layout,
-            visibility: options.lines ? 'visible' : 'none',
-          }}
-          // filter={[
-          //   'all',
-          //   lineLabelLayer.filter,
-          //   ['!=', ['id'], excludeId || null],
-          // ]}
-        />
-      </Source>
-    </>
-  );
+        <Source
+          id="lines"
+          type="geojson"
+          data={geoJsonURL.lines}
+          generateId
+          promoteId="id"
+          filter={filterId ? ['!=', ['get', 'id'], filterId] : undefined}
+        >
+          <Layer
+            {...lineLayer}
+            layout={{
+              ...lineLayer.layout,
+              visibility: options.lines ? 'visible' : 'none',
+            }}
+            // filter={['all', lineLayer.filter, ['!=', ['id'], excludeId || null]]}
+          />
+          <Layer
+            {...lineLabelLayer}
+            layout={{
+              ...lineLabelLayer.layout,
+              visibility: options.lines ? 'visible' : 'none',
+            }}
+            // filter={[
+            //   'all',
+            //   lineLabelLayer.filter,
+            //   ['!=', ['id'], excludeId || null],
+            // ]}
+          />
+        </Source>
+      </>
+    );
+  }
 };

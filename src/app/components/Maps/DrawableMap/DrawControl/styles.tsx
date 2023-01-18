@@ -167,7 +167,7 @@ export const drawControlStyles = (
         ['!=', 'mode', 'static'],
       ],
       paint: {
-        'circle-radius': 3,
+        'circle-radius': 5,
         'circle-color': '#D20C0C',
       },
     },

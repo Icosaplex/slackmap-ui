@@ -28,7 +28,7 @@ import {
 } from './layers';
 import { useMapStyle } from './useMapStyle';
 import { MapImage } from './Components/MapImage';
-import { defaultMapViewState, MAPBOX_TOKEN } from './constants';
+import { defaultMapViewState, MAPBOX_TOKEN, mapStyles } from './constants';
 import { MapLogo } from './Components/Logo';
 import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
 import { CustomPopup } from './Components/Popups/CustomPopup';
@@ -40,12 +40,7 @@ import {
   useSelectedFeature,
   useZoomToUserLocationOnMapLoad,
 } from './mapHooks';
-import {
-  calculateBounds,
-  parseMapFeature,
-  pointsGeoJsonDict,
-} from './mapUtils';
-import { Box } from '@mui/system';
+import { parseMapFeature } from './mapUtils';
 
 interface Props {
   onMapMoveEnd?: (event: ViewStateChangeEvent) => void;
@@ -54,22 +49,17 @@ interface Props {
   onSelectedFeatureChange?: (feature?: MapboxGeoJSONFeature) => void;
 }
 
-export const WorldMap = (props: Props) => {
+export const CommunityMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
   const [zoomLevel, setZoomLevel] = useState(props.initialViewState?.zoom);
-  const { mapStyle, projection } = useMapStyle(zoomLevel);
+  const { projection } = useMapStyle(zoomLevel);
   const [popupLocation, setPopupLocation] = useState<Position>();
-
-  const [legendOptions, setLegendOptions] = useState<LegendOptions>({
-    lines: true,
-    spots: true,
-  });
 
   const setHoveredFeature = useHoveredFeature(mapRef);
   const setSelectedFeature = useSelectedFeature(mapRef);
   const { isMapLoaded, onMapLoad, onSourceData, onMouseMove, onClick, cursor } =
     useMapEvents(mapRef, {
-      clusterSourceId: 'worldMapCluster',
+      clusterSourceId: 'communitiesCluster',
       onMouseMovedToFeature(feature) {
         if (isMouseHoverableLayer(feature.layer.id)) {
           setHoveredFeature(feature);
@@ -78,27 +68,16 @@ export const WorldMap = (props: Props) => {
       onMouseMovedToVoid() {
         setHoveredFeature(undefined);
       },
-      onClickedToFeature(feature) {
-        if (feature.layer.id === unclusteredPointLayer.id) {
-          const pointFeature = pointsGeoJsonDict[feature.properties?.id];
-          if (pointFeature) {
-            const { marginedBounds } = calculateBounds(
-              pointFeature.geometry,
-              parseFloat(feature.properties?.l),
-            );
-            mapRef.current?.fitBounds(marginedBounds);
-          }
-        } else if (isMouseHoverableLayer(feature.layer.id)) {
-          setSelectedFeature(feature);
-          const { center } = parseMapFeature(feature);
-          setPopupLocation(center);
-          props.onSelectedFeatureChange?.(feature);
-        }
-      },
       onClickedToVoid() {
         setSelectedFeature(undefined);
         setPopupLocation(undefined);
         props.onSelectedFeatureChange?.(undefined);
+      },
+      onClickedToFeature(feature) {
+        setSelectedFeature(feature);
+        const { center } = parseMapFeature(feature);
+        setPopupLocation(center);
+        props.onSelectedFeatureChange?.(feature);
       },
     });
 
@@ -106,10 +85,6 @@ export const WorldMap = (props: Props) => {
     mapRef,
     isMapLoaded && !props.initialViewState,
   );
-
-  const onLegendOptionsUpdate = (options: LegendOptions) => {
-    setLegendOptions(options);
-  };
 
   const onPopupClose = () => {
     setPopupLocation(undefined);
@@ -122,22 +97,11 @@ export const WorldMap = (props: Props) => {
     <>
       {!isMapLoaded && <MapLoadingPlaceholder />}
       <MapLogo />
-      <MapLegend
-        options={legendOptions}
-        onOptionsChange={onLegendOptionsUpdate}
-      />
       <ReactMapGL
         initialViewState={props.initialViewState || defaultMapViewState}
-        mapStyle={mapStyle}
+        mapStyle={mapStyles.light}
         mapboxAccessToken={MAPBOX_TOKEN}
-        interactiveLayerIds={[
-          lineLayer.id!,
-          lineLabelLayer.id!,
-          polygonLayer.id!,
-          polygonLabelLayer.id!,
-          unclusteredPointLayer.id!,
-          clusterLayer.id!,
-        ]}
+        interactiveLayerIds={[unclusteredPointLayer.id!, clusterLayer.id!]}
         attributionControl={false}
         onLoad={onMapLoad}
         onSourceData={onSourceData}
@@ -145,9 +109,6 @@ export const WorldMap = (props: Props) => {
         onMoveEnd={props.onMapMoveEnd}
         onMouseMove={onMouseMove}
         cursor={cursor}
-        onZoom={e => {
-          setZoomLevel(e.viewState.zoom);
-        }}
         pitchWithRotate={false}
         maxPitch={0}
         // reuseMaps
@@ -160,6 +121,9 @@ export const WorldMap = (props: Props) => {
             'high-color': 'black',
           } as any
         }
+        onZoom={e => {
+          setZoomLevel(e.viewState.zoom);
+        }}
       >
         <GeolocateControl />
         <AttributionControl
@@ -181,7 +145,7 @@ export const WorldMap = (props: Props) => {
             {props.popup}
           </CustomPopup>
         )}
-        <MapSources options={legendOptions} />
+        <MapSources options={{ communities: true }} />
       </ReactMapGL>
     </>
   );
