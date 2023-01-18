@@ -49,9 +49,7 @@ export const MapSources = (props: Props) => {
           generateId={true}
           clusterProperties={
             isJoinedClustering
-              ? {
-                  ft: ['max', ['get', 'ft2']],
-                }
+              ? undefined
               : {
                   ft: [
                     ['get', 'ft'],

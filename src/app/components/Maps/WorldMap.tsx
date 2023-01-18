@@ -33,7 +33,7 @@ import { MapImage } from './Components/MapImage';
 import { InfoPopup } from './Components/InfoPopup';
 import { FlyToOptions, MapSourceDataEvent, PaddingOptions } from 'mapbox-gl';
 import {
-  cachePointsGeoJson,
+  cacheClustersGeoJson,
   calculateBounds,
   parseMapFeature,
   pointsGeoJsonDict,
@@ -76,7 +76,6 @@ export const WorldMap = (props: Props) => {
     id: string;
     position: Position;
   }>();
-  const [loadedSourceId, setLoadedSourceId] = useState<string>();
   const { isDesktop } = useMediaQuery();
 
   const flyTo = (
@@ -119,38 +118,21 @@ export const WorldMap = (props: Props) => {
     };
     setPopup(undefined);
     zoomToUserLocation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMapLoaded, props.zoomToUserLocation, props.initialViewState]);
 
-  useEffect(() => {
-    if (!loadedSourceId) return;
-    cachePointsGeoJson(loadedSourceId);
-  }, [loadedSourceId]);
 
   useEffect(() => {
     if (!mapRef.current) return;
     const map = mapRef.current;
 
     if (hoveredFeature) {
-      // const renderedFeatures = map.queryRenderedFeatures();
-      // const featuresWithId = renderedFeatures.filter(
-      //   f => f.properties?.id === hoveredFeature.properties?.id,
-      // );
-      // for (const feature of featuresWithId) {
       map.setFeatureState(hoveredFeature, { hover: true });
-      // }
     }
     return () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const map = mapRef.current;
       if (hoveredFeature && map) {
-        // const renderedFeatures = map.queryRenderedFeatures();
-        // const featuresWithId = renderedFeatures.filter(
-        //   f => f.properties?.id === hoveredFeature.properties?.id,
-        // );
-        // for (const feature of featuresWithId) {
         map?.removeFeatureState(hoveredFeature, 'hover');
-        // }
       }
     };
   }, [hoveredFeature]);
@@ -196,7 +178,7 @@ export const WorldMap = (props: Props) => {
 
   const onSourceData = (event: MapSourceDataEvent) => {
     if (event.sourceId === 'clusterPoints' && event.isSourceLoaded) {
-      setLoadedSourceId(event.sourceId);
+      cacheClustersGeoJson();
     }
   };
 
@@ -264,6 +246,13 @@ export const WorldMap = (props: Props) => {
     setLegendOptions(options);
   };
 
+  const onPopupClose = () => {
+    setPopup(undefined);
+    mapRef.current?.easeTo({
+      padding: { top: 0, left: 0, bottom: 0, right: 0 },
+    });
+  };
+
   return (
     <>
       {!isMapLoaded && <MapLoadingPlaceholder />}
@@ -320,7 +309,7 @@ export const WorldMap = (props: Props) => {
             longitude={popup.position[0]}
             latitude={popup.position[1]}
             anchor="left"
-            onClose={() => setPopup(undefined)}
+            onClose={onPopupClose}
             maxWidth="none"
           >
             <InfoPopup

@@ -19,25 +19,21 @@ mapboxgl.workerClass =
   // eslint-disable-next-line import/no-webpack-loader-syntax
   require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
-const cachedSourceIds: Record<string, boolean> = {};
 export const pointsGeoJsonDict: { [key: string]: Feature<Point> } = {};
 // This http get will directly get from browser cache. Its only called after Mapbox Loaded the source.
 // Clustered points have buggy coordinates, so we need to get the original coordinates from the geojson.
-export const cachePointsGeoJson = async (sourceId: string) => {
-  if (cachedSourceIds[sourceId]) {
-    return;
+export const cacheClustersGeoJson = async () => {
+  if (Object.keys(pointsGeoJsonDict).length === 0) {
+    const url = geoJsonURL.clustersMain;
+    const response = await fetch(url).then(r => r.json());
+    if (response) {
+      featureEach<Point>(response, pointFeature => {
+        if (pointFeature.properties?.id) {
+          pointsGeoJsonDict[pointFeature.properties?.id] = pointFeature;
+        }
+      });
+    }
   }
-
-  const url = geoJsonURL.clustersMain;
-  const response = await fetch(url).then(r => r.json());
-  if (response) {
-    featureEach<Point>(response, pointFeature => {
-      if (pointFeature.properties?.id) {
-        pointsGeoJsonDict[pointFeature.properties?.id] = pointFeature;
-      }
-    });
-  }
-  cachedSourceIds[sourceId] = true;
 };
 
 export const mapUrlSearchParams = {
@@ -93,11 +89,5 @@ export const calculateBounds = (
   const marginedBounds = bbox(
     circle(center(bboxPolygon(exactBounds)), radius, { steps: 4 }),
   ) as [number, number, number, number];
-
-  // console.log(
-  //   JSON.stringify(
-  //     circle(center(bboxPolygon(exactBounds)), radius, { steps: 4 }),
-  //   ),
-  // );
   return { exactBounds, marginedBounds };
 };
