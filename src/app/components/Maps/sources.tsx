@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Source, Layer, useMap } from 'react-map-gl';
+import { appColors } from 'styles/theme/colors';
 import { LegendOptions } from './Components/MapLegend';
 import { geoJsonURL } from './constants';
 import {
@@ -7,6 +8,7 @@ import {
   clusterLayer,
   lineLabelLayer,
   lineLayer,
+  pointLayer,
   polygonLabelLayer,
   polygonLayer,
   polygonOutlineLayer,
@@ -43,21 +45,17 @@ export const MapSources = (props: Props) => {
     return (
       <>
         <Source
-          key={clusterGeoJsonUrl}
-          id="communitiesCluster"
+          id="communities"
           type="geojson"
           data={geoJsonURL.communities}
-          cluster={true}
-          clusterMinPoints={3}
-          clusterRadius={60}
           generateId={true}
         >
-          <Layer {...clusterLayer} />
-          <Layer {...clusterCountLayer} />
           <Layer
-            {...unclusteredPointLayer}
-            maxzoom={21}
-            paint={{ ...unclusteredPointLayer.paint, 'circle-radius': 8 }}
+            {...pointLayer}
+            paint={{
+              ...pointLayer!.paint,
+              'circle-color': appColors.isaBlue,
+            }}
           />
         </Source>
       </>

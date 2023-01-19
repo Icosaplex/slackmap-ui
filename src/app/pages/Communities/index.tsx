@@ -17,7 +17,6 @@ interface Props {}
 
 export function CommunitiesPage(props: Props) {
   const [selectedFeatureId, setSelectedFeatureId] = useState<string>();
-  const navigate = useNavigate();
 
   const onSelectedFeatureChange = (feature?: MapboxGeoJSONFeature) => {
     if (!feature) return setSelectedFeatureId(undefined);
@@ -26,9 +25,8 @@ export function CommunitiesPage(props: Props) {
 
   const Popup = useMemo(() => {
     if (!selectedFeatureId) return null;
-
     return <CommunityInfoPopup id={selectedFeatureId} />;
-  }, [navigate, selectedFeatureId]);
+  }, [selectedFeatureId]);
 
   return (
     <Box

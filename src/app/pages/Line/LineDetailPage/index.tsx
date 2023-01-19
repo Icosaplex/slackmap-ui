@@ -6,6 +6,8 @@ import { lineApi } from 'app/api/line-api';
 import { LineDetailCard } from './LineDetailCard';
 import { FocusedMap } from 'app/components/Maps/FocusedMap';
 import { centerOfMass } from '@turf/turf';
+import { MapboxGeoJSONFeature } from 'mapbox-gl';
+import { parseMapFeature } from 'app/components/Maps/mapUtils';
 
 interface Props {}
 
@@ -23,12 +25,15 @@ export function LineDetailPage(props: Props) {
     }
   }, [isError]);
 
-  const onFeatureClick = (id: string, type: MapSlacklineFeatureType) => {
-    if (type === 'line') {
-      navigate(`/line/${id}`);
-    }
-    if (type === 'spot') {
-      navigate(`/spot/${id}`);
+  const onFeatureClick = (feature: MapboxGeoJSONFeature) => {
+    const { id, type } = parseMapFeature(feature);
+    if (id && typeof id === 'string' && type) {
+      if (type === 'line') {
+        navigate(`/line/${id}`);
+      }
+      if (type === 'spot') {
+        navigate(`/spot/${id}`);
+      }
     }
   };
 

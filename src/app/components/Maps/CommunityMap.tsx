@@ -25,6 +25,7 @@ import {
   clusterLayer,
   polygonLabelLayer,
   isMouseHoverableLayer,
+  pointLayer,
 } from './layers';
 import { useMapStyle } from './useMapStyle';
 import { MapImage } from './Components/MapImage';
@@ -57,29 +58,34 @@ export const CommunityMap = (props: Props) => {
 
   const setHoveredFeature = useHoveredFeature(mapRef);
   const setSelectedFeature = useSelectedFeature(mapRef);
-  const { isMapLoaded, onMapLoad, onSourceData, onMouseMove, onClick, cursor } =
-    useMapEvents(mapRef, {
-      clusterSourceId: 'communitiesCluster',
-      onMouseMovedToFeature(feature) {
-        if (isMouseHoverableLayer(feature.layer.id)) {
-          setHoveredFeature(feature);
-        }
-      },
-      onMouseMovedToVoid() {
-        setHoveredFeature(undefined);
-      },
-      onClickedToVoid() {
-        setSelectedFeature(undefined);
-        setPopupLocation(undefined);
-        props.onSelectedFeatureChange?.(undefined);
-      },
-      onClickedToFeature(feature) {
-        setSelectedFeature(feature);
-        const { center } = parseMapFeature(feature);
-        setPopupLocation(center);
-        props.onSelectedFeatureChange?.(feature);
-      },
-    });
+  const {
+    isMapLoaded,
+    onMapLoad,
+    onSourceData,
+    onMouseMove,
+    onMapClick,
+    cursor,
+  } = useMapEvents(mapRef, {
+    onMouseMovedToFeature(feature) {
+      if (isMouseHoverableLayer(feature.layer.id)) {
+        setHoveredFeature(feature);
+      }
+    },
+    onMouseMovedToVoid() {
+      setHoveredFeature(undefined);
+    },
+    onClickedToVoid() {
+      setSelectedFeature(undefined);
+      setPopupLocation(undefined);
+      props.onSelectedFeatureChange?.(undefined);
+    },
+    onClickedToFeature(feature) {
+      setSelectedFeature(feature);
+      const { center } = parseMapFeature(feature);
+      setPopupLocation(center);
+      props.onSelectedFeatureChange?.(feature);
+    },
+  });
 
   useZoomToUserLocationOnMapLoad(
     mapRef,
@@ -101,11 +107,11 @@ export const CommunityMap = (props: Props) => {
         initialViewState={props.initialViewState || defaultMapViewState}
         mapStyle={mapStyles.light}
         mapboxAccessToken={MAPBOX_TOKEN}
-        interactiveLayerIds={[unclusteredPointLayer.id!, clusterLayer.id!]}
+        interactiveLayerIds={[pointLayer!.id]}
         attributionControl={false}
         onLoad={onMapLoad}
         onSourceData={onSourceData}
-        onClick={onClick}
+        onClick={onMapClick}
         onMoveEnd={props.onMapMoveEnd}
         onMouseMove={onMouseMove}
         cursor={cursor}

@@ -112,7 +112,10 @@ export const useMapEvents = (
   }, []);
 
   const onSourceData = useCallback((event: MapSourceDataEvent) => {
-    if (event.sourceId.includes('Cluster') && event.isSourceLoaded) {
+    if (
+      event.sourceId.toLowerCase().includes('cluster') &&
+      event.isSourceLoaded
+    ) {
       cacheClustersGeoJson(event.sourceId);
     }
   }, []);
@@ -135,7 +138,7 @@ export const useMapEvents = (
     [isMapLoaded, opts],
   );
 
-  const onClick = useCallback(
+  const onMapClick = useCallback(
     (event: MapLayerMouseEvent) => {
       if (!isMapLoaded) return;
 
@@ -163,5 +166,12 @@ export const useMapEvents = (
     [isMapLoaded, mapRef, opts],
   );
 
-  return { onMapLoad, isMapLoaded, onSourceData, onMouseMove, onClick, cursor };
+  return {
+    onMapLoad,
+    isMapLoaded,
+    onSourceData,
+    onMouseMove,
+    onMapClick,
+    cursor,
+  };
 };

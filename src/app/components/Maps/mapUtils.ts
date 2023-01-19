@@ -26,10 +26,18 @@ export const pointsGeoJsonDict: { [key: string]: Feature<Point> } = {};
 // This http get will directly get from browser cache. Its only called after Mapbox Loaded the source.
 // Clustered points have buggy coordinates, so we need to get the original coordinates from the geojson.
 export const cacheClustersGeoJson = async (sourceId: string) => {
-  let url = geoJsonURL.clustersMain;
-  if (sourceId === 'communitiesCluster') {
-    url = geoJsonURL.communities;
+  let url: string = '';
+  switch (sourceId) {
+    case 'slacklineMapCluster':
+      url = geoJsonURL.clustersMain;
+      break;
+    default:
+      break;
   }
+  if (!url) {
+    return;
+  }
+
   const response = await fetch(url).then(r => r.json());
   if (response) {
     featureEach<Point>(response, pointFeature => {
@@ -94,6 +102,23 @@ export const calculateBounds = (
     circle(center(bboxPolygon(exactBounds)), radius, { steps: 4 }),
   ) as [number, number, number, number];
   return { exactBounds, marginedBounds };
+};
+
+export const fitMapToGeoJson = (
+  mapRef: RefObject<MapRef>,
+  geoJson: any,
+  opts: { animate?: boolean } = {},
+) => {
+  if (!geoJson || !mapRef.current) return;
+  const map = mapRef.current;
+
+  const { marginedBounds } = calculateBounds(
+    geoJson,
+    parseFloat(geoJson.features[0]?.properties?.l),
+  );
+  map.fitBounds(marginedBounds, {
+    animate: opts.animate || map.getZoom() > 10,
+  });
 };
 
 export const flyMapTo = (

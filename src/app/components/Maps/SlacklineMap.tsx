@@ -67,7 +67,7 @@ export const SlacklineMap = (props: Props) => {
 
   const setHoveredFeature = useHoveredFeature(mapRef);
   const setSelectedFeature = useSelectedFeature(mapRef);
-  const { isMapLoaded, onMapLoad, onSourceData, onMouseMove, onClick, cursor } =
+  const { isMapLoaded, onMapLoad, onSourceData, onMouseMove, onMapClick, cursor } =
     useMapEvents(mapRef, {
       clusterSourceId: 'slacklineMapCluster',
       onMouseMovedToFeature(feature) {
@@ -141,7 +141,7 @@ export const SlacklineMap = (props: Props) => {
         attributionControl={false}
         onLoad={onMapLoad}
         onSourceData={onSourceData}
-        onClick={onClick}
+        onClick={onMapClick}
         onMoveEnd={props.onMapMoveEnd}
         onMouseMove={onMouseMove}
         cursor={cursor}

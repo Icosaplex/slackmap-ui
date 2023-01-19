@@ -15,51 +15,58 @@ import {
   lineLabelLayer,
   lineLayer,
   polygonLayer,
+  unclusteredPointLayer,
 } from './layers';
 import { MapImage } from './Components/MapImage';
-import { calculateBounds, parseMapFeature } from './mapUtils';
+import {
+  calculateBounds,
+  fitMapToGeoJson,
+  parseMapFeature,
+  pointsGeoJsonDict,
+} from './mapUtils';
 import { FeatureCollection } from '@turf/turf';
 import { defaultMapViewState, MAPBOX_TOKEN, mapStyles } from './constants';
 import { FocusedButton } from './Components/FocusButton';
 import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
 import { MapSources } from './sources';
 import { LegendOptions, MapLegend } from './Components/MapLegend';
+import { useHoveredFeature, useMapEvents } from './mapHooks';
 
 interface Props {
-  onFeatureClick: (id: string, type: MapSlacklineFeatureType) => void;
   geoJson?: FeatureCollection;
+  onFeatureClick?: (feature: MapboxGeoJSONFeature) => void;
 }
 
 export const FocusedMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isMapReady, setIsMapReady] = useState(false);
-  const [cursor, setCursor] = useState('auto');
-  const [hoveredFeature, setHoveredFeature] = useState<MapboxGeoJSONFeature>();
   const [legendOptions, setLegendOptions] = useState<LegendOptions>({
     lines: true,
     spots: true,
   });
 
-  const fitMapToCurrentGeoJson = useCallback(
-    (opts: { animate?: boolean } = {}) => {
-      if (!isMapLoaded || !props.geoJson || !mapRef.current) return;
-      const map = mapRef.current;
-
-      const { marginedBounds } = calculateBounds(
-        props.geoJson,
-        parseFloat(props.geoJson.features[0].properties?.l),
-      );
-      map.fitBounds(marginedBounds, {
-        animate: opts.animate || map.getZoom() > 10,
-      });
-    },
-    [isMapLoaded, props.geoJson],
-  );
+  const setHoveredFeature = useHoveredFeature(mapRef);
+  // const setSelectedFeature = useSelectedFeature(mapRef);
+  const { isMapLoaded, onMapLoad, onMouseMove, onMapClick, cursor } =
+    useMapEvents(mapRef, {
+      onMouseMovedToFeature(feature) {
+        if (isMouseHoverableLayer(feature.layer.id)) {
+          setHoveredFeature(feature);
+        }
+      },
+      onMouseMovedToVoid() {
+        setHoveredFeature(undefined);
+      },
+      onClickedToFeature(feature) {
+        if (isMouseHoverableLayer(feature.layer.id)) {
+          props.onFeatureClick?.(feature);
+        }
+      },
+    });
 
   useEffect(() => {
     if (!isMapLoaded || !props.geoJson || !mapRef.current) return;
-    fitMapToCurrentGeoJson();
+    fitMapToGeoJson(mapRef, props.geoJson);
     setIsMapReady(true);
     const geoJson = props.geoJson;
     for (const feature of geoJson.features) {
@@ -94,72 +101,15 @@ export const FocusedMap = (props: Props) => {
         }
       }
     };
-  }, [fitMapToCurrentGeoJson, isMapLoaded, props.geoJson]);
-
-  useEffect(() => {
-    if (!mapRef.current) return;
-    const map = mapRef.current;
-
-    if (hoveredFeature) {
-      map.setFeatureState(hoveredFeature, { hover: true });
-    }
-    return () => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      const map = mapRef.current;
-      if (hoveredFeature) {
-        map?.removeFeatureState(hoveredFeature, 'hover');
-      }
-    };
-  }, [hoveredFeature]);
-
-  const onMapLoad = useCallback(() => {
-    setIsMapLoaded(true);
-    mapRef.current?.setPadding({ top: 0, left: 0, bottom: 0, right: 0 });
-  }, []);
-
-  const onMouseMove = (event: MapLayerMouseEvent) => {
-    if (!isMapLoaded) return;
-
-    const feature = event.features?.[0];
-    if (!feature) {
-      setHoveredFeature(undefined);
-      setCursor('auto');
-      return;
-    }
-
-    if (isCursorInteractableLayer(feature.layer.id)) {
-      setCursor('pointer');
-    }
-
-    if (isMouseHoverableLayer(feature.layer.id)) {
-      setHoveredFeature(feature);
-    }
-  };
-
-  const onMapClick = (event: MapLayerMouseEvent) => {
-    if (!isMapLoaded) return;
-
-    const feature = event.features?.[0];
-    if (!feature) {
-      return;
-    }
-    if (isMouseHoverableLayer(feature.layer.id)) {
-      const { id, type } = parseMapFeature(feature);
-      if (id && typeof id === 'string' && type) {
-        props.onFeatureClick(id, type);
-      }
-    }
-  };
+  }, [isMapLoaded, props.geoJson]);
 
   const onFocusClick = () => {
-    if (!isMapLoaded || !props.geoJson || !mapRef.current) return;
-    fitMapToCurrentGeoJson({ animate: true });
+    fitMapToGeoJson(mapRef, props.geoJson, { animate: true });
   };
 
   const onLegendOptionsUpdate = (options: LegendOptions) => {
     setLegendOptions(options);
   };
-
   return (
     <>
       {!isMapReady && <MapLoadingPlaceholder />}

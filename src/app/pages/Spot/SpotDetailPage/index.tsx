@@ -5,6 +5,8 @@ import { SpotDetailCard } from './SpotDetailCard';
 import { FocusedMap } from 'app/components/Maps/FocusedMap';
 import { spotApi } from 'app/api/spot-api';
 import { centerOfMass } from '@turf/turf';
+import { MapboxGeoJSONFeature } from 'mapbox-gl';
+import { parseMapFeature } from 'app/components/Maps/mapUtils';
 
 interface Props {}
 
@@ -22,12 +24,15 @@ export function SpotDetailPage(props: Props) {
     }
   }, [isError]);
 
-  const onFeatureClick = (id: string, type: MapSlacklineFeatureType) => {
-    if (type === 'line') {
-      navigate(`/line/${id}`);
-    }
-    if (type === 'spot') {
-      navigate(`/spot/${id}`);
+  const onFeatureClick = (feature: MapboxGeoJSONFeature) => {
+    const { id, type } = parseMapFeature(feature);
+    if (id && typeof id === 'string' && type) {
+      if (type === 'line') {
+        navigate(`/line/${id}`);
+      }
+      if (type === 'spot') {
+        navigate(`/spot/${id}`);
+      }
     }
   };
 

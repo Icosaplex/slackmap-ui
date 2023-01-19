@@ -8,7 +8,7 @@ import type {
 } from 'react-map-gl';
 import { appColors } from 'styles/theme/colors';
 
-export const pointLayer: LayerProps = {
+export const pointLayer: CircleLayer = {
   id: 'point',
   type: 'circle',
   filter: ['==', ['geometry-type'], 'Point'],
@@ -21,6 +21,9 @@ export const pointLayer: LayerProps = {
       appColors.guideFeaturesColor,
       appColors.lineStrokeColor,
     ],
+
+    'circle-stroke-width': 1,
+    'circle-stroke-color': 'white',
   },
 };
 
@@ -307,6 +310,7 @@ export const unclusteredPointLayer: CircleLayer = {
 };
 
 const cursorInteractableLayerIds = [
+  pointLayer!.id!,
   lineLayer.id!,
   lineLabelLayer.id!,
   polygonLayer.id!,
