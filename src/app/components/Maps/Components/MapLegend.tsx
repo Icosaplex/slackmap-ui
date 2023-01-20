@@ -7,25 +7,38 @@ import {
   Stack,
 } from '@mui/material';
 import { check } from 'prettier';
-import React from 'react';
+import React, { useState } from 'react';
 
-export interface LegendOptions {
-  spots?: boolean;
-  lines?: boolean;
-  guides?: boolean;
+export interface LegendMenuItem {
+  key: string;
+  label: string;
+  isSelected?: boolean;
+  isDisabled?: boolean;
 }
 interface Props {
-  options: LegendOptions;
-  onOptionsChange: (options: LegendOptions) => void;
+  menu: LegendMenuItem[];
+  onItemsUpdated: (items: LegendMenuItem[]) => void;
+  exclusiveSelection?: boolean;
 }
 
 export const MapLegend = (props: Props) => {
+  const [items, setItems] = useState<LegendMenuItem[]>(props.menu);
+
   const onChange = (key: string, checked?: boolean) => {
-    props.onOptionsChange({
-      ...props.options,
-      [key]: checked,
-    });
+    const newItems = [...items];
+    if (props.exclusiveSelection && checked) {
+      for (const item of newItems) {
+        item.isSelected = false;
+      }
+    }
+    for (const item of newItems) {
+      item.isSelected = item.key === key ? checked : item.isSelected;
+    }
+
+    setItems(newItems);
+    props.onItemsUpdated(newItems);
   };
+
   return (
     <Box
       sx={{
@@ -57,43 +70,22 @@ export const MapLegend = (props: Props) => {
             pl: 1,
           }}
         >
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={props.options.spots}
-                onChange={e => {
-                  onChange('spots', e.target.checked);
-                }}
-              />
-            }
-            label="Spots"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={props.options.lines}
-                onChange={e => {
-                  onChange('lines', e.target.checked);
-                }}
-              />
-            }
-            label="Lines"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={props.options.guides}
-                onChange={e => {
-                  onChange('guides', e.target.checked);
-                }}
-              />
-            }
-            label="Guides"
-            disabled
-          />
+          {items.map(option => (
+            <FormControlLabel
+              key={option.key}
+              label={option.label}
+              disabled={option.isDisabled}
+              control={
+                <Checkbox
+                  size="small"
+                  checked={option.isSelected}
+                  onChange={e => {
+                    onChange(option.key, e.target.checked);
+                  }}
+                />
+              }
+            />
+          ))}
         </FormGroup>
       </Paper>
     </Box>

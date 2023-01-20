@@ -71,9 +71,11 @@
     "zod-formik-adapter": "1.2.0"
   },
   "scripts": {
-    "start": "react-scripts start",
     "build": "react-scripts build",
-    "start:prod": "yarn run build && serve -s build",
+    "start": "env-cmd -f .env.dev react-scripts start",
+    "start:prod": "env-cmd -f .env.prod react-scripts start",
+    "start:serve": "env-cmd -f .env.dev yarn run build && serve -s build",
+    "start:serve:prod": "env-cmd -f .env.prod yarn run build && serve -s build",
     "checkTs": "tsc --noEmit",
     "eslint": "eslint --ext js,ts,tsx",
     "lint": "yarn run eslint src",
@@ -81,7 +83,8 @@
     "prettify": "prettier --write",
     "prettifyAll": "prettier --write '{src,test}/**/*.tsx'",
     "prepare": "husky install",
-    "deploy": "npm run build  && env-cmd -f .env.production sh ./internals/deployToS3.sh",
+    "deploy": "env-cmd -f .env.dev --use-shell 'npm run build && sh ./internals/deployToS3.sh'",
+    "deploy:prod": "env-cmd -f .env.prod --use-shell 'npm run build && sh ./internals/deployToS3.sh'",
     "generate": "plop --plopfile internals/generators/plopfile.ts"
   },
   "browserslist": {

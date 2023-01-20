@@ -1,30 +1,67 @@
 import { Point, Position } from 'geojson';
 import {
-  FlyToOptions,
   GeoJSONSource,
   MapboxGeoJSONFeature,
   MapLayerMouseEvent,
   MapSourceDataEvent,
-  PaddingOptions,
 } from 'mapbox-gl';
 import { RefObject, useCallback, useEffect, useState } from 'react';
 import { MapRef } from 'react-map-gl';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
-import {
-  isCursorInteractableLayer,
-  isMouseHoverableLayer,
-  unclusteredPointLayer,
-} from './layers';
+import { LegendMenuItem } from './Components/MapLegend';
+import { isCursorInteractableLayer } from './layers';
 import {
   cacheClustersGeoJson,
-  calculateBounds,
   flyMapTo,
   parseMapFeature,
-  pointsGeoJsonDict,
   zoomToUserLocation,
 } from './mapUtils';
 
 type MapRefType = RefObject<MapRef>;
+
+export const useLegendMenu = <
+  T extends {
+    [key: string]: {
+      label: string;
+      isSelected?: boolean;
+      isDisabled?: boolean;
+    };
+  },
+>(
+  options: T,
+) => {
+  const legendMenu: {
+    key: keyof T;
+    label: string;
+    isSelected?: boolean;
+    isDisabled?: boolean;
+  }[] = [];
+  const legendValuesDefault: { [key in keyof T]: boolean | undefined } =
+    {} as any;
+  for (const [key, value] of Object.entries(options)) {
+    legendValuesDefault[key as keyof T] = value.isSelected;
+    legendMenu.push({
+      key,
+      label: value.label,
+      isSelected: value.isSelected,
+      isDisabled: value.isDisabled,
+    });
+  }
+
+  const [legendValues, setLegendValues] = useState(legendValuesDefault);
+
+  const onLegendItemsUpdated = (items: LegendMenuItem[]) => {
+    setLegendValues(prev => {
+      const newValues = { ...prev };
+      for (const item of items) {
+        newValues[item.key as keyof T] = item.isSelected;
+      }
+      return newValues;
+    });
+  };
+
+  return { legendValues, legendMenu, onLegendItemsUpdated };
+};
 
 export const useZoomToUserLocationOnMapLoad = (
   mapRef: MapRefType,

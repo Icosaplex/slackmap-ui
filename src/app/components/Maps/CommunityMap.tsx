@@ -29,14 +29,20 @@ import {
 } from './layers';
 import { useMapStyle } from './useMapStyle';
 import { MapImage } from './Components/MapImage';
-import { defaultMapViewState, MAPBOX_TOKEN, mapStyles } from './constants';
+import {
+  defaultMapSettings,
+  defaultMapViewState,
+  MAPBOX_TOKEN,
+  mapStyles,
+} from './constants';
 import { MapLogo } from './Components/Logo';
 import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
 import { CustomPopup } from './Components/Popups/CustomPopup';
-import { LegendOptions, MapLegend } from './Components/MapLegend';
-import { MapSources } from './sources';
+import { LegendMenuItem, MapLegend } from './Components/MapLegend';
+import { CommunityMapSources } from './sources';
 import {
   useHoveredFeature,
+  useLegendMenu,
   useMapEvents,
   useSelectedFeature,
   useZoomToUserLocationOnMapLoad,
@@ -55,6 +61,15 @@ export const CommunityMap = (props: Props) => {
   const [zoomLevel, setZoomLevel] = useState(props.initialViewState?.zoom);
   const { projection } = useMapStyle(zoomLevel);
   const [popupLocation, setPopupLocation] = useState<Position>();
+
+  const { legendMenu, legendValues, onLegendItemsUpdated } = useLegendMenu({
+    groups: { label: 'Groups', isSelected: true },
+    associations: {
+      label: 'Associations',
+      isSelected: false,
+      isDisabled: true,
+    },
+  });
 
   const setHoveredFeature = useHoveredFeature(mapRef);
   const setSelectedFeature = useSelectedFeature(mapRef);
@@ -103,30 +118,24 @@ export const CommunityMap = (props: Props) => {
     <>
       {!isMapLoaded && <MapLoadingPlaceholder />}
       <MapLogo />
+      <MapLegend
+        menu={legendMenu}
+        onItemsUpdated={onLegendItemsUpdated}
+        exclusiveSelection
+      />
       <ReactMapGL
+        {...defaultMapSettings}
         initialViewState={props.initialViewState || defaultMapViewState}
         mapStyle={mapStyles.light}
-        mapboxAccessToken={MAPBOX_TOKEN}
         interactiveLayerIds={[pointLayer!.id]}
-        attributionControl={false}
         onLoad={onMapLoad}
         onSourceData={onSourceData}
         onClick={onMapClick}
         onMoveEnd={props.onMapMoveEnd}
         onMouseMove={onMouseMove}
         cursor={cursor}
-        pitchWithRotate={false}
-        maxPitch={0}
-        // reuseMaps
         ref={mapRef}
         projection={projection}
-        fog={
-          {
-            'horizon-blend': 0.1,
-            color: 'grey',
-            'high-color': 'black',
-          } as any
-        }
         onZoom={e => {
           setZoomLevel(e.viewState.zoom);
         }}
@@ -151,7 +160,7 @@ export const CommunityMap = (props: Props) => {
             {props.popup}
           </CustomPopup>
         )}
-        <MapSources options={{ communities: true }} />
+        <CommunityMapSources options={legendValues} />
       </ReactMapGL>
     </>
   );

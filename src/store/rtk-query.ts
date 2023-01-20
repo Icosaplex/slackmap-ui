@@ -28,7 +28,7 @@ export const isaAccountApi = createApi({
 });
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'https://wt5d2cy2w1.execute-api.eu-central-1.amazonaws.com/dev/',
+  baseUrl: process.env.REACT_APP_SLACKMAP_API_BASE_URL,
   prepareHeaders: async (headers, { getState }) => {
     const isSignedIn =
       (getState() as RootState).app?.authState === AuthState.SignedIn;

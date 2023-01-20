@@ -13,7 +13,7 @@ import { MapLoadingPlaceholder } from '../Components/MapLoadingPlaceholder';
 import { DrawControl, MapboxDrawEvent } from './DrawControl';
 import { MapboxDrawControls } from '@mapbox/mapbox-gl-draw';
 import { Feature, FeatureCollection } from 'geojson';
-import { MapSources } from '../sources';
+import { SlacklineMapSources } from '../sources';
 import { calculateBounds } from '../mapUtils';
 
 const featuresDict = (features: Feature[]) => {
@@ -138,7 +138,7 @@ export const DrawableMap = (props: Props) => {
             styles={props.drawControlStyles}
           />
         )}
-        <MapSources
+        <SlacklineMapSources
           options={{ lines: true, guides: true, spots: true }}
           filterId={(props.drawingFeatures || [])[0]?.properties?.id}
         />

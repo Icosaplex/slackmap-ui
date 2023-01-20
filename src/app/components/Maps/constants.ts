@@ -1,5 +1,17 @@
 export const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
+export const defaultMapSettings = {
+  mapboxAccessToken: MAPBOX_TOKEN,
+  attributionControl: false,
+  pitchWithRotate: false,
+  maxPitch: 0,
+  fog: {
+    'horizon-blend': 0.1,
+    color: 'grey',
+    'high-color': 'black',
+  } as any,
+};
+
 export const defaultMapViewState = {
   latitude: 35.92263245263329,
   longitude: -39.41644394307363,
@@ -8,8 +20,7 @@ export const defaultMapViewState = {
   pitch: 0,
 };
 
-const baseUrl = 'https://d1hbfm0s717r1n.cloudfront.net';
-
+const baseUrl = process.env.REACT_APP_APP_DATA_BASE_URL;
 export const geoJsonURL = {
   linePoints: baseUrl + '/geojson/lines/points.geojson',
   lines: baseUrl + '/geojson/lines/main.geojson',

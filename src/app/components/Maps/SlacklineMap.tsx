@@ -28,14 +28,19 @@ import {
 } from './layers';
 import { useMapStyle } from './useMapStyle';
 import { MapImage } from './Components/MapImage';
-import { defaultMapViewState, MAPBOX_TOKEN } from './constants';
+import {
+  defaultMapSettings,
+  defaultMapViewState,
+  MAPBOX_TOKEN,
+} from './constants';
 import { MapLogo } from './Components/Logo';
 import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
 import { CustomPopup } from './Components/Popups/CustomPopup';
-import { LegendOptions, MapLegend } from './Components/MapLegend';
-import { MapSources } from './sources';
+import { LegendMenuItem, MapLegend } from './Components/MapLegend';
+import { SlacklineMapSources } from './sources';
 import {
   useHoveredFeature,
+  useLegendMenu,
   useMapEvents,
   useSelectedFeature,
   useZoomToUserLocationOnMapLoad,
@@ -60,56 +65,58 @@ export const SlacklineMap = (props: Props) => {
   const { mapStyle, projection } = useMapStyle(zoomLevel);
   const [popupLocation, setPopupLocation] = useState<Position>();
 
-  const [legendOptions, setLegendOptions] = useState<LegendOptions>({
-    lines: true,
-    spots: true,
+  const { legendMenu, legendValues, onLegendItemsUpdated } = useLegendMenu({
+    lines: { label: 'Lines', isSelected: true },
+    spots: { label: 'Spots', isSelected: true },
   });
 
   const setHoveredFeature = useHoveredFeature(mapRef);
   const setSelectedFeature = useSelectedFeature(mapRef);
-  const { isMapLoaded, onMapLoad, onSourceData, onMouseMove, onMapClick, cursor } =
-    useMapEvents(mapRef, {
-      clusterSourceId: 'slacklineMapCluster',
-      onMouseMovedToFeature(feature) {
-        if (isMouseHoverableLayer(feature.layer.id)) {
-          setHoveredFeature(feature);
+  const {
+    isMapLoaded,
+    onMapLoad,
+    onSourceData,
+    onMouseMove,
+    onMapClick,
+    cursor,
+  } = useMapEvents(mapRef, {
+    clusterSourceId: 'slacklineMapCluster',
+    onMouseMovedToFeature(feature) {
+      if (isMouseHoverableLayer(feature.layer.id)) {
+        setHoveredFeature(feature);
+      }
+    },
+    onMouseMovedToVoid() {
+      setHoveredFeature(undefined);
+    },
+    onClickedToFeature(feature) {
+      if (feature.layer.id === unclusteredPointLayer.id) {
+        const pointFeature = pointsGeoJsonDict[feature.properties?.id];
+        if (pointFeature) {
+          const { marginedBounds } = calculateBounds(
+            pointFeature.geometry,
+            parseFloat(feature.properties?.l),
+          );
+          mapRef.current?.fitBounds(marginedBounds);
         }
-      },
-      onMouseMovedToVoid() {
-        setHoveredFeature(undefined);
-      },
-      onClickedToFeature(feature) {
-        if (feature.layer.id === unclusteredPointLayer.id) {
-          const pointFeature = pointsGeoJsonDict[feature.properties?.id];
-          if (pointFeature) {
-            const { marginedBounds } = calculateBounds(
-              pointFeature.geometry,
-              parseFloat(feature.properties?.l),
-            );
-            mapRef.current?.fitBounds(marginedBounds);
-          }
-        } else if (isMouseHoverableLayer(feature.layer.id)) {
-          setSelectedFeature(feature);
-          const { center } = parseMapFeature(feature);
-          setPopupLocation(center);
-          props.onSelectedFeatureChange?.(feature);
-        }
-      },
-      onClickedToVoid() {
-        setSelectedFeature(undefined);
-        setPopupLocation(undefined);
-        props.onSelectedFeatureChange?.(undefined);
-      },
-    });
+      } else if (isMouseHoverableLayer(feature.layer.id)) {
+        setSelectedFeature(feature);
+        const { center } = parseMapFeature(feature);
+        setPopupLocation(center);
+        props.onSelectedFeatureChange?.(feature);
+      }
+    },
+    onClickedToVoid() {
+      setSelectedFeature(undefined);
+      setPopupLocation(undefined);
+      props.onSelectedFeatureChange?.(undefined);
+    },
+  });
 
   useZoomToUserLocationOnMapLoad(
     mapRef,
     isMapLoaded && !props.initialViewState,
   );
-
-  const onLegendOptionsUpdate = (options: LegendOptions) => {
-    setLegendOptions(options);
-  };
 
   const onPopupClose = () => {
     setPopupLocation(undefined);
@@ -122,14 +129,11 @@ export const SlacklineMap = (props: Props) => {
     <>
       {!isMapLoaded && <MapLoadingPlaceholder />}
       <MapLogo />
-      <MapLegend
-        options={legendOptions}
-        onOptionsChange={onLegendOptionsUpdate}
-      />
+      <MapLegend menu={legendMenu} onItemsUpdated={onLegendItemsUpdated} />
       <ReactMapGL
+        {...defaultMapSettings}
         initialViewState={props.initialViewState || defaultMapViewState}
         mapStyle={mapStyle}
-        mapboxAccessToken={MAPBOX_TOKEN}
         interactiveLayerIds={[
           lineLayer.id!,
           lineLabelLayer.id!,
@@ -138,7 +142,6 @@ export const SlacklineMap = (props: Props) => {
           unclusteredPointLayer.id!,
           clusterLayer.id!,
         ]}
-        attributionControl={false}
         onLoad={onMapLoad}
         onSourceData={onSourceData}
         onClick={onMapClick}
@@ -148,18 +151,8 @@ export const SlacklineMap = (props: Props) => {
         onZoom={e => {
           setZoomLevel(e.viewState.zoom);
         }}
-        pitchWithRotate={false}
-        maxPitch={0}
-        // reuseMaps
         ref={mapRef}
         projection={projection}
-        fog={
-          {
-            'horizon-blend': 0.1,
-            color: 'grey',
-            'high-color': 'black',
-          } as any
-        }
       >
         <GeolocateControl />
         <AttributionControl
@@ -181,7 +174,7 @@ export const SlacklineMap = (props: Props) => {
             {props.popup}
           </CustomPopup>
         )}
-        <MapSources options={legendOptions} />
+        <SlacklineMapSources options={legendValues} />
       </ReactMapGL>
     </>
   );

@@ -25,12 +25,17 @@ import {
   pointsGeoJsonDict,
 } from './mapUtils';
 import { FeatureCollection } from '@turf/turf';
-import { defaultMapViewState, MAPBOX_TOKEN, mapStyles } from './constants';
+import {
+  defaultMapSettings,
+  defaultMapViewState,
+  MAPBOX_TOKEN,
+  mapStyles,
+} from './constants';
 import { FocusedButton } from './Components/FocusButton';
 import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
-import { MapSources } from './sources';
-import { LegendOptions, MapLegend } from './Components/MapLegend';
-import { useHoveredFeature, useMapEvents } from './mapHooks';
+import { SlacklineMapSources } from './sources';
+import { MapLegend } from './Components/MapLegend';
+import { useHoveredFeature, useLegendMenu, useMapEvents } from './mapHooks';
 
 interface Props {
   geoJson?: FeatureCollection;
@@ -40,9 +45,10 @@ interface Props {
 export const FocusedMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
   const [isMapReady, setIsMapReady] = useState(false);
-  const [legendOptions, setLegendOptions] = useState<LegendOptions>({
-    lines: true,
-    spots: true,
+
+  const { legendMenu, legendValues, onLegendItemsUpdated } = useLegendMenu({
+    lines: { label: 'Lines', isSelected: true },
+    spots: { label: 'Spots', isSelected: true },
   });
 
   const setHoveredFeature = useHoveredFeature(mapRef);
@@ -107,24 +113,16 @@ export const FocusedMap = (props: Props) => {
     fitMapToGeoJson(mapRef, props.geoJson, { animate: true });
   };
 
-  const onLegendOptionsUpdate = (options: LegendOptions) => {
-    setLegendOptions(options);
-  };
   return (
     <>
       {!isMapReady && <MapLoadingPlaceholder />}
       <FocusedButton onFocusClick={onFocusClick} />
-      <MapLegend
-        options={legendOptions}
-        onOptionsChange={onLegendOptionsUpdate}
-      />
+      <MapLegend menu={legendMenu} onItemsUpdated={onLegendItemsUpdated} />
       <ReactMapGL
+        {...defaultMapSettings}
         initialViewState={defaultMapViewState}
         mapStyle={mapStyles.satelliteStreets}
-        mapboxAccessToken={MAPBOX_TOKEN}
-        attributionControl={false}
         onLoad={onMapLoad}
-        // reuseMaps
         ref={mapRef}
         onMouseMove={onMouseMove}
         onClick={onMapClick}
@@ -134,12 +132,10 @@ export const FocusedMap = (props: Props) => {
           polygonLayer.id!,
         ]}
         cursor={cursor}
-        pitchWithRotate={false}
-        maxPitch={0}
       >
         <ScaleControl />
         <MapImage name={'marker'} url={'/images/line-marker.png'} />
-        <MapSources options={legendOptions} disableClustering />
+        <SlacklineMapSources options={legendValues} disableClustering />
       </ReactMapGL>
     </>
   );
