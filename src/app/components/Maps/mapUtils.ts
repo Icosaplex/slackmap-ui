@@ -29,7 +29,7 @@ export const cacheClustersGeoJson = async (sourceId: string) => {
   let url: string = '';
   switch (sourceId) {
     case 'slacklineMapCluster':
-      url = geoJsonURL.clustersMain;
+      url = geoJsonURL.clustersAll;
       break;
     default:
       break;
@@ -77,12 +77,15 @@ export const mapUrlSearchParams = {
 
 export const parseMapFeature = (feature: MapboxGeoJSONFeature) => {
   let type: MapSlacklineFeatureType | undefined;
-  switch (feature.geometry.type) {
-    case 'LineString':
+  switch (feature.properties?.['ft']) {
+    case 'l':
       type = 'line';
       break;
-    case 'Polygon':
+    case 's':
       type = 'spot';
+      break;
+    case 'g':
+      type = 'guide';
       break;
     default:
       break;

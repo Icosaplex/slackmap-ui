@@ -34,6 +34,9 @@ export function LineDetailPage(props: Props) {
       if (type === 'spot') {
         navigate(`/spot/${id}`);
       }
+      if (type === 'guide') {
+        navigate(`/guide/${id}`);
+      }
     }
   };
 

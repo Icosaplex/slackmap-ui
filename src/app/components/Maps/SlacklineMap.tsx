@@ -25,6 +25,8 @@ import {
   clusterLayer,
   polygonLabelLayer,
   isMouseHoverableLayer,
+  pointLayer,
+  pointLabelLayer,
 } from './layers';
 import { useMapStyle } from './useMapStyle';
 import { MapImage } from './Components/MapImage';
@@ -36,7 +38,7 @@ import {
 import { MapLogo } from './Components/Logo';
 import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
 import { CustomPopup } from './Components/Popups/CustomPopup';
-import { LegendMenuItem, MapLegend } from './Components/MapLegend';
+import {  MapLegend } from './Components/MapLegend';
 import { SlacklineMapSources } from './sources';
 import {
   useHoveredFeature,
@@ -50,7 +52,6 @@ import {
   parseMapFeature,
   pointsGeoJsonDict,
 } from './mapUtils';
-import { Box } from '@mui/system';
 
 interface Props {
   onMapMoveEnd?: (event: ViewStateChangeEvent) => void;
@@ -68,6 +69,7 @@ export const SlacklineMap = (props: Props) => {
   const { legendMenu, legendValues, onLegendItemsUpdated } = useLegendMenu({
     lines: { label: 'Lines', isSelected: true },
     spots: { label: 'Spots', isSelected: true },
+    guides: { label: 'Guides', isSelected: true },
   });
 
   const setHoveredFeature = useHoveredFeature(mapRef);
@@ -135,10 +137,16 @@ export const SlacklineMap = (props: Props) => {
         initialViewState={props.initialViewState || defaultMapViewState}
         mapStyle={mapStyle}
         interactiveLayerIds={[
-          lineLayer.id!,
-          lineLabelLayer.id!,
-          polygonLayer.id!,
-          polygonLabelLayer.id!,
+          pointLayer('guide').id,
+          pointLabelLayer('guide').id,
+          lineLayer('line').id,
+          lineLayer('guide').id,
+          lineLabelLayer('line').id,
+          lineLabelLayer('guide').id,
+          polygonLayer('spot').id,
+          polygonLayer('guide').id,
+          polygonLabelLayer('spot').id,
+          polygonLabelLayer('guide').id,
           unclusteredPointLayer.id!,
           clusterLayer.id!,
         ]}

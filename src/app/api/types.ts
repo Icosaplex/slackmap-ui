@@ -99,6 +99,32 @@ export interface CreateSpotDetailsPayload {
   images?: { id?: string; content?: string; isCover?: boolean }[];
 }
 
+export interface GetGuideDetailsAPIResponse {
+  id: string;
+  creatorUserId: string;
+  description?: string;
+  type: GuideType;
+  typeLabel: string;
+  createdDateTime: string;
+  lastModifiedDateTime?: string;
+  isUserEditor?: boolean;
+  images?: { s3Key: string; isCover?: boolean }[];
+}
+
+export interface UpdateGuideDetailsPayload {
+  geoJson: FeatureCollection;
+  description?: string;
+  type: GuideType;
+  images?: { id?: string; content?: string; isCover?: boolean }[];
+}
+
+export interface CreateGuideDetailsPayload {
+  geoJson: FeatureCollection;
+  description?: string;
+  type: GuideType;
+  images?: { id?: string; content?: string; isCover?: boolean }[];
+}
+
 export interface GetUserBasicDetailsAPIResponse {
   name: string;
   surnam?: string;

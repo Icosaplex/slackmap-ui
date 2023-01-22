@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Stack } from '@mui/system';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SpotDetailCard } from './SpotDetailCard';
 import { FocusedMap } from 'app/components/Maps/FocusedMap';
-import { spotApi } from 'app/api/spot-api';
 import { centerOfMass } from '@turf/turf';
 import { MapboxGeoJSONFeature } from 'mapbox-gl';
 import { parseMapFeature } from 'app/components/Maps/mapUtils';
+import { guideApi } from 'app/api/guide-api';
+import { GuideDetailCard } from './GuideDetailCard';
 
 interface Props {}
 
-export function SpotDetailPage(props: Props) {
-  const { spotId } = useParams();
+export function GuideDetailPage(props: Props) {
+  const { guideId } = useParams();
   const navigate = useNavigate();
 
-  const { data: spotGeoJson, isError } = spotApi.useGetSpotGeoJsonQuery(
-    spotId!,
+  const { data: guideGeoJson, isError } = guideApi.useGetGuideGeoJsonQuery(
+    guideId!,
   );
 
   useEffect(() => {
@@ -39,8 +39,8 @@ export function SpotDetailPage(props: Props) {
     }
   };
 
-  const center = spotGeoJson
-    ? centerOfMass(spotGeoJson).geometry.coordinates
+  const center = guideGeoJson
+    ? centerOfMass(guideGeoJson).geometry.coordinates
     : undefined;
 
   return (
@@ -57,7 +57,7 @@ export function SpotDetailPage(props: Props) {
           position: 'relative',
         }}
       >
-        <FocusedMap geoJson={spotGeoJson} onFeatureClick={onFeatureClick} />
+        <FocusedMap geoJson={guideGeoJson} onFeatureClick={onFeatureClick} />
       </Box>
 
       <Box
@@ -66,7 +66,7 @@ export function SpotDetailPage(props: Props) {
           height: { xs: 'auto', lg: '100vh' },
         }}
       >
-        {spotId && <SpotDetailCard spotId={spotId} coordinates={center} />}
+        {guideId && <GuideDetailCard guideId={guideId} coordinates={center} />}
       </Box>
     </Stack>
   );

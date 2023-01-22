@@ -14,6 +14,8 @@ import {
   isMouseHoverableLayer,
   lineLabelLayer,
   lineLayer,
+  pointLabelLayer,
+  pointLayer,
   polygonLayer,
   unclusteredPointLayer,
 } from './layers';
@@ -49,6 +51,7 @@ export const FocusedMap = (props: Props) => {
   const { legendMenu, legendValues, onLegendItemsUpdated } = useLegendMenu({
     lines: { label: 'Lines', isSelected: true },
     spots: { label: 'Spots', isSelected: true },
+    guides: { label: 'Guides', isSelected: true },
   });
 
   const setHoveredFeature = useHoveredFeature(mapRef);
@@ -127,9 +130,14 @@ export const FocusedMap = (props: Props) => {
         onMouseMove={onMouseMove}
         onClick={onMapClick}
         interactiveLayerIds={[
-          lineLayer.id!,
-          lineLabelLayer.id!,
-          polygonLayer.id!,
+          pointLayer('guide').id,
+          pointLabelLayer('guide').id,
+          lineLayer('line').id,
+          lineLayer('guide').id,
+          lineLabelLayer('line').id,
+          lineLabelLayer('guide').id,
+          polygonLayer('spot').id,
+          polygonLayer('guide').id,
         ]}
         cursor={cursor}
       >

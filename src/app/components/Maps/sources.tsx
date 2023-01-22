@@ -7,6 +7,7 @@ import {
   clusterLayer,
   lineLabelLayer,
   lineLayer,
+  pointLabelLayer,
   pointLayer,
   polygonLabelLayer,
   polygonLayer,
@@ -25,15 +26,24 @@ export const SlacklineMapSources = (props: {
 }) => {
   const { disableClustering, options, filterId } = props;
   let clusterGeoJsonUrl = '';
-  const isJoinedClustering = options.lines && options.spots;
+  const isJoinedClustering =
+    [options.lines, options.spots, options.guides].filter(Boolean).length > 1;
 
   if (!disableClustering) {
-    if (options.lines && options.spots) {
-      clusterGeoJsonUrl = geoJsonURL.clustersMain;
-    } else if (options.spots) {
-      clusterGeoJsonUrl = geoJsonURL.spotPoints;
+    if (options.lines && options.spots && options.guides) {
+      clusterGeoJsonUrl = geoJsonURL.clustersAll;
+    } else if (options.lines && options.spots) {
+      clusterGeoJsonUrl = geoJsonURL.clustersLinesSpots;
+    } else if (options.lines && options.guides) {
+      clusterGeoJsonUrl = geoJsonURL.clustersLinesGuides;
+    } else if (options.spots && options.guides) {
+      clusterGeoJsonUrl = geoJsonURL.clustersSpotsGuides;
     } else if (options.lines) {
       clusterGeoJsonUrl = geoJsonURL.linePoints;
+    } else if (options.spots) {
+      clusterGeoJsonUrl = geoJsonURL.spotPoints;
+    } else if (options.guides) {
+      clusterGeoJsonUrl = geoJsonURL.guidePoints;
     }
   }
 
@@ -68,6 +78,56 @@ export const SlacklineMapSources = (props: {
       )}
 
       <Source
+        id="guides"
+        type="geojson"
+        data={geoJsonURL.guides}
+        generateId={true}
+        promoteId="id"
+        filter={filterId ? ['!=', ['get', 'id'], filterId] : undefined}
+      >
+        <Layer
+          {...polygonLayer('guide', {
+            visibility: options.guides ? 'visible' : 'none',
+          })}
+        />
+
+        <Layer
+          {...polygonOutlineLayer('guide', {
+            visibility: options.guides ? 'visible' : 'none',
+          })}
+        />
+
+        <Layer
+          {...polygonLabelLayer('guide', {
+            visibility: options.guides ? 'visible' : 'none',
+          })}
+        />
+
+        <Layer
+          {...lineLayer('guide', {
+            visibility: options.guides ? 'visible' : 'none',
+          })}
+        />
+
+        <Layer
+          {...lineLabelLayer('guide', {
+            visibility: options.guides ? 'visible' : 'none',
+          })}
+        />
+
+        <Layer
+          {...pointLayer('guide', {
+            visibility: options.guides ? 'visible' : 'none',
+          })}
+        />
+         <Layer
+          {...pointLabelLayer('guide', {
+            visibility: options.guides ? 'visible' : 'none',
+          })}
+        />
+      </Source>
+
+      <Source
         id="spots"
         type="geojson"
         data={geoJsonURL.spots}
@@ -76,25 +136,19 @@ export const SlacklineMapSources = (props: {
         filter={filterId ? ['!=', ['get', 'id'], filterId] : undefined}
       >
         <Layer
-          {...polygonLayer}
-          layout={{
-            ...polygonLayer.layout,
+          {...polygonLayer('spot', {
             visibility: options.spots ? 'visible' : 'none',
-          }}
+          })}
         />
         <Layer
-          {...polygonOutlineLayer}
-          layout={{
-            ...polygonOutlineLayer.layout,
+          {...polygonOutlineLayer('spot', {
             visibility: options.spots ? 'visible' : 'none',
-          }}
+          })}
         />
         <Layer
-          {...polygonLabelLayer}
-          layout={{
-            ...polygonLabelLayer.layout,
+          {...polygonLabelLayer('spot', {
             visibility: options.spots ? 'visible' : 'none',
-          }}
+          })}
         />
       </Source>
 
@@ -107,19 +161,15 @@ export const SlacklineMapSources = (props: {
         filter={filterId ? ['!=', ['get', 'id'], filterId] : undefined}
       >
         <Layer
-          {...lineLayer}
-          layout={{
-            ...lineLayer.layout,
+          {...lineLayer('line', {
             visibility: options.lines ? 'visible' : 'none',
-          }}
+          })}
           // filter={['all', lineLayer.filter, ['!=', ['id'], excludeId || null]]}
         />
         <Layer
-          {...lineLabelLayer}
-          layout={{
-            ...lineLabelLayer.layout,
+          {...lineLabelLayer('line', {
             visibility: options.lines ? 'visible' : 'none',
-          }}
+          })}
           // filter={[
           //   'all',
           //   lineLabelLayer.filter,
@@ -146,11 +196,9 @@ export const CommunityMapSources = (props: {
         generateId={true}
       >
         <Layer
-          {...pointLayer}
-          paint={{
-            ...pointLayer!.paint,
+          {...pointLayer('slacklineGroup', undefined, {
             'circle-color': appColors.isaBlue,
-          }}
+          })}
         />
       </Source>
     </>

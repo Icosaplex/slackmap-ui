@@ -10,7 +10,7 @@ export const appColors = {
   lineStrokeColor: red,
   guideFeaturesColor: muiColors.orange[400],
   spotFillColor: slackmapGreen,
-  mainClusterColor: darken(slackmapGreen, 0.2),
+  mainClusterColor: isaBlue,
   slackmapBlue,
   slackmapGreen,
   isaBlue,

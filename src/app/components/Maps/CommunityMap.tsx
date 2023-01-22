@@ -127,7 +127,7 @@ export const CommunityMap = (props: Props) => {
         {...defaultMapSettings}
         initialViewState={props.initialViewState || defaultMapViewState}
         mapStyle={mapStyles.light}
-        interactiveLayerIds={[pointLayer!.id]}
+        interactiveLayerIds={[pointLayer('slacklineGroup').id]}
         onLoad={onMapLoad}
         onSourceData={onSourceData}
         onClick={onMapClick}

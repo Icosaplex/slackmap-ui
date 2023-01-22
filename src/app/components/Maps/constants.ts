@@ -23,10 +23,16 @@ export const defaultMapViewState = {
 const baseUrl = process.env.REACT_APP_APP_DATA_BASE_URL;
 export const geoJsonURL = {
   linePoints: baseUrl + '/geojson/lines/points.geojson',
-  lines: baseUrl + '/geojson/lines/main.geojson',
+  lines: baseUrl + '/geojson/lines/all.geojson',
   spotPoints: baseUrl + '/geojson/spots/points.geojson',
-  spots: baseUrl + '/geojson/spots/main.geojson',
-  clustersMain: baseUrl + '/geojson/clusters/main.geojson',
+  spots: baseUrl + '/geojson/spots/all.geojson',
+  guidePoints: baseUrl + '/geojson/guides/points.geojson',
+  guides: baseUrl + '/geojson/guides/all.geojson',
+  clustersAll: baseUrl + '/geojson/clusters/all.geojson',
+  clustersLinesSpots: baseUrl + '/geojson/clusters/lines-spots.geojson',
+  clustersLinesGuides: baseUrl + '/geojson/clusters/lines-guides.geojson',
+  clustersSpotsGuides: baseUrl + '/geojson/clusters/spots-guides.geojson',
+
   communities:
     'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/communities.geojson',
 };

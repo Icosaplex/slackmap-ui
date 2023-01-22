@@ -17,10 +17,9 @@ import {
 import { AuthState } from 'app/slices/app/types';
 import NotificationSnackbar from 'app/components/NotificationSnackbar';
 import GlobalStyles from '@mui/material/GlobalStyles';
-import { LoadingIndicator } from './components/LoadingIndicator';
+import { AppDrawer } from './components/AppDrawer';
 import { Homepage } from './pages/Homepage/Loadable';
 import { LineDetailPage } from './pages/Line/LineDetailPage/Loadable';
-import { AppDrawer } from './components/AppDrawer';
 import { CreateLinePage } from './pages/Create/Line/Loadable';
 import { CreateGuidePage } from './pages/Create/Guide/Loadable';
 import { LineEditPage } from './pages/Line/LineEditPage/Loadable';
@@ -28,6 +27,8 @@ import { SpotDetailPage } from './pages/Spot/SpotDetailPage/Loadable';
 import { CreateSpotPage } from './pages/Create/Spot/Loadable';
 import { SpotEditPage } from './pages/Spot/SpotEditPage/Loadable';
 import { CommunitiesPage } from './pages/Communities/Loadable';
+import { GuideDetailPage } from './pages/Guide/GuideDetailPage/Loadable';
+import { GuideEditPage } from './pages/Guide/GuideEditPage/Loadable';
 
 export function App() {
   useAppSlice();
@@ -113,6 +114,7 @@ export function App() {
           <Route path="/communities" element={<CommunitiesPage />} />
           <Route path="/line/:lineId" element={<LineDetailPage />} />
           <Route path="/spot/:spotId" element={<SpotDetailPage />} />
+          <Route path="/guide/:guideId" element={<GuideDetailPage />} />
           {isSignedIn && (
             <>
               <Route path="/create/line" element={<CreateLinePage />} />
@@ -120,6 +122,7 @@ export function App() {
               <Route path="/create/spot" element={<CreateSpotPage />} />
               <Route path="/spot/:spotId/edit" element={<SpotEditPage />} />
               <Route path="/create/guide" element={<CreateGuidePage />} />
+              <Route path="/guide/:guideId/edit" element={<GuideEditPage />} />
             </>
           )}
           <Route path="*" element={<Homepage />} />

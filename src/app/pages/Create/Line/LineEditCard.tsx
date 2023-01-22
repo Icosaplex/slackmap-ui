@@ -142,7 +142,6 @@ export const LineEditCard = (props: Props) => {
               label="Type"
               required
             >
-              <MenuItem value={''}></MenuItem>
               {lineTypes.map(option => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
@@ -242,7 +241,7 @@ export const LineEditCard = (props: Props) => {
               placeholder="Don't forget to add your contact info for people to reach you"
             />
 
-            <EditingTextFieldHeader subHeader="All the photos are publicly viewable. You can add max 3 photos and the first one will be used as the cover photo. Max file size allowed is 2MB">
+            <EditingTextFieldHeader subHeader="All the photos are publicly viewable. You can add max 3 photos and max file size allowed is 2 MB">
               Media
             </EditingTextFieldHeader>
 

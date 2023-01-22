@@ -15,6 +15,7 @@ import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
 import { useSignInAlert } from 'utils/hooks/useSignInAlert';
 import { LineInfoPopup } from 'app/components/Maps/Components/Popups/LineInfoPopup';
 import { SpotInfoPopup } from 'app/components/Maps/Components/Popups/SpotInfoPopup';
+import { GuideInfoPopup } from 'app/components/Maps/Components/Popups/GuideInfoPopup';
 
 interface Props {}
 
@@ -91,6 +92,18 @@ export function Homepage(props: Props) {
         />
       );
     }
+
+    if (selectedFeature.type === 'guide') {
+      return (
+        <GuideInfoPopup
+          guideId={selectedFeature.id}
+          onDetailsClick={() => {
+            navigate(`/guide/${selectedFeature.id}`);
+          }}
+        />
+      );
+    }
+    
     return null;
   }, [navigate, selectedFeature]);
 
@@ -127,14 +140,14 @@ export function Homepage(props: Props) {
             color: t => t.palette.primary.main,
           }}
         />
-        {/* <SpeedDialAction
+        <SpeedDialAction
           icon={<FollowTheSignsIcon />}
           tooltipTitle={'Add a new guide'}
           onClick={onAddGuideClick}
           sx={{
             color: t => t.palette.primary.main,
           }}
-        /> */}
+        />
       </SpeedDial>
 
       {/* <Button></Button> */}

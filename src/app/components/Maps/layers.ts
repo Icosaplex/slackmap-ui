@@ -1,4 +1,14 @@
 import { darken, lighten } from '@mui/material';
+import {
+  CircleLayout,
+  CirclePaint,
+  FillLayout,
+  FillPaint,
+  LineLayout,
+  LinePaint,
+  SymbolLayout,
+  SymbolPaint,
+} from 'mapbox-gl';
 import type {
   CircleLayer,
   FillLayer,
@@ -8,10 +18,26 @@ import type {
 } from 'react-map-gl';
 import { appColors } from 'styles/theme/colors';
 
-export const pointLayer: CircleLayer = {
-  id: 'point',
+export enum LayerIds {
+  point,
+  pointLabel,
+  line,
+  lineLabel,
+}
+
+type FeatureLayerType = 'line' | 'spot' | 'guide' | 'slacklineGroup';
+
+export const pointLayer = (
+  type: FeatureLayerType,
+  layout?: CircleLayout,
+  paint?: CirclePaint,
+): CircleLayer => ({
+  id: 'point' + (type ? `-${type}` : ''),
   type: 'circle',
   filter: ['==', ['geometry-type'], 'Point'],
+  layout: {
+    ...layout,
+  },
   paint: {
     'circle-radius': 7,
     'circle-opacity': 0.8,
@@ -21,14 +47,17 @@ export const pointLayer: CircleLayer = {
       appColors.guideFeaturesColor,
       appColors.lineStrokeColor,
     ],
-
     'circle-stroke-width': 1,
     'circle-stroke-color': 'white',
+    ...paint,
   },
-};
+});
 
-export const pointLabelLayer: LayerProps = {
-  id: 'pointLabel',
+export const pointLabelLayer = (
+  type: FeatureLayerType,
+  layout?: SymbolLayout,
+): SymbolLayer => ({
+  id: 'pointLabel' + (type ? `-${type}` : ''),
   type: 'symbol',
   minzoom: 13,
   filter: ['all', ['==', ['geometry-type'], 'Point'], ['has', 'l']],
@@ -41,6 +70,7 @@ export const pointLabelLayer: LayerProps = {
     'icon-allow-overlap': true,
     'text-allow-overlap': true,
     'icon-text-fit-padding': [8, 8, 8, 8],
+    ...layout,
   },
   paint: {
     'text-color': 'white',
@@ -62,16 +92,20 @@ export const pointLabelLayer: LayerProps = {
       appColors.lineStrokeColor,
     ],
   },
-};
+});
 
-export const lineLayer: LineLayer = {
-  id: 'line',
+export const lineLayer = (
+  type: FeatureLayerType,
+  layout?: LineLayout,
+): LineLayer => ({
+  id: 'line' + (type ? `-${type}` : ''),
   type: 'line',
   minzoom: 12,
   filter: ['==', ['geometry-type'], 'LineString'],
   layout: {
     'line-cap': 'round',
     'line-join': 'round',
+    ...layout,
   },
   paint: {
     'line-width': [
@@ -114,10 +148,13 @@ export const lineLayer: LineLayer = {
       ['literal', [1]],
     ],
   },
-};
+});
 
-export const lineLabelLayer: SymbolLayer = {
-  id: 'lineLabel',
+export const lineLabelLayer = (
+  type: FeatureLayerType,
+  layout?: SymbolLayout,
+): SymbolLayer => ({
+  id: 'lineLabel' + (type ? `-${type}` : ''),
   type: 'symbol',
   minzoom: 14,
   filter: ['all', ['==', ['geometry-type'], 'LineString'], ['has', 'l']],
@@ -131,6 +168,7 @@ export const lineLabelLayer: SymbolLayer = {
     'text-allow-overlap': true,
     'icon-text-fit': 'both',
     'icon-text-fit-padding': [8, 8, 8, 8],
+    ...layout,
   },
   paint: {
     'text-color': 'white',
@@ -153,13 +191,19 @@ export const lineLabelLayer: SymbolLayer = {
       appColors.lineStrokeColor,
     ],
   },
-};
+});
 
-export const polygonLayer: FillLayer = {
-  id: 'polygon',
+export const polygonLayer = (
+  type: FeatureLayerType,
+  layout?: FillLayout,
+): FillLayer => ({
+  id: 'polygon' + (type ? `-${type}` : ''),
   type: 'fill',
   minzoom: 12,
   filter: ['==', ['geometry-type'], 'Polygon'],
+  layout: {
+    ...layout,
+  },
   paint: {
     'fill-opacity': [
       'case',
@@ -180,22 +224,42 @@ export const polygonLayer: FillLayer = {
       appColors.spotFillColor,
     ],
   },
-};
+});
 
-export const polygonOutlineLayer: LineLayer = {
-  id: 'polygonOutline',
+export const polygonOutlineLayer = (
+  type: FeatureLayerType,
+  layout?: LineLayout,
+): LineLayer => ({
+  id: 'polygonOutline' + (type ? `-${type}` : ''),
   type: 'line',
   minzoom: 12,
   filter: ['==', ['geometry-type'], 'Polygon'],
+  layout: {
+    ...layout,
+  },
   paint: {
-    'line-color': appColors.spotFillColor,
     'line-width': 2,
     'line-opacity': 1,
+    'line-color': [
+      'case',
+      ['==', ['get', 'ft'], 'g'],
+      appColors.guideFeaturesColor,
+      appColors.spotFillColor,
+    ],
+    'line-dasharray': [
+      'case',
+      ['==', ['get', 'ft'], 'g'],
+      ['literal', [0.4, 2]],
+      ['literal', [1]],
+    ],
   },
-};
+});
 
-export const polygonLabelLayer: SymbolLayer = {
-  id: 'polygonLabel',
+export const polygonLabelLayer = (
+  type: FeatureLayerType,
+  layout?: SymbolLayout,
+): SymbolLayer => ({
+  id: 'polygonLabel' + (type ? `-${type}` : ''),
   type: 'symbol',
   minzoom: 13,
   filter: ['all', ['==', ['geometry-type'], 'Polygon'], ['has', 'l']],
@@ -208,6 +272,7 @@ export const polygonLabelLayer: SymbolLayer = {
     'icon-allow-overlap': true,
     'text-allow-overlap': true,
     'icon-text-fit-padding': [8, 8, 8, 8],
+    ...layout,
   },
   paint: {
     'text-color': 'white',
@@ -219,7 +284,7 @@ export const polygonLabelLayer: SymbolLayer = {
       appColors.spotFillColor,
     ],
   },
-};
+});
 
 export const clusterLayer: LayerProps = {
   id: 'clusters',
@@ -310,18 +375,25 @@ export const unclusteredPointLayer: CircleLayer = {
 };
 
 const cursorInteractableLayerIds = [
-  pointLayer!.id!,
-  lineLayer.id!,
-  lineLabelLayer.id!,
-  polygonLayer.id!,
+  pointLayer('guide').id,
+  lineLayer('line').id,
+  lineLayer('guide').id,
+  lineLabelLayer('line').id,
+  lineLabelLayer('guide').id,
+  polygonLayer('spot').id,
+  polygonLayer('guide').id,
   unclusteredPointLayer.id!,
   clusterLayer.id!,
 ];
 
 const mouseHoverableLayersIds = [
-  lineLayer.id!,
-  lineLabelLayer.id!,
-  polygonLayer.id!,
+  pointLayer('guide').id,
+  lineLayer('line').id,
+  lineLayer('guide').id,
+  lineLabelLayer('line').id,
+  lineLabelLayer('guide').id,
+  polygonLayer('spot').id,
+  polygonLayer('guide').id,
 ];
 
 export const isMouseHoverableLayer = (layerId: string) =>

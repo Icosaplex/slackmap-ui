@@ -4,7 +4,7 @@ import { Feature } from 'geojson';
 export const validateSpotFeatures = (features: Feature[]): string[] => {
   const errors: string[] = [];
   if (features.length === 0) {
-    errors.push('You need to draw a spot');
+    errors.push('You need to draw a polygon');
   }
   for (const feature of features) {
     if (!isFeatureSpot(feature)) {
