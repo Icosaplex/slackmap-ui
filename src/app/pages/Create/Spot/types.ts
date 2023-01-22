@@ -6,4 +6,10 @@ export interface SpotDetailsForm {
   restrictionLevel?: SlacklineRestrictionLevel;
   restrictionInfo?: string;
   extraInfo?: string;
+  images?: {
+    s3Key?: string;
+    id?: string;
+    content?: string;
+    isCover?: boolean;
+  }[];
 }

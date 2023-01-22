@@ -28,3 +28,10 @@ export function showInfoNotification(message: string, duration?: number) {
     duration,
   });
 }
+
+export const imageUrlFromS3Key = (s3Key?: string) => {
+  if (!s3Key) {
+    return undefined;
+  }
+  return `${process.env.REACT_APP_SLACKMAP_IMAGES_BASE_URL}/${s3Key}`;
+};

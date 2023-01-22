@@ -59,7 +59,6 @@ export function SpotEditPage(props: Props) {
       type: 'FeatureCollection',
       features,
     };
-    console.log(geoJson);
     updateSpot({ id: spotId!, payload: { ...values, geoJson } });
   };
 
@@ -111,6 +110,7 @@ export function SpotEditPage(props: Props) {
               extraInfo: spotDetails.extraInfo,
               restrictionInfo: spotDetails.restrictionInfo,
               restrictionLevel: spotDetails.restrictionLevel,
+              images: spotDetails.images,
             }}
           />
         )}

@@ -18,6 +18,7 @@ import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { spotApi } from 'app/api/spot-api';
 import { SlacklineDetailInfoField } from '../../../TextFields/SlacklineDetailInfoField';
 import { appColors } from 'styles/theme/colors';
+import { imageUrlFromS3Key } from 'utils';
 
 interface Props {
   lineId: string;
@@ -65,7 +66,9 @@ export const LineInfoPopup = (props: Props) => {
             component="img"
             height="194"
             image={
-              lineDetails.coverImageUrl || '/images/coverImageFallback.png'
+              imageUrlFromS3Key(
+                lineDetails?.images?.find(i => i.isCover)?.s3Key,
+              ) || '/images/coverImageFallback.png'
             }
           />
           <CardContent component={Stack} spacing={2} sx={{}}>

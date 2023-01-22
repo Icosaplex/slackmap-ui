@@ -11,7 +11,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MapIcon from '@mui/icons-material/Map';
 import { LoadingIndicator } from 'app/components/LoadingIndicator';
 import { format } from 'date-fns';
-import { Menu, MenuItem } from '@mui/material';
+import { Menu, MenuItem, Typography } from '@mui/material';
 import { useState } from 'react';
 import { Stack } from '@mui/system';
 import { SlacklineDetailInfoField } from 'app/components/TextFields/SlacklineDetailInfoField';
@@ -29,6 +29,8 @@ import startCase from 'lodash.startcase';
 import { spotApi } from 'app/api/spot-api';
 import { OutdatedInfoField } from 'app/components/TextFields/OutdatedInfoField';
 import { Position } from 'geojson';
+import { imageUrlFromS3Key } from 'utils';
+import { S3ImageList } from 'app/components/ImageList';
 
 interface Props {
   spotId: string;
@@ -130,7 +132,9 @@ export const SpotDetailCard = (props: Props) => {
             component="img"
             height="194"
             image={
-              spotDetails?.coverImageUrl || '/images/coverImageFallback.png'
+              imageUrlFromS3Key(
+                spotDetails?.images?.find(i => i.isCover)?.s3Key,
+              ) || '/images/coverImageFallback.png'
             }
           />
           <CardContent component={Stack} spacing={2} sx={{}}>
@@ -164,6 +168,12 @@ export const SpotDetailCard = (props: Props) => {
               content={spotDetails.extraInfo}
               skipIfEmpty
             />
+            {(spotDetails.images?.length || []) > 0 && (
+              <>
+                <Typography variant="h6">Media</Typography>
+                <S3ImageList userMode="view" photos={spotDetails.images} />
+              </>
+            )}
           </CardContent>
           <CardActions>
             {props.coordinates && (

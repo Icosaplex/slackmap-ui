@@ -24,6 +24,7 @@ import {
   EditingTextFieldHeader,
   restrictionSelectOptions,
 } from '../Line/LineEditCard';
+import { S3ImageList, S3PhotoMeta } from 'app/components/ImageList';
 
 interface Props {
   initialValues?: SpotDetailsForm;
@@ -42,8 +43,15 @@ const cleanValues = (values: SpotDetailsForm): SpotDetailsForm => {
 export const SpotEditCard = (props: Props) => {
   const isCreateMode = !props.initialValues;
 
-  // const validationSchema = z.object({});
+  const [images, setImages] = React.useState<S3PhotoMeta[]>(
+    props.initialValues?.images ?? [],
+  );
 
+  const onPhotosChanged = (photos: S3PhotoMeta[]) => {
+    setImages(photos);
+  };
+
+  // const validationSchema = z.object({});
   const formik = useFormik<SpotDetailsForm>({
     initialValues: props.initialValues ?? {
       restrictionLevel: 'none',
@@ -51,7 +59,8 @@ export const SpotEditCard = (props: Props) => {
     // validationSchema: toFormikValidationSchema(validationSchema),
     // validateOnChange: true,
     onSubmit: values => {
-      props.onSubmit(cleanValues(values));
+      const allValues = { ...values, images: images };
+      props.onSubmit(cleanValues(allValues));
     },
   });
 
@@ -151,6 +160,16 @@ export const SpotEditCard = (props: Props) => {
               label={'Restriction Details'}
               multiline
               placeholder="Don't forget to add your contact info for people to reach you"
+            />
+
+            <EditingTextFieldHeader subHeader="All the photos are publicly viewable. You can add max 3 photos and the first one will be used as the cover photo. Max file size allowed is 2MB">
+              Media
+            </EditingTextFieldHeader>
+
+            <S3ImageList
+              userMode="edit"
+              photos={props.initialValues?.images}
+              onPhotosChanged={onPhotosChanged}
             />
 
             <LoadingButton

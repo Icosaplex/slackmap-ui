@@ -12,7 +12,7 @@ import MapIcon from '@mui/icons-material/Map';
 import { lineApi } from 'app/api/line-api';
 import { LoadingIndicator } from 'app/components/LoadingIndicator';
 import { format } from 'date-fns';
-import { Menu, MenuItem } from '@mui/material';
+import { Menu, MenuItem, Typography } from '@mui/material';
 import { useState } from 'react';
 import { Stack } from '@mui/system';
 import { SlacklineDetailInfoField } from 'app/components/TextFields/SlacklineDetailInfoField';
@@ -29,6 +29,8 @@ import { appColors } from 'styles/theme/colors';
 import startCase from 'lodash.startcase';
 import { OutdatedInfoField } from 'app/components/TextFields/OutdatedInfoField';
 import { Position } from '@turf/turf';
+import { imageUrlFromS3Key } from 'utils';
+import { S3ImageList } from 'app/components/ImageList';
 
 interface Props {
   lineId: string;
@@ -130,7 +132,9 @@ export const LineDetailCard = (props: Props) => {
             component="img"
             height="194"
             image={
-              lineDetails?.coverImageUrl || '/images/coverImageFallback.png'
+              imageUrlFromS3Key(
+                lineDetails?.images?.find(i => i.isCover)?.s3Key,
+              ) || '/images/coverImageFallback.png'
             }
           />
           <CardContent component={Stack} spacing={2} sx={{}}>
@@ -186,6 +190,12 @@ export const LineDetailCard = (props: Props) => {
               content={lineDetails.extraInfo}
               skipIfEmpty
             />
+            {(lineDetails.images?.length || []) > 0 && (
+              <>
+                <Typography variant="h6">Media</Typography>
+                <S3ImageList userMode="view" photos={lineDetails.images} />
+              </>
+            )}
           </CardContent>
           <CardActions>
             {props.coordinates && (

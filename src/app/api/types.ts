@@ -15,12 +15,12 @@ export interface GetLineDetailsAPIResponse {
   contactInfo?: string;
   restrictionLevel?: SlacklineRestrictionLevel;
   extraInfo?: string;
-  coverImageUrl?: string;
   createdDateTime: string;
   lastModifiedDateTime?: string;
   restrictionInfo?: string;
   isMeasured?: boolean;
   isUserEditor?: boolean;
+  images?: { s3Key: string; isCover?: boolean }[];
 }
 
 export interface UpdateLineDetailsPayload {
@@ -38,6 +38,7 @@ export interface UpdateLineDetailsPayload {
   extraInfo?: string;
   restrictionInfo?: string;
   isMeasured?: boolean;
+  images?: { id?: string; content?: string; isCover?: boolean }[];
 }
 
 export interface CreateLineDetailsPayload {
@@ -55,6 +56,7 @@ export interface CreateLineDetailsPayload {
   extraInfo?: string;
   restrictionInfo?: string;
   isMeasured?: boolean;
+  images?: { id?: string; content?: string; isCover?: boolean }[];
 }
 
 export interface GetSpotDetailsAPIResponse {
@@ -66,11 +68,11 @@ export interface GetSpotDetailsAPIResponse {
   contactInfo?: string;
   restrictionLevel?: SlacklineRestrictionLevel;
   extraInfo?: string;
-  coverImageUrl?: string;
   createdDateTime: string;
   lastModifiedDateTime?: string;
   restrictionInfo?: string;
   isUserEditor?: boolean;
+  images?: { s3Key: string; isCover?: boolean }[];
 }
 
 export interface UpdateSpotDetailsPayload {
@@ -82,6 +84,7 @@ export interface UpdateSpotDetailsPayload {
   restrictionLevel?: SlacklineRestrictionLevel;
   restrictionInfo?: string;
   extraInfo?: string;
+  images?: { id?: string; content?: string; isCover?: boolean }[];
 }
 
 export interface CreateSpotDetailsPayload {
@@ -93,6 +96,7 @@ export interface CreateSpotDetailsPayload {
   restrictionLevel?: SlacklineRestrictionLevel;
   restrictionInfo?: string;
   extraInfo?: string;
+  images?: { id?: string; content?: string; isCover?: boolean }[];
 }
 
 export interface GetUserBasicDetailsAPIResponse {

@@ -116,6 +116,7 @@ export function LineEditPage(props: Props) {
               restrictionInfo: lineDetails.restrictionInfo,
               restrictionLevel: lineDetails.restrictionLevel,
               type: lineDetails.type,
+              images: lineDetails.images,
             }}
           />
         )}

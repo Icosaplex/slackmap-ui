@@ -32,6 +32,7 @@ export const geoJsonURL = {
 };
 
 export const mapStyles = {
+  streets: 'mapbox://styles/mapbox/streets-v11',
   satelliteStreets: 'mapbox://styles/mapbox/satellite-streets-v11',
   satellite: 'mapbox://styles/mapbox/satellite-v9',
   light: 'mapbox://styles/mapbox/light-v11',

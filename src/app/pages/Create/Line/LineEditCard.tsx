@@ -6,8 +6,13 @@ import Avatar from '@mui/material/Avatar';
 import { LoadingIndicator } from 'app/components/LoadingIndicator';
 import {
   Alert,
+  Button,
   Checkbox,
   FormControlLabel,
+  IconButton,
+  ImageList,
+  ImageListItem,
+  ImageListItemBar,
   MenuItem,
   Stack,
   StandardTextFieldProps,
@@ -20,6 +25,7 @@ import { z } from 'zod';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { LineDetailsForm } from './types';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { S3ImageList, S3PhotoMeta } from 'app/components/ImageList';
 
 const lineTypes: { value: SlacklineType; label: string }[] = [
   {
@@ -72,8 +78,15 @@ const cleanValues = (values: LineDetailsForm): LineDetailsForm => {
 export const LineEditCard = (props: Props) => {
   const isCreateMode = !props.initialValues;
 
-  // const validationSchema = z.object({});
+  const [images, setImages] = React.useState<S3PhotoMeta[]>(
+    props.initialValues?.images ?? [],
+  );
 
+  const onPhotosChanged = (photos: S3PhotoMeta[]) => {
+    setImages(photos);
+  };
+
+  // const validationSchema = z.object({});
   const formik = useFormik<LineDetailsForm>({
     initialValues: props.initialValues ?? {
       isMeasured: false,
@@ -83,7 +96,8 @@ export const LineEditCard = (props: Props) => {
     // validationSchema: toFormikValidationSchema(validationSchema),
     // validateOnChange: true,
     onSubmit: values => {
-      props.onSubmit(cleanValues(values));
+      const allValues = { ...values, images: images };
+      props.onSubmit(cleanValues(allValues));
     },
   });
 
@@ -226,6 +240,16 @@ export const LineEditCard = (props: Props) => {
               label={'Restriction Details'}
               multiline
               placeholder="Don't forget to add your contact info for people to reach you"
+            />
+
+            <EditingTextFieldHeader subHeader="All the photos are publicly viewable. You can add max 3 photos and the first one will be used as the cover photo. Max file size allowed is 2MB">
+              Media
+            </EditingTextFieldHeader>
+
+            <S3ImageList
+              userMode="edit"
+              photos={props.initialValues?.images}
+              onPhotosChanged={onPhotosChanged}
             />
 
             <LoadingButton
