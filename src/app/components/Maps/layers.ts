@@ -25,12 +25,16 @@ export enum LayerIds {
   lineLabel,
 }
 
-type FeatureLayerType = 'line' | 'spot' | 'guide' | 'slacklineGroup';
+type FeatureLayerType =
+  | 'line'
+  | 'spot'
+  | 'guide'
+  | 'slacklineGroup'
+  | 'countryAssociation';
 
 export const pointLayer = (
   type: FeatureLayerType,
   layout?: CircleLayout,
-  paint?: CirclePaint,
 ): CircleLayer => ({
   id: 'point' + (type ? `-${type}` : ''),
   type: 'circle',
@@ -39,17 +43,29 @@ export const pointLayer = (
     ...layout,
   },
   paint: {
-    'circle-radius': 7,
+    'circle-radius': [
+      'case',
+      [
+        'any',
+        ['boolean', ['feature-state', 'isSelected'], false],
+        ['boolean', ['feature-state', 'isFocused'], false],
+      ],
+      12,
+      ['boolean', ['feature-state', 'hover'], false],
+      9,
+      7,
+    ],
     'circle-opacity': 0.8,
     'circle-color': [
       'case',
       ['==', ['get', 'ft'], 'g'],
       appColors.guideFeaturesColor,
+      ['==', ['get', 'ft'], 'sg'],
+      appColors.isaBlue,
       appColors.lineStrokeColor,
     ],
     'circle-stroke-width': 1,
     'circle-stroke-color': 'white',
-    ...paint,
   },
 });
 
@@ -200,7 +216,11 @@ export const polygonLayer = (
   id: 'polygon' + (type ? `-${type}` : ''),
   type: 'fill',
   minzoom: 12,
-  filter: ['==', ['geometry-type'], 'Polygon'],
+  filter: [
+    'any',
+    ['==', ['geometry-type'], 'Polygon'],
+    ['==', ['geometry-type'], 'MultiPolygon'],
+  ],
   layout: {
     ...layout,
   },
@@ -221,6 +241,8 @@ export const polygonLayer = (
       'case',
       ['==', ['get', 'ft'], 'g'],
       appColors.guideFeaturesColor,
+      ['==', ['get', 'ft'], 'ca'],
+      appColors.isaBlue,
       appColors.spotFillColor,
     ],
   },
@@ -375,6 +397,8 @@ export const unclusteredPointLayer: CircleLayer = {
 };
 
 const cursorInteractableLayerIds = [
+  pointLayer('slacklineGroup').id,
+  polygonLayer('countryAssociation').id,
   pointLayer('guide').id,
   lineLayer('line').id,
   lineLayer('guide').id,
@@ -387,6 +411,8 @@ const cursorInteractableLayerIds = [
 ];
 
 const mouseHoverableLayersIds = [
+  pointLayer('slacklineGroup').id,
+  polygonLayer('countryAssociation').id,
   pointLayer('guide').id,
   lineLayer('line').id,
   lineLayer('guide').id,

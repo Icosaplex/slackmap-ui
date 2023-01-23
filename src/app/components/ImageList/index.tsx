@@ -6,7 +6,7 @@ import {
   ImageListItemBar,
   Stack,
 } from '@mui/material';
-import React, { useEffect } from 'react';
+import React, { ChangeEventHandler, useEffect } from 'react';
 import { imageUrlFromS3Key, showErrorNotification } from 'utils';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
@@ -30,32 +30,39 @@ export const S3ImageList = (props: Props) => {
 
   const [images, setImages] = React.useState<S3PhotoMeta[]>(props.photos ?? []);
 
-  const addPhotoClicked = (file: File) => {
-    if (file.size > 2 * 1000 * 1000) {
-      dispatch(showErrorNotification(`Max file size is 2MB`));
-      return;
-    }
-    const fileNameArray = file.name.split('.');
-    const fileExtension = fileNameArray[fileNameArray.length - 1];
-    const allowedFileTypes = ['jpg', 'png', 'jpeg'];
+  const onImageChange: ChangeEventHandler<any> = e => {
+    if (e.target.files) {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 2 * 1000 * 1000) {
+          dispatch(showErrorNotification(`Max file size is 2MB`));
+          e.target.value = null;
+          return;
+        }
+        const fileNameArray = file.name.split('.');
+        const fileExtension = fileNameArray[fileNameArray.length - 1];
+        const allowedFileTypes = ['jpg', 'png', 'jpeg'];
 
-    if (!allowedFileTypes.includes(fileExtension)) {
-      dispatch(showErrorNotification('Only jpg and png are allowed.'));
-      return;
-    }
+        if (!allowedFileTypes.includes(fileExtension)) {
+          dispatch(showErrorNotification('Only jpg and png are allowed.'));
+          e.target.value = null;
+          return;
+        }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.result) {
-        setImages([
-          ...images,
-          {
-            content: reader.result.toString(),
-          },
-        ]);
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (reader.result) {
+            setImages([
+              ...images,
+              {
+                content: reader.result.toString(),
+              },
+            ]);
+          }
+        };
+        reader.readAsDataURL(file);
       }
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const deletePhotoClicked = (id: string) => {
@@ -113,14 +120,8 @@ export const S3ImageList = (props: Props) => {
           <input
             id="upload-photo"
             type="file"
-            onChange={e => {
-              if (e.target.files) {
-                const file = e.target.files[0];
-                if (file) {
-                  addPhotoClicked(file);
-                }
-              }
-            }}
+            accept="image/jpeg, image/png, image/jpg"
+            onChange={onImageChange}
           />
         </>
       )}

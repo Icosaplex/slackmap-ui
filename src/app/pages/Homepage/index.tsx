@@ -16,6 +16,7 @@ import { useSignInAlert } from 'utils/hooks/useSignInAlert';
 import { LineInfoPopup } from 'app/components/Maps/Components/Popups/LineInfoPopup';
 import { SpotInfoPopup } from 'app/components/Maps/Components/Popups/SpotInfoPopup';
 import { GuideInfoPopup } from 'app/components/Maps/Components/Popups/GuideInfoPopup';
+import { useWindowSize } from 'react-use';
 
 interface Props {}
 
@@ -55,7 +56,7 @@ export function Homepage(props: Props) {
 
     const { id, type } = parseMapFeature(feature);
     if (id && typeof id === 'string' && type) {
-      setSelectedFeature({ id, type });
+      setSelectedFeature({ id, type: type as MapSlacklineFeatureType });
     }
   };
 
@@ -103,7 +104,7 @@ export function Homepage(props: Props) {
         />
       );
     }
-    
+
     return null;
   }, [navigate, selectedFeature]);
 

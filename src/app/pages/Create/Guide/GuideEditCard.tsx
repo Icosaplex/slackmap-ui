@@ -106,7 +106,7 @@ export const GuideEditCard = (props: Props) => {
         title={
           <>
             <Typography variant="h5">
-              {isCreateMode ? 'Create New Guide' : 'Edit GUide'}
+              {isCreateMode ? 'Create New Guide' : 'Edit Guide'}
             </Typography>
           </>
         }

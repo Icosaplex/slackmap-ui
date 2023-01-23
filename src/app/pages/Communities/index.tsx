@@ -1,32 +1,57 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box } from '@mui/system';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { mapUrlSearchParams } from 'app/components/Maps/mapUtils';
-import { MapboxGeoJSONFeature, ViewStateChangeEvent } from 'react-map-gl';
-import { SpeedDial, SpeedDialAction } from '@mui/material';
-import LinearScaleIcon from '@mui/icons-material/LinearScale';
-import AddIcon from '@mui/icons-material/Add';
-import PentagonIcon from '@mui/icons-material/Pentagon';
-import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
-import { useSignInAlert } from 'utils/hooks/useSignInAlert';
-import { LineInfoPopup } from 'app/components/Maps/Components/Popups/LineInfoPopup';
+import { parseMapFeature } from 'app/components/Maps/mapUtils';
+import { MapboxGeoJSONFeature } from 'react-map-gl';
 import { CommunityMap } from 'app/components/Maps/CommunityMap';
-import { CommunityInfoPopup } from 'app/components/Maps/Components/Popups/CommunityInfoPopup';
+import { SlacklineGroupInfoPopup } from 'app/components/Maps/Components/Popups/SlacklineGroupInfoPopup';
+import { CountryAssociationInfoPopup } from 'app/components/Maps/Components/Popups/CountryAssociationInfoPopup';
 
 interface Props {}
 
 export function CommunitiesPage(props: Props) {
-  const [selectedFeatureId, setSelectedFeatureId] = useState<string>();
+  const [selectedFeature, setSelectedFeature] = useState<{
+    id: string;
+    type: MapCommunityFeatureType;
+    organizationIds?: string[];
+    cn?: 'Switzerland';
+  }>();
 
   const onSelectedFeatureChange = (feature?: MapboxGeoJSONFeature) => {
-    if (!feature) return setSelectedFeatureId(undefined);
-    setSelectedFeatureId(feature.properties?.id);
+    if (!feature) return setSelectedFeature(undefined);
+    const { id, type } = parseMapFeature(feature);
+
+    if (id && typeof id === 'string' && type) {
+      setSelectedFeature({
+        id,
+        type: type as MapCommunityFeatureType,
+        cn: feature.properties?.cn,
+        organizationIds:
+          feature.properties?.organizationIds &&
+          JSON.parse(feature.properties?.organizationIds),
+      });
+    }
   };
 
   const Popup = useMemo(() => {
-    if (!selectedFeatureId) return null;
-    return <CommunityInfoPopup id={selectedFeatureId} />;
-  }, [selectedFeatureId]);
+    if (!selectedFeature) return null;
+
+    if (selectedFeature.type === 'slacklineGroup') {
+      return <SlacklineGroupInfoPopup id={selectedFeature.id} />;
+    }
+
+    if (
+      selectedFeature.type === 'countryAssociation' &&
+      selectedFeature.cn &&
+      selectedFeature.organizationIds
+    ) {
+      return (
+        <CountryAssociationInfoPopup
+          countryName={selectedFeature.cn}
+          organizationIds={selectedFeature.organizationIds}
+        />
+      );
+    }
+  }, [selectedFeature]);
 
   return (
     <Box

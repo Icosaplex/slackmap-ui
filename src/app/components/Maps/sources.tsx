@@ -120,7 +120,7 @@ export const SlacklineMapSources = (props: {
             visibility: options.guides ? 'visible' : 'none',
           })}
         />
-         <Layer
+        <Layer
           {...pointLabelLayer('guide', {
             visibility: options.guides ? 'visible' : 'none',
           })}
@@ -190,15 +190,30 @@ export const CommunityMapSources = (props: {
   return (
     <>
       <Source
-        id="communities"
+        id="slacklineGroups"
         type="geojson"
-        data={geoJsonURL.communities}
+        data={geoJsonURL.groups}
         generateId={true}
+        promoteId="id"
       >
         <Layer
-          {...pointLayer('slacklineGroup', undefined, {
-            'circle-color': appColors.isaBlue,
+          {...pointLayer('slacklineGroup', {
+            visibility: props.options.groups ? 'visible' : 'none',
           })}
+        />
+      </Source>
+      <Source
+        id="countryAssociations"
+        type="geojson"
+        data={geoJsonURL.associations}
+        generateId={true}
+        promoteId="id"
+      >
+        <Layer
+          {...polygonLayer('countryAssociation', {
+            visibility: props.options.associations ? 'visible' : 'none',
+          })}
+          minzoom={0}
         />
       </Source>
     </>

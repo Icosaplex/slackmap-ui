@@ -120,6 +120,7 @@ export const SlacklineMap = (props: Props) => {
     isMapLoaded && !props.initialViewState,
   );
 
+  
   const onPopupClose = () => {
     setPopupLocation(undefined);
     mapRef.current?.easeTo({

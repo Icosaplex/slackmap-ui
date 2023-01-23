@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import { DrawerPanel } from './DrawerPanel';
+import { useWindowSize } from 'react-use';
 
 const drawerWidth = 240;
 
@@ -16,10 +17,12 @@ interface Props {
 export const AppDrawer = (props: Props) => {
   const { children } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const size = useWindowSize();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+  
 
   return (
     <Box sx={{ display: 'flex', position: 'relative' }}>
@@ -80,7 +83,7 @@ export const AppDrawer = (props: Props) => {
         sx={{
           flexGrow: 1,
           //   width: { lg: `calc(100% - ${drawerWidth}px)` },
-          height: '100vh',
+          height: size.height,
         }}
       >
         {children}

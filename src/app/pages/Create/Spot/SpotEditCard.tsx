@@ -130,12 +130,7 @@ export const SpotEditCard = (props: Props) => {
               multiline
             />
 
-            <EditingTextFieldHeader
-              subHeader='Access restriction warnings will be displayed to the viewers
-                  on top of the page to prevent permission problems. "Partial"
-                  restriction in just a warning and "Full" means it requires
-                  permissions.'
-            >
+            <EditingTextFieldHeader subHeader='Access restriction warnings will be displayed to viewers to prevent further problems with access. "Partial" restriction warnings need to be taken seriously, defined procedures need to be followed, "Full" restriction means the line is either illegal or can not be rigged anymore.'>
               Restriction
             </EditingTextFieldHeader>
 

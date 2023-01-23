@@ -33,8 +33,10 @@ export const geoJsonURL = {
   clustersLinesGuides: baseUrl + '/geojson/clusters/lines-guides.geojson',
   clustersSpotsGuides: baseUrl + '/geojson/clusters/spots-guides.geojson',
 
-  communities:
-    'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/communities.geojson',
+  groups:
+    'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/groups/groups.geojson',
+  associations:
+    'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/associations/associations.geojson',
 };
 
 export const mapStyles = {

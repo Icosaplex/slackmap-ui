@@ -19,7 +19,7 @@ import { spotApi } from 'app/api/spot-api';
 import { SlacklineDetailInfoField } from '../../../TextFields/SlacklineDetailInfoField';
 import { appColors } from 'styles/theme/colors';
 
-interface CommunityInfo {
+interface GroupInfo {
   id: string;
   name: string;
   lat: number;
@@ -35,35 +35,35 @@ interface Props {
   id: string;
 }
 
-let communitiesJson: CommunityInfo[] = [];
+let groupsJson: GroupInfo[] = [];
 
-const getCommunityInfo = async (id: string) => {
-  if (communitiesJson.length === 0) {
+const getGroupInfo = async (id: string) => {
+  if (groupsJson.length === 0) {
     const response = await fetch(
-      'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/communities.json',
+      'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/groups/groups.json',
     ).then(r => r.json());
-    communitiesJson = response;
+    groupsJson = response;
   }
-  return communitiesJson.find(c => c.id === id);
+  return groupsJson.find(c => c.id === id);
 };
 
-export const CommunityInfoPopup = (props: Props) => {
+export const SlacklineGroupInfoPopup = (props: Props) => {
   const { isDesktop } = useMediaQuery();
   const [isLoading, setIsLoading] = useState(false);
-  const [community, setCommunity] = useState<CommunityInfo>();
+  const [group, setGroup] = useState<GroupInfo>();
 
   useEffect(() => {
     setIsLoading(true);
-    getCommunityInfo(props.id).then(r => {
+    getGroupInfo(props.id).then(r => {
       if (r) {
-        setCommunity(r);
+        setGroup(r);
       }
       setIsLoading(false);
     });
   }, [props.id]);
 
-  let title = community?.name || 'Unknown Name';
-  title = title + (community?.isRegional ? ' (Regional)' : '');
+  let title = group?.name || 'Unknown Name';
+  title = title + (group?.isRegional ? ' (Regional)' : '');
 
   return (
     <Card
@@ -71,7 +71,7 @@ export const CommunityInfoPopup = (props: Props) => {
         width: isDesktop ? '300px' : '67vw',
       }}
     >
-      {isLoading || !community ? (
+      {isLoading || !group ? (
         <CardContent>
           <LoadingIndicator />
         </CardContent>
@@ -85,22 +85,22 @@ export const CommunityInfoPopup = (props: Props) => {
                   backgroundColor: appColors.isaBlue,
                 }}
               >
-                C
+                G
               </Avatar>
             }
             title={title}
             subheader={`Last updated: ${format(
-              new Date(community.updatedDateTime ?? community.createdDateTime),
+              new Date(group.updatedDateTime ?? group.createdDateTime),
               'dd MMM yyyy',
             )}`}
           />
           <CardContent component={Stack} spacing={2} sx={{}}>
             <Box>
               <Typography variant="body2" color={t => t.palette.text.secondary}>
-                Member Count: <b>{community.members || 'Unknown'}</b>
+                Member Count: <b>{group.members || 'Unknown'}</b>
               </Typography>
               <Typography variant="body2" color={t => t.palette.text.secondary}>
-                Email: <b>{community.email || 'Unknown'}</b>
+                Email: <b>{group.email || 'Unknown'}</b>
               </Typography>
             </Box>
 
@@ -115,22 +115,22 @@ export const CommunityInfoPopup = (props: Props) => {
               This information is retrieved from the{' '}
               <a
                 href={
-                  'https://github.com/International-Slackline-Association/slackline-data/tree/master/communities'
+                  'https://github.com/International-Slackline-Association/slackline-data/tree/master/communities/groups'
                 }
                 target="_blank"
                 rel="noreferrer"
               >
-                open community data
+                public slackline groups data
               </a>
               . If you think it is incorrect, please contact the ISA as
               described in the link.
             </Typography>
           </CardContent>
-          {community.link && (
+          {group.link && (
             <CardActions sx={{ justifyContent: 'center', padding: 2 }}>
               <Button
                 variant="contained"
-                href={community.link}
+                href={group.link}
                 target="_blank"
                 rel="noreferrer"
               >

@@ -67,9 +67,12 @@ export const CommunityMap = (props: Props) => {
     associations: {
       label: 'Associations',
       isSelected: false,
-      isDisabled: true,
     },
   });
+
+  useEffect(() => {
+    onPopupClose();
+  }, [legendValues]);
 
   const setHoveredFeature = useHoveredFeature(mapRef);
   const setSelectedFeature = useSelectedFeature(mapRef);
@@ -127,7 +130,10 @@ export const CommunityMap = (props: Props) => {
         {...defaultMapSettings}
         initialViewState={props.initialViewState || defaultMapViewState}
         mapStyle={mapStyles.light}
-        interactiveLayerIds={[pointLayer('slacklineGroup').id]}
+        interactiveLayerIds={[
+          pointLayer('slacklineGroup').id,
+          polygonLayer('countryAssociation').id,
+        ]}
         onLoad={onMapLoad}
         onSourceData={onSourceData}
         onClick={onMapClick}

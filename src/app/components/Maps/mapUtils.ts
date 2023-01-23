@@ -76,7 +76,7 @@ export const mapUrlSearchParams = {
 };
 
 export const parseMapFeature = (feature: MapboxGeoJSONFeature) => {
-  let type: MapSlacklineFeatureType | undefined;
+  let type: MapSlacklineFeatureType | MapCommunityFeatureType | undefined;
   switch (feature.properties?.['ft']) {
     case 'l':
       type = 'line';
@@ -87,11 +87,18 @@ export const parseMapFeature = (feature: MapboxGeoJSONFeature) => {
     case 'g':
       type = 'guide';
       break;
+    case 'sg':
+      type = 'slacklineGroup';
+      break;
+    case 'ca':
+      type = 'countryAssociation';
+      break;
     default:
       break;
   }
+
   const center = centerOfMass(feature).geometry.coordinates;
-  return { id: feature.id, type, center };
+  return { id: feature.properties?.id, type, center };
 };
 
 export const calculateBounds = (
