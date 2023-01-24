@@ -90,8 +90,8 @@ export const parseMapFeature = (feature: MapboxGeoJSONFeature) => {
     case 'sg':
       type = 'slacklineGroup';
       break;
-    case 'ca':
-      type = 'countryAssociation';
+    case 'co':
+      type = 'countryOrganization';
       break;
     default:
       break;

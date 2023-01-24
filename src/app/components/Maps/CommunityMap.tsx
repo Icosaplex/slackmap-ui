@@ -64,8 +64,8 @@ export const CommunityMap = (props: Props) => {
 
   const { legendMenu, legendValues, onLegendItemsUpdated } = useLegendMenu({
     groups: { label: 'Groups', isSelected: true },
-    associations: {
-      label: 'Associations',
+    organizations: {
+      label: 'Organizations',
       isSelected: false,
     },
   });
@@ -132,7 +132,7 @@ export const CommunityMap = (props: Props) => {
         mapStyle={mapStyles.light}
         interactiveLayerIds={[
           pointLayer('slacklineGroup').id,
-          polygonLayer('countryAssociation').id,
+          polygonLayer('countryOrganization').id,
         ]}
         onLoad={onMapLoad}
         onSourceData={onSourceData}

@@ -30,7 +30,7 @@ type FeatureLayerType =
   | 'spot'
   | 'guide'
   | 'slacklineGroup'
-  | 'countryAssociation';
+  | 'countryOrganization';
 
 export const pointLayer = (
   type: FeatureLayerType,
@@ -241,7 +241,7 @@ export const polygonLayer = (
       'case',
       ['==', ['get', 'ft'], 'g'],
       appColors.guideFeaturesColor,
-      ['==', ['get', 'ft'], 'ca'],
+      ['==', ['get', 'ft'], 'co'],
       appColors.isaBlue,
       appColors.spotFillColor,
     ],
@@ -398,7 +398,7 @@ export const unclusteredPointLayer: CircleLayer = {
 
 const cursorInteractableLayerIds = [
   pointLayer('slacklineGroup').id,
-  polygonLayer('countryAssociation').id,
+  polygonLayer('countryOrganization').id,
   pointLayer('guide').id,
   lineLayer('line').id,
   lineLayer('guide').id,
@@ -412,7 +412,7 @@ const cursorInteractableLayerIds = [
 
 const mouseHoverableLayersIds = [
   pointLayer('slacklineGroup').id,
-  polygonLayer('countryAssociation').id,
+  polygonLayer('countryOrganization').id,
   pointLayer('guide').id,
   lineLayer('line').id,
   lineLayer('guide').id,

@@ -11,7 +11,7 @@ import { Stack } from '@mui/system';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 import { appColors } from 'styles/theme/colors';
 
-interface AssociationInfo {
+interface OrganizationInfo {
   id: string;
   name: string;
   email: string;
@@ -21,12 +21,12 @@ interface Props {
   organizationIds: string[];
 }
 
-let assocationsInfo: { [key: string]: AssociationInfo } = {};
+let assocationsInfo: { [key: string]: OrganizationInfo } = {};
 
-const getAssociationsInfo = async () => {
+const getOrganizationsInfo = async () => {
   if (Object.keys(assocationsInfo).length === 0) {
     const response = await fetch(
-      'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/associations/associations.json',
+      'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/organizations/organizations.json',
     ).then(r => r.json());
     for (const a of response) {
       assocationsInfo[a.id] = a;
@@ -35,25 +35,25 @@ const getAssociationsInfo = async () => {
   return assocationsInfo;
 };
 
-export const CountryAssociationInfoPopup = (props: Props) => {
+export const CountryOrganizationInfoPopup = (props: Props) => {
   const { isDesktop } = useMediaQuery();
   const [isLoading, setIsLoading] = useState(false);
-  const [associations, setAssociations] = useState<AssociationInfo[]>([]);
+  const [organizations, setOrganizations] = useState<OrganizationInfo[]>([]);
 
   useEffect(() => {
     setIsLoading(true);
 
-    const fetchAssociations = async () => {
-      const associationInfo = await getAssociationsInfo();
-      setAssociations(
+    const fetchOrganizations = async () => {
+      const organizationInfo = await getOrganizationsInfo();
+      setOrganizations(
         props.organizationIds.map(id => {
-          return { ...associationInfo[id] };
+          return { ...organizationInfo[id] };
         }),
       );
       setIsLoading(false);
     };
 
-    fetchAssociations();
+    fetchOrganizations();
   }, [props.organizationIds]);
 
   return (
@@ -62,7 +62,7 @@ export const CountryAssociationInfoPopup = (props: Props) => {
         width: isDesktop ? '300px' : '67vw',
       }}
     >
-      {isLoading || associations.length === 0 ? (
+      {isLoading || organizations.length === 0 ? (
         <CardContent>
           <LoadingIndicator />
         </CardContent>
@@ -79,22 +79,21 @@ export const CountryAssociationInfoPopup = (props: Props) => {
                 C
               </Avatar>
             }
-            title={`Associations of ${props.countryName}`}
+            title={`Organizations of ${props.countryName}`}
           />
           <CardContent component={Stack} spacing={2} sx={{}}>
             <Typography variant="caption">
-              ISA Member Associations, that are listed below, and their members
-              have rights to edit & delete the features inside the marked
-              region.
+              ISA Members below have rights to edit & delete the features inside
+              the marked region.
             </Typography>
             <Stack spacing={1} sx={{ maxHeight: '33vh', overflow: 'scroll' }}>
-              {associations.map(association => (
+              {organizations.map(organization => (
                 <Typography
-                  key={association.id}
+                  key={organization.id}
                   variant="body2"
                   color={t => t.palette.text.secondary}
                 >
-                  <b>{association.name}</b>({association.email})
+                  <b>{organization.name}</b>({organization.email})
                 </Typography>
               ))}
             </Stack>
@@ -110,12 +109,12 @@ export const CountryAssociationInfoPopup = (props: Props) => {
               This information is retrieved from the{' '}
               <a
                 href={
-                  'https://github.com/International-Slackline-Association/slackline-data/tree/master/communities/associations'
+                  'https://github.com/International-Slackline-Association/slackline-data/tree/master/communities/organizations'
                 }
                 target="_blank"
                 rel="noreferrer"
               >
-                public ISA Assocations data
+                public ISA Organizations data
               </a>
               . If you think it is incorrect, please contact the ISA as
               described in the link.

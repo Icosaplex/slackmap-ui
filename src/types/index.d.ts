@@ -2,7 +2,7 @@ type UserIdentityType = 'individual' | 'organization';
 type SlacklineType = 'highline' | 'waterline' | 'other';
 type SlacklineRestrictionLevel = 'partial' | 'full' | 'none';
 type MapSlacklineFeatureType = 'line' | 'spot' | 'guide';
-type MapCommunityFeatureType = 'slacklineGroup' | 'countryAssociation';
+type MapCommunityFeatureType = 'slacklineGroup' | 'countryOrganization';
 
 type GuideType =
   | 'parkingLot'

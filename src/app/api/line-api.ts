@@ -65,5 +65,17 @@ export const lineApi = baseApi
           });
         },
       }),
+      requestTemporaryEditorship: builder.mutation<void, string>({
+        query: id => ({
+          url: `line/${id}/requestTemporaryEditorship`,
+          method: 'PUT',
+        }),
+        invalidatesTags: ['lineDetails'],
+        async onQueryStarted(_, { dispatch, queryFulfilled }) {
+          await queryFulfilled.then(() => {
+            dispatch(showSuccessNotification('Request Sent'));
+          });
+        },
+      }),
     }),
   });

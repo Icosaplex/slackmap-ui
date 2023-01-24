@@ -53,6 +53,8 @@ export const SpotDetailCard = (props: Props) => {
   const [deleteSpot, { isSuccess: isDeleted }] =
     spotApi.useDeleteSpotMutation();
 
+  const [requestEditorship] = spotApi.useRequestTemporaryEditorshipMutation();
+
   useEffect(() => {
     if (isDeleted) {
       navigate({ pathname: '/', search: searchParams.toString() });
@@ -71,6 +73,17 @@ export const SpotDetailCard = (props: Props) => {
       content: 'Are you sure you want to delete this spot?',
     }).then(() => {
       deleteSpot(props.spotId);
+    });
+  };
+
+  const onRequestEditorshipClick = async () => {
+    cardHeaderPopupState.close();
+    await confirmDialog({
+      title: 'Request Temporary Permissions',
+      content: `This spot seems to have no editors. You can ask for temporary permissions to edit this spot. 
+        The permissions will be revoked automatically every Sunday night.`,
+    }).then(() => {
+      requestEditorship(props.spotId);
     });
   };
 
@@ -117,6 +130,11 @@ export const SpotDetailCard = (props: Props) => {
                   >
                     Delete
                   </MenuItem>
+                  {spotDetails.hasNoEditors && (
+                    <MenuItem onClick={onRequestEditorshipClick}>
+                      Request to Edit
+                    </MenuItem>
+                  )}
                 </Menu>
               </>
             }

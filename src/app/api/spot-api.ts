@@ -66,5 +66,17 @@ export const spotApi = baseApi
           });
         },
       }),
+      requestTemporaryEditorship: builder.mutation<void, string>({
+        query: id => ({
+          url: `spot/${id}/requestTemporaryEditorship`,
+          method: 'PUT',
+        }),
+        invalidatesTags: ['spotDetails'],
+        async onQueryStarted(_, { dispatch, queryFulfilled }) {
+          await queryFulfilled.then(() => {
+            dispatch(showSuccessNotification('Request Sent'));
+          });
+        },
+      }),
     }),
   });

@@ -4,7 +4,7 @@ import { parseMapFeature } from 'app/components/Maps/mapUtils';
 import { MapboxGeoJSONFeature } from 'react-map-gl';
 import { CommunityMap } from 'app/components/Maps/CommunityMap';
 import { SlacklineGroupInfoPopup } from 'app/components/Maps/Components/Popups/SlacklineGroupInfoPopup';
-import { CountryAssociationInfoPopup } from 'app/components/Maps/Components/Popups/CountryAssociationInfoPopup';
+import { CountryOrganizationInfoPopup } from 'app/components/Maps/Components/Popups/CountryOrganizationInfoPopup';
 
 interface Props {}
 
@@ -40,12 +40,12 @@ export function CommunitiesPage(props: Props) {
     }
 
     if (
-      selectedFeature.type === 'countryAssociation' &&
+      selectedFeature.type === 'countryOrganization' &&
       selectedFeature.cn &&
       selectedFeature.organizationIds
     ) {
       return (
-        <CountryAssociationInfoPopup
+        <CountryOrganizationInfoPopup
           countryName={selectedFeature.cn}
           organizationIds={selectedFeature.organizationIds}
         />

@@ -19,8 +19,9 @@ export interface GetLineDetailsAPIResponse {
   lastModifiedDateTime?: string;
   restrictionInfo?: string;
   isMeasured?: boolean;
-  isUserEditor?: boolean;
   images?: { s3Key: string; isCover?: boolean }[];
+  isUserEditor?: boolean;
+  hasNoEditors?: boolean;
 }
 
 export interface UpdateLineDetailsPayload {
@@ -71,8 +72,9 @@ export interface GetSpotDetailsAPIResponse {
   createdDateTime: string;
   lastModifiedDateTime?: string;
   restrictionInfo?: string;
-  isUserEditor?: boolean;
   images?: { s3Key: string; isCover?: boolean }[];
+  isUserEditor?: boolean;
+  hasNoEditors?: boolean;
 }
 
 export interface UpdateSpotDetailsPayload {

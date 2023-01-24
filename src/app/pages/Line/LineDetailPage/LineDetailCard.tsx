@@ -53,6 +53,8 @@ export const LineDetailCard = (props: Props) => {
   const [deleteLine, { isSuccess: isDeleted }] =
     lineApi.useDeleteLineMutation();
 
+  const [requestEditorship] = lineApi.useRequestTemporaryEditorshipMutation();
+
   useEffect(() => {
     if (isDeleted) {
       navigate({ pathname: '/', search: searchParams.toString() });
@@ -71,6 +73,17 @@ export const LineDetailCard = (props: Props) => {
       content: 'Are you sure you want to delete this line?',
     }).then(() => {
       deleteLine(props.lineId);
+    });
+  };
+
+  const onRequestEditorshipClick = async () => {
+    cardHeaderPopupState.close();
+    await confirmDialog({
+      title: 'Request Temporary Permissions',
+      content: `This line seems to have no editors. You can ask for temporary permissions to edit this line. 
+        The permissions will be revoked automatically every Sunday night.`,
+    }).then(() => {
+      requestEditorship(props.lineId);
     });
   };
 
@@ -117,6 +130,11 @@ export const LineDetailCard = (props: Props) => {
                   >
                     Delete
                   </MenuItem>
+                  {lineDetails.hasNoEditors && (
+                    <MenuItem onClick={onRequestEditorshipClick}>
+                      Request to Edit
+                    </MenuItem>
+                  )}
                 </Menu>
               </>
             }
