@@ -16,7 +16,7 @@ export const useMapStyle = (zoomLevel?: number) => {
       setProjection('mercator');
     }
     if (zoomLevel > 10) {
-      setMapStyle(mapStyles.satellite);
+      setMapStyle(mapStyles.satelliteStreets);
     } else {
       setMapStyle(mapStyles.light);
     }

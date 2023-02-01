@@ -210,9 +210,13 @@ export const CommunityMapSources = (props: {
         promoteId="id"
       >
         <Layer
-          {...polygonLayer('countryOrganization', {
-            visibility: props.options.organizations ? 'visible' : 'none',
-          })}
+          {...polygonLayer(
+            'countryOrganization',
+            {
+              visibility: props.options.organizations ? 'visible' : 'none',
+            },
+            'high',
+          )}
           minzoom={0}
         />
       </Source>

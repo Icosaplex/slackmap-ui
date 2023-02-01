@@ -212,6 +212,7 @@ export const lineLabelLayer = (
 export const polygonLayer = (
   type: FeatureLayerType,
   layout?: FillLayout,
+  opacity?: 'low' | 'high',
 ): FillLayer => ({
   id: 'polygon' + (type ? `-${type}` : ''),
   type: 'fill',
@@ -232,10 +233,10 @@ export const polygonLayer = (
         ['boolean', ['feature-state', 'isSelected'], false],
         ['boolean', ['feature-state', 'isFocused'], false],
       ],
-      0.9,
-      ['boolean', ['feature-state', 'hover'], false],
       0.8,
-      0.5,
+      ['boolean', ['feature-state', 'hover'], false],
+      opacity === 'high' ? 0.8 : 0.6,
+      opacity === 'high' ? 0.4 : 0.2,
     ],
     'fill-color': [
       'case',

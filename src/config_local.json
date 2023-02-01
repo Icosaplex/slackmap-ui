@@ -14,10 +14,6 @@
           "redirectSignOut": "http://localhost:3000",
           "responseType": "code"
         }
-      },
-      "Storage": {
-        "bucket": "images.slacklineinternational.org",
-        "region": "eu-central-1"
       }
     }
   }

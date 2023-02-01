@@ -22,7 +22,6 @@ export const AppDrawer = (props: Props) => {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-  
 
   return (
     <Box sx={{ display: 'flex', position: 'relative' }}>

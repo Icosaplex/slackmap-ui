@@ -47,7 +47,7 @@ export const Footer = () => {
           size="small"
           color="inherit"
           href={`mailto:${'slackmap@slacklineinternational.org'}?subject=${
-            encodeURIComponent('ISA Account Contact') || ''
+            encodeURIComponent('Slackmap Contact') || ''
           }&body=${encodeURIComponent('') || ''}`}
         >
           <EmailIcon sx={{ fontSize: '1rem' }} />

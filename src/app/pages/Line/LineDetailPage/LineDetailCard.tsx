@@ -31,6 +31,8 @@ import { OutdatedInfoField } from 'app/components/TextFields/OutdatedInfoField';
 import { Position } from '@turf/turf';
 import { imageUrlFromS3Key } from 'utils';
 import { S3ImageList } from 'app/components/ImageList';
+import { useSelector } from 'react-redux';
+import { selectIsUserSignedIn } from 'app/slices/app/selectors';
 
 interface Props {
   lineId: string;
@@ -40,6 +42,7 @@ interface Props {
 export const LineDetailCard = (props: Props) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const isSignedIn = useSelector(selectIsUserSignedIn);
 
   const cardHeaderPopupState = usePopupState({
     variant: 'popover',
@@ -131,7 +134,10 @@ export const LineDetailCard = (props: Props) => {
                     Delete
                   </MenuItem>
                   {lineDetails.hasNoEditors && (
-                    <MenuItem onClick={onRequestEditorshipClick}>
+                    <MenuItem
+                      onClick={onRequestEditorshipClick}
+                      disabled={!isSignedIn}
+                    >
                       Request to Edit
                     </MenuItem>
                   )}

@@ -192,6 +192,12 @@ export const LineEditCard = (props: Props) => {
             />
             <EditingTextField
               formik={formik}
+              field={'gearInfo'}
+              label={'Gear Information'}
+              multiline
+            />
+            <EditingTextField
+              formik={formik}
               field={'accessInfo'}
               label={'Access Information'}
               multiline
