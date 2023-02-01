@@ -35,7 +35,7 @@ const getOrganizationsInfo = async () => {
   return assocationsInfo;
 };
 
-export const CountryOrganizationInfoPopup = (props: Props) => {
+export const ManagedCountryInfoPopup = (props: Props) => {
   const { isDesktop } = useMediaQuery();
   const [isLoading, setIsLoading] = useState(false);
   const [organizations, setOrganizations] = useState<OrganizationInfo[]>([]);

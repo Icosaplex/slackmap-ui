@@ -106,7 +106,7 @@ export const GuideEditCard = (props: Props) => {
         title={
           <>
             <Typography variant="h5">
-              {isCreateMode ? 'Create New Guide' : 'Edit Guide'}
+              {isCreateMode ? 'Create New Access Guide' : 'Edit Access Guide'}
             </Typography>
           </>
         }
@@ -114,9 +114,9 @@ export const GuideEditCard = (props: Props) => {
       <CardContent component={Stack} spacing={1} sx={{}}>
         {isCreateMode && (
           <Typography variant="caption">
-            Guides are used to provide extra visual information for the viewers.
-            You can draw anything that can be helpful for the given area, such
-            like parking lots, campings spots, hiking paths etc..
+            Access guides are used to provide extra visual information for the
+            viewers. You can draw anything that can be helpful for the given
+            area, such like parking lots, campings spots, hiking paths etc..
           </Typography>
         )}
         <Stack spacing={1}>

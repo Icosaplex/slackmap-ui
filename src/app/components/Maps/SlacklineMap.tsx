@@ -38,7 +38,7 @@ import {
 import { MapLogo } from './Components/Logo';
 import { MapLoadingPlaceholder } from './Components/MapLoadingPlaceholder';
 import { CustomPopup } from './Components/Popups/CustomPopup';
-import {  MapLegend } from './Components/MapLegend';
+import { MapLegend } from './Components/MapLegend';
 import { SlacklineMapSources } from './sources';
 import {
   useHoveredFeature,
@@ -69,7 +69,7 @@ export const SlacklineMap = (props: Props) => {
   const { legendMenu, legendValues, onLegendItemsUpdated } = useLegendMenu({
     lines: { label: 'Lines', isSelected: true },
     spots: { label: 'Spots', isSelected: true },
-    guides: { label: 'Guides', isSelected: true },
+    guides: { label: 'Access Guides', isSelected: true },
   });
 
   const setHoveredFeature = useHoveredFeature(mapRef);
@@ -120,7 +120,6 @@ export const SlacklineMap = (props: Props) => {
     isMapLoaded && !props.initialViewState,
   );
 
-  
   const onPopupClose = () => {
     setPopupLocation(undefined);
     mapRef.current?.easeTo({

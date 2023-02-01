@@ -184,7 +184,7 @@ export const SlacklineMapSources = (props: {
 export const CommunityMapSources = (props: {
   options: {
     groups?: boolean;
-    organizations?: boolean;
+    managedAreas?: boolean;
   };
 }) => {
   return (
@@ -203,17 +203,17 @@ export const CommunityMapSources = (props: {
         />
       </Source>
       <Source
-        id="countryOrganizations"
+        id="managedAreas"
         type="geojson"
-        data={geoJsonURL.organizations}
+        data={geoJsonURL.managedAreas}
         generateId={true}
         promoteId="id"
       >
         <Layer
           {...polygonLayer(
-            'countryOrganization',
+            'managedArea',
             {
-              visibility: props.options.organizations ? 'visible' : 'none',
+              visibility: props.options.managedAreas ? 'visible' : 'none',
             },
             'high',
           )}

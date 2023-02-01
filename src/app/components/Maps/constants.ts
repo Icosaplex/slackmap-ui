@@ -35,8 +35,8 @@ export const geoJsonURL = {
 
   groups:
     'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/groups/groups.geojson',
-  organizations:
-    'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/organizations/organizations.geojson',
+  managedAreas:
+    'https://raw.githubusercontent.com/International-Slackline-Association/slackline-data/master/communities/organizations/managedAreas.geojson',
 };
 
 export const mapStyles = {

@@ -143,7 +143,7 @@ export function Homepage(props: Props) {
         />
         <SpeedDialAction
           icon={<FollowTheSignsIcon />}
-          tooltipTitle={'Add a new guide'}
+          tooltipTitle={'Add a new access guide'}
           onClick={onAddGuideClick}
           sx={{
             color: t => t.palette.primary.main,

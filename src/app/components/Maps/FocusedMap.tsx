@@ -51,7 +51,7 @@ export const FocusedMap = (props: Props) => {
   const { legendMenu, legendValues, onLegendItemsUpdated } = useLegendMenu({
     lines: { label: 'Lines', isSelected: true },
     spots: { label: 'Spots', isSelected: true },
-    guides: { label: 'Guides', isSelected: true },
+    guides: { label: 'Access Guides', isSelected: true },
   });
 
   const setHoveredFeature = useHoveredFeature(mapRef);
