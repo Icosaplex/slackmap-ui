@@ -15,6 +15,11 @@ export const selectIsUserSignedIn = createSelector(
   state => state === AuthState.SignedIn,
 );
 
+export const selectLastMapLocation = createSelector(
+  [selectSlice],
+  state => state.lastMapLocation,
+);
+
 export const selectSnackbarNotification = createSelector(
   [selectSlice],
   state => state.snackbarNotification,

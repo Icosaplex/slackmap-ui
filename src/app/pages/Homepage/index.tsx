@@ -16,7 +16,10 @@ import { useSignInAlert } from 'utils/hooks/useSignInAlert';
 import { LineInfoPopup } from 'app/components/Maps/Components/Popups/LineInfoPopup';
 import { SpotInfoPopup } from 'app/components/Maps/Components/Popups/SpotInfoPopup';
 import { GuideInfoPopup } from 'app/components/Maps/Components/Popups/GuideInfoPopup';
-import { useWindowSize } from 'react-use';
+import { useDispatch } from 'react-redux';
+import { appActions } from 'app/slices/app';
+import { useSelector } from 'react-redux';
+import { selectLastMapLocation } from 'app/slices/app/selectors';
 
 interface Props {}
 
@@ -29,6 +32,19 @@ export function Homepage(props: Props) {
 
   const navigate = useNavigate();
   const checkUserSignIn = useSignInAlert();
+  const dispatch = useDispatch();
+  const lastMapLocation = useSelector(selectLastMapLocation);
+
+  useEffect(() => {
+    if (lastMapLocation && !mapUrlSearchParams.parse(searchParams)) {
+      const { longitude, latitude, zoom } = lastMapLocation;
+      searchParams.set(
+        'map',
+        mapUrlSearchParams.stringify(longitude, latitude, zoom),
+      );
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [lastMapLocation]);
 
   const onAddSpotClick = async () => {
     const signedIn = await checkUserSignIn();
@@ -67,6 +83,7 @@ export function Homepage(props: Props) {
       mapUrlSearchParams.stringify(longitude, latitude, zoom),
     );
     setSearchParams(searchParams, { replace: true });
+    dispatch(appActions.updateLastMapLocation({ longitude, latitude, zoom }));
   };
 
   const Popup = useMemo(() => {
@@ -151,11 +168,12 @@ export function Homepage(props: Props) {
         />
       </SpeedDial>
 
-      {/* <Button></Button> */}
       <SlacklineMap
         onSelectedFeatureChange={onSelectedFeatureChange}
         onMapMoveEnd={onMapMoveEnd}
-        initialViewState={mapUrlSearchParams.parse(searchParams)}
+        initialViewState={
+          lastMapLocation || mapUrlSearchParams.parse(searchParams)
+        }
         popup={Popup}
       />
     </Box>

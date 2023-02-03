@@ -86,6 +86,17 @@ export const SlacklineMapSources = (props: {
         filter={filterId ? ['!=', ['get', 'id'], filterId] : undefined}
       >
         <Layer
+          {...pointLayer('guide', {
+            visibility: options.guides ? 'visible' : 'none',
+          })}
+          minzoom={13}
+        />
+        <Layer
+          {...pointLabelLayer('guide', {
+            visibility: options.guides ? 'visible' : 'none',
+          })}
+        />
+        <Layer
           {...polygonLayer('guide', {
             visibility: options.guides ? 'visible' : 'none',
           })}
@@ -111,17 +122,6 @@ export const SlacklineMapSources = (props: {
 
         <Layer
           {...lineLabelLayer('guide', {
-            visibility: options.guides ? 'visible' : 'none',
-          })}
-        />
-
-        <Layer
-          {...pointLayer('guide', {
-            visibility: options.guides ? 'visible' : 'none',
-          })}
-        />
-        <Layer
-          {...pointLabelLayer('guide', {
             visibility: options.guides ? 'visible' : 'none',
           })}
         />

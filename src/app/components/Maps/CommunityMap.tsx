@@ -48,30 +48,41 @@ import {
   useZoomToUserLocationOnMapLoad,
 } from './mapHooks';
 import { parseMapFeature } from './mapUtils';
+import { useSearchParams } from 'react-router-dom';
 
+type LegendType = 'groups' | 'managedAreas';
 interface Props {
-  onMapMoveEnd?: (event: ViewStateChangeEvent) => void;
-  initialViewState?: Partial<ViewState>;
   popup?: React.ReactNode;
   onSelectedFeatureChange?: (feature?: MapboxGeoJSONFeature) => void;
 }
 
 export const CommunityMap = (props: Props) => {
   const mapRef = useRef<MapRef>(null);
-  const [zoomLevel, setZoomLevel] = useState(props.initialViewState?.zoom);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [zoomLevel, setZoomLevel] = useState<number>();
   const { projection } = useMapStyle(zoomLevel);
   const [popupLocation, setPopupLocation] = useState<Position>();
 
   const { legendMenu, legendValues, onLegendItemsUpdated } = useLegendMenu({
-    groups: { label: 'Groups', isSelected: true },
+    groups: {
+      label: 'Groups',
+      isSelected:
+        searchParams.get('legend') === 'groups' || !searchParams.get('legend'),
+    },
     managedAreas: {
       label: 'Managed Areas',
-      isSelected: false,
+      isSelected: searchParams.get('legend') === 'managedAreas',
     },
   });
 
   useEffect(() => {
     onPopupClose();
+    let selectedLegend: LegendType = 'groups';
+    if (legendValues.managedAreas) {
+      selectedLegend = 'managedAreas';
+    }
+    searchParams.set('legend', selectedLegend);
+    setSearchParams(searchParams, { replace: true });
   }, [legendValues]);
 
   const setHoveredFeature = useHoveredFeature(mapRef);
@@ -105,10 +116,7 @@ export const CommunityMap = (props: Props) => {
     },
   });
 
-  useZoomToUserLocationOnMapLoad(
-    mapRef,
-    isMapLoaded && !props.initialViewState,
-  );
+  useZoomToUserLocationOnMapLoad(mapRef, isMapLoaded);
 
   const onPopupClose = () => {
     setPopupLocation(undefined);
@@ -128,7 +136,7 @@ export const CommunityMap = (props: Props) => {
       />
       <ReactMapGL
         {...defaultMapSettings}
-        initialViewState={props.initialViewState || defaultMapViewState}
+        initialViewState={defaultMapViewState}
         mapStyle={mapStyles.light}
         interactiveLayerIds={[
           pointLayer('slacklineGroup').id,
@@ -137,7 +145,6 @@ export const CommunityMap = (props: Props) => {
         onLoad={onMapLoad}
         onSourceData={onSourceData}
         onClick={onMapClick}
-        onMoveEnd={props.onMapMoveEnd}
         onMouseMove={onMouseMove}
         cursor={cursor}
         ref={mapRef}

@@ -47,6 +47,10 @@ const guideTypes: { value: GuideType; label: string }[] = [
     value: 'riggingPath',
     label: 'Rigging Path',
   },
+  {
+    value: 'information',
+    label: 'Information',
+  },
 ];
 
 interface Props {

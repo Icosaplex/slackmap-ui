@@ -9,4 +9,5 @@ type GuideType =
   | 'campingSpot'
   | 'accessPath'
   | 'riggingPath'
+  | 'information'
   | 'other';

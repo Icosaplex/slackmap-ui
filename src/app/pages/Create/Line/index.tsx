@@ -10,7 +10,6 @@ import { validateLineFeatures } from './validations';
 import { showErrorNotification, showInfoNotification } from 'utils';
 import { useDispatch } from 'react-redux';
 import { drawControlStyles } from 'app/components/Maps/DrawableMap/DrawControl/styles';
-import { ExtrasPopup } from 'app/components/Maps/DrawableMap/ExtrasPopup';
 import { LineDetailsForm } from './types';
 import { lineApi } from 'app/api/line-api';
 

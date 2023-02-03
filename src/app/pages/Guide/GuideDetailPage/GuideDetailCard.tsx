@@ -74,6 +74,10 @@ export const GuideDetailCard = (props: Props) => {
     });
   };
 
+  const onCloseClicked = () => {
+    navigate({ pathname: '/', search: searchParams.toString() });
+  };
+
   return (
     <Card
       sx={{
@@ -117,6 +121,7 @@ export const GuideDetailCard = (props: Props) => {
                   >
                     Delete
                   </MenuItem>
+                  <MenuItem onClick={onCloseClicked}>Close</MenuItem>
                 </Menu>
               </>
             }

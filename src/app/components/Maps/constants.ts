@@ -1,4 +1,4 @@
-export const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
+export const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN as string;
 
 export const defaultMapSettings = {
   mapboxAccessToken: MAPBOX_TOKEN,

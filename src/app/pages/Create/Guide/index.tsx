@@ -10,7 +10,6 @@ import { validateGuideFeatures } from './validations';
 import { showErrorNotification } from 'utils';
 import { useDispatch } from 'react-redux';
 import { drawControlStyles } from 'app/components/Maps/DrawableMap/DrawControl/styles';
-import { ExtrasPopup } from 'app/components/Maps/DrawableMap/ExtrasPopup';
 import { guideApi } from 'app/api/guide-api';
 import { GuideDetailsForm } from './types';
 

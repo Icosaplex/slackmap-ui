@@ -52,6 +52,8 @@ import {
   parseMapFeature,
   pointsGeoJsonDict,
 } from './mapUtils';
+import { GeocoderControl } from './Controls/geocoderControl';
+import { Box } from '@mui/material';
 
 interface Props {
   onMapMoveEnd?: (event: ViewStateChangeEvent) => void;
@@ -128,7 +130,20 @@ export const SlacklineMap = (props: Props) => {
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        '& .mapboxgl-ctrl-top-left': {
+          'margin-left': { xs: '18%', lg: 0 },
+        },
+        '& .mapboxgl-ctrl-geocoder': {
+          'margin-top': '10px',
+          'margin-left': { xs: '0', lg: '10px' },
+        },
+      }}
+    >
       {!isMapLoaded && <MapLoadingPlaceholder />}
       <MapLogo />
       <MapLegend menu={legendMenu} onItemsUpdated={onLegendItemsUpdated} />
@@ -137,8 +152,8 @@ export const SlacklineMap = (props: Props) => {
         initialViewState={props.initialViewState || defaultMapViewState}
         mapStyle={mapStyle}
         interactiveLayerIds={[
-          pointLayer('guide').id,
           pointLabelLayer('guide').id,
+          pointLayer('guide').id,
           lineLayer('line').id,
           lineLayer('guide').id,
           lineLabelLayer('line').id,
@@ -169,6 +184,13 @@ export const SlacklineMap = (props: Props) => {
         />
         <ScaleControl />
         <NavigationControl />
+        <GeocoderControl
+          mapboxAccessToken={MAPBOX_TOKEN}
+          position="top-left"
+          placeholder="Search for a location..."
+          marker={false}
+          minLength={3}
+        />
         <MapImage name={'marker'} url={'/images/line-marker.png'} />
         {popupLocation && props.popup && (
           <CustomPopup
@@ -184,6 +206,6 @@ export const SlacklineMap = (props: Props) => {
         )}
         <SlacklineMapSources options={legendValues} />
       </ReactMapGL>
-    </>
+    </Box>
   );
 };

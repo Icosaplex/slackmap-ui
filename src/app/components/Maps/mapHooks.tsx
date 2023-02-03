@@ -68,11 +68,13 @@ export const useZoomToUserLocationOnMapLoad = (
   shouldZoom?: boolean,
 ) => {
   const { isDesktop } = useMediaQuery();
-  useEffect(() => {
-    if (!mapRef.current || !shouldZoom) return;
+  const [hasAlreadyZoomed, setHasAlreadyZoomed] = useState(false);
 
+  useEffect(() => {
+    if (!mapRef.current || !shouldZoom || hasAlreadyZoomed) return;
     zoomToUserLocation(mapRef, { zoom: isDesktop ? 2.5 : 1.5 });
-  }, [isDesktop, shouldZoom, mapRef]);
+    setHasAlreadyZoomed(true);
+  }, [isDesktop, shouldZoom, mapRef, hasAlreadyZoomed]);
 };
 
 export const useHoveredFeature = (mapRef: MapRefType) => {

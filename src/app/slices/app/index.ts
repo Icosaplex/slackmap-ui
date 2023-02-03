@@ -18,6 +18,16 @@ const appSlice = createSlice({
     updateIdentityType(state, action: PayloadAction<UserIdentityType>) {
       state.userIdentityType = action.payload;
     },
+    updateLastMapLocation(
+      state,
+      action: PayloadAction<{
+        latitude: number;
+        longitude: number;
+        zoom: number;
+      }>,
+    ) {
+      state.lastMapLocation = action.payload;
+    },
     updateSnackbarNotification(
       state,
       action: PayloadAction<SnackbarNotification | 'error'>,

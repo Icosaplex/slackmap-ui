@@ -90,6 +90,10 @@ export const LineDetailCard = (props: Props) => {
     });
   };
 
+  const onCloseClicked = () => {
+    navigate({ pathname: '/', search: searchParams.toString() });
+  };
+
   return (
     <Card
       sx={{
@@ -141,6 +145,7 @@ export const LineDetailCard = (props: Props) => {
                       Request to Edit
                     </MenuItem>
                   )}
+                  <MenuItem onClick={onCloseClicked}>Close</MenuItem>
                 </Menu>
               </>
             }

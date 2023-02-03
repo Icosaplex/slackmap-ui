@@ -13,7 +13,7 @@ export function CommunitiesPage(props: Props) {
     id: string;
     type: MapCommunityFeatureType;
     organizationIds?: string[];
-    cn?: 'Switzerland';
+    cn?: string;
   }>();
 
   const onSelectedFeatureChange = (feature?: MapboxGeoJSONFeature) => {

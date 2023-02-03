@@ -18,13 +18,6 @@ import type {
 } from 'react-map-gl';
 import { appColors } from 'styles/theme/colors';
 
-export enum LayerIds {
-  point,
-  pointLabel,
-  line,
-  lineLabel,
-}
-
 type FeatureLayerType =
   | 'line'
   | 'spot'
@@ -401,6 +394,7 @@ const cursorInteractableLayerIds = [
   pointLayer('slacklineGroup').id,
   polygonLayer('managedArea').id,
   pointLayer('guide').id,
+  pointLabelLayer('guide').id,
   lineLayer('line').id,
   lineLayer('guide').id,
   lineLabelLayer('line').id,
@@ -415,6 +409,7 @@ const mouseHoverableLayersIds = [
   pointLayer('slacklineGroup').id,
   polygonLayer('managedArea').id,
   pointLayer('guide').id,
+  pointLabelLayer('guide').id,
   lineLayer('line').id,
   lineLayer('guide').id,
   lineLabelLayer('line').id,

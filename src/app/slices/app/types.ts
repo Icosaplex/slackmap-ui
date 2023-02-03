@@ -3,6 +3,11 @@ export interface AppState {
   authState?: AuthState;
   snackbarNotification: SnackbarNotification;
   userIdentityType?: UserIdentityType;
+  lastMapLocation?: {
+    latitude: number;
+    longitude: number;
+    zoom: number;
+  };
 }
 export type SnackbarNotification = {
   message: string;
