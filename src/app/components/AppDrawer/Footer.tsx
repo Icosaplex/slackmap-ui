@@ -57,7 +57,11 @@ export const Footer = () => {
         </IconButton>
       </Grid>
       <Grid item xs={6}>
-        <IconButton sx={{ borderRadius: 0, padding: 0 }} color="inherit">
+        <IconButton
+          sx={{ borderRadius: 0, padding: 0 }}
+          color="inherit"
+          href="https://data.slacklineinternational.org/access/slackmap.com-faq/"
+        >
           <HelpCenterIcon sx={{ fontSize: '1rem' }} />
           <Typography variant="caption" sx={{ marginLeft: 0.5 }}>
             FAQ

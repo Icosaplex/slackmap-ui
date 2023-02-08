@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Auth, Hub, Amplify } from 'aws-amplify';
+import { Auth, Hub, Amplify, Analytics } from 'aws-amplify';
 
 import configJson from 'config.json';
 import configLocalJson from 'config_local.json';
@@ -47,6 +47,11 @@ export function App() {
         : configJson.AWS.Amplify;
 
     Amplify.configure(amplifyConfig);
+    Analytics.autoTrack('pageView', {
+      enable: true,
+      type: 'SPA',
+    });
+
     Hub.listen('auth', async ({ payload: { event, data } }) => {
       switch (event) {
         case 'signIn':

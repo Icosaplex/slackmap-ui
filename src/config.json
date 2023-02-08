@@ -4,15 +4,22 @@
       "Auth": {
         "userPoolId": "eu-central-1_iGaYGKeyJ",
         "userPoolWebClientId": "4f7vphq9s9ava93irhh2e7pieh",
-        "identityPoolId": "eu-central-1:e77377fc-74a7-49f3-bba9-0c137f8ed9ef",
+        "identityPoolId": "eu-central-1:60954222-4eb3-41e8-bb7b-1287ae6417b7",
         "identityPoolRegion": "eu-central-1",
         "region": "eu-central-1",
         "oauth": {
           "domain": "auth.slacklineinternational.org",
           "scope": ["email", "openid", "aws.cognito.signin.user.admin"],
-          "redirectSignIn": "https://map.slacklineinternational.org",
-          "redirectSignOut": "https://map.slacklineinternational.org",
+          "redirectSignIn": "https://slackmap.com",
+          "redirectSignOut": "https://slackmap.com",
           "responseType": "code"
+        }
+      },
+      "Analytics": {
+        "AWSPinpoint": {
+          "appId": "86554d5160cf44689b2407758af5000d",
+          "region": "eu-central-1",
+          "mandatorySignIn": false
         }
       }
     }

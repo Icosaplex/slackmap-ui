@@ -6,6 +6,7 @@ import type {
 import { baseApi } from 'store/rtk-query';
 import { FeatureCollection } from '@turf/turf';
 import { showInfoNotification, showSuccessNotification } from 'utils';
+import { recordAnalyticsEvent } from 'utils/analytics';
 
 export const lineApi = baseApi
   .enhanceEndpoints({
@@ -35,6 +36,7 @@ export const lineApi = baseApi
             dispatch(
               showInfoNotification('Refresh the page after few seconds', 5000),
             );
+            recordAnalyticsEvent('createLine');
           });
         },
       }),
@@ -51,6 +53,7 @@ export const lineApi = baseApi
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
           await queryFulfilled.then(() => {
             dispatch(showSuccessNotification('Changes Saved'));
+            recordAnalyticsEvent('updateLine');
           });
         },
       }),
@@ -62,6 +65,7 @@ export const lineApi = baseApi
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
           await queryFulfilled.then(() => {
             dispatch(showSuccessNotification('Line Deleted'));
+            recordAnalyticsEvent('deleteLine');
           });
         },
       }),

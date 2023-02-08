@@ -20,6 +20,7 @@ import { useDispatch } from 'react-redux';
 import { appActions } from 'app/slices/app';
 import { useSelector } from 'react-redux';
 import { selectLastMapLocation } from 'app/slices/app/selectors';
+import { recordAnalyticsEvent } from 'utils/analytics';
 
 interface Props {}
 

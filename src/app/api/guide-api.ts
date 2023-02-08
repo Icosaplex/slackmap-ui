@@ -6,6 +6,7 @@ import type {
 import { baseApi } from 'store/rtk-query';
 import { FeatureCollection } from '@turf/turf';
 import { showInfoNotification, showSuccessNotification } from 'utils';
+import { recordAnalyticsEvent } from 'utils/analytics';
 
 export const guideApi = baseApi
   .enhanceEndpoints({
@@ -35,6 +36,7 @@ export const guideApi = baseApi
             dispatch(
               showInfoNotification('Refresh the page after few seconds', 5000),
             );
+            recordAnalyticsEvent('createGuide');
           });
         },
       }),
@@ -51,6 +53,7 @@ export const guideApi = baseApi
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
           await queryFulfilled.then(() => {
             dispatch(showSuccessNotification('Changes Saved'));
+            recordAnalyticsEvent('updateGuide');
           });
         },
       }),
@@ -62,6 +65,7 @@ export const guideApi = baseApi
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
           await queryFulfilled.then(() => {
             dispatch(showSuccessNotification('Guide Deleted'));
+            recordAnalyticsEvent('deleteGuide');
           });
         },
       }),

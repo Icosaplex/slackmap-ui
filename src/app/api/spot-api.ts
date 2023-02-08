@@ -5,6 +5,7 @@ import type {
 } from './types';
 import { baseApi } from 'store/rtk-query';
 import { showInfoNotification, showSuccessNotification } from 'utils';
+import { recordAnalyticsEvent } from 'utils/analytics';
 
 export const spotApi = baseApi
   .enhanceEndpoints({
@@ -34,6 +35,7 @@ export const spotApi = baseApi
             dispatch(
               showInfoNotification('Refresh the page after few seconds', 5000),
             );
+            recordAnalyticsEvent('createSpot');
           });
         },
       }),
@@ -52,6 +54,7 @@ export const spotApi = baseApi
             dispatch(
               showInfoNotification('Refresh the page after few seconds', 5000),
             );
+            recordAnalyticsEvent('updateSpot');
           });
         },
       }),
@@ -63,6 +66,7 @@ export const spotApi = baseApi
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
           await queryFulfilled.then(() => {
             dispatch(showSuccessNotification('Spot Deleted'));
+            recordAnalyticsEvent('deleteSpot');
           });
         },
       }),

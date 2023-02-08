@@ -80,7 +80,7 @@ export const LineInfoPopup = (props: Props) => {
             )}
             <SlacklineDetailInfoField
               header="Description"
-              content={lineDetails.description}
+              content={lineDetails.description || 'Unknown'}
             />
           </CardContent>
           <CardActions sx={{ justifyContent: 'center', padding: 2 }}>
