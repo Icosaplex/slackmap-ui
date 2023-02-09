@@ -50,6 +50,20 @@ export function App() {
     Analytics.autoTrack('pageView', {
       enable: true,
       type: 'SPA',
+      getUrl: () => {
+        let path = window.location.pathname as string;
+        const origin = window.location.origin;
+        if (path.includes('/line')) {
+          path = '/line';
+        }
+        if (path.includes('/spot')) {
+          path = '/spot';
+        }
+        if (path.includes('/guide')) {
+          path = '/guide';
+        }
+        return origin + path;
+      },
     });
 
     Hub.listen('auth', async ({ payload: { event, data } }) => {
@@ -87,17 +101,6 @@ export function App() {
       Auth.signOut();
     }
   }, [authState, dispatch]);
-
-  const extractCurrentPathAndSearch = () => {
-    if (
-      window.location.pathname &&
-      window.location.pathname !== '' &&
-      window.location.pathname !== '/'
-    ) {
-      return window.location.pathname + window.location.search;
-    }
-    return undefined;
-  };
 
   const onSnackbarClose = () => {
     dispatch(appActions.updateSnackbarNotification(null));

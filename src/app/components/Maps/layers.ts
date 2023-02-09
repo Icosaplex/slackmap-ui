@@ -31,7 +31,12 @@ export const pointLayer = (
 ): CircleLayer => ({
   id: 'point' + (type ? `-${type}` : ''),
   type: 'circle',
-  filter: ['==', ['geometry-type'], 'Point'],
+  filter: [
+    'any',
+    ['==', ['geometry-type'], 'Point'],
+    ['==', ['geometry-type'], 'MultiPoint'],
+  ],
+
   layout: {
     ...layout,
   },
