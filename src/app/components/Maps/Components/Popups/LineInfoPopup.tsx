@@ -67,7 +67,8 @@ export const LineInfoPopup = (props: Props) => {
             height="194"
             image={
               imageUrlFromS3Key(
-                lineDetails?.images?.find(i => i.isCover)?.s3Key,
+                lineDetails?.images?.find(i => i.isCover)?.s3Key ||
+                  lineDetails?.images?.[0]?.s3Key,
               ) || '/images/coverImageFallback.png'
             }
           />

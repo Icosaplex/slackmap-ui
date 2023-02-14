@@ -40,6 +40,27 @@ const lineTypes: { value: SlacklineType; label: string }[] = [
     value: 'waterline',
     label: 'Waterline',
   },
+  {
+    value: 'midline',
+    label: 'Midline',
+  },
+
+  {
+    value: 'longline',
+    label: 'Longline',
+  },
+  {
+    value: 'rodeoline',
+    label: 'Rodeoline',
+  },
+  {
+    value: 'trickline',
+    label: 'Trickline',
+  },
+  {
+    value: 'parkline',
+    label: 'Parkline',
+  },
 ];
 
 export const restrictionSelectOptions: {

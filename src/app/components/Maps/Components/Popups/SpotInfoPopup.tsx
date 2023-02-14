@@ -67,7 +67,8 @@ export const SpotInfoPopup = (props: Props) => {
             height="194"
             image={
               imageUrlFromS3Key(
-                spotDetails?.images?.find(i => i.isCover)?.s3Key,
+                spotDetails?.images?.find(i => i.isCover)?.s3Key ||
+                  spotDetails?.images?.[0]?.s3Key,
               ) || '/images/coverImageFallback.png'
             }
           />

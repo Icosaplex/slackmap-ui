@@ -67,7 +67,8 @@ export const GuideInfoPopup = (props: Props) => {
             height="194"
             image={
               imageUrlFromS3Key(
-                guideDetails?.images?.find(i => i.isCover)?.s3Key,
+                guideDetails?.images?.find(i => i.isCover)?.s3Key ||
+                  guideDetails?.images?.[0]?.s3Key,
               ) || '/images/coverImageFallback.png'
             }
           />
