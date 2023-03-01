@@ -29,6 +29,7 @@ import { SpotEditPage } from './pages/Spot/SpotEditPage/Loadable';
 import { CommunitiesPage } from './pages/Communities/Loadable';
 import { GuideDetailPage } from './pages/Guide/GuideDetailPage/Loadable';
 import { GuideEditPage } from './pages/Guide/GuideEditPage/Loadable';
+import { LegacyDetailPage } from './pages/LegacyDetailPage/Loadable';
 
 export function App() {
   useAppSlice();
@@ -133,6 +134,7 @@ export function App() {
               <Route path="/guide/:guideId/edit" element={<GuideEditPage />} />
             </>
           )}
+          <Route path="/x/:legacyId" element={<LegacyDetailPage />} />
           <Route path="*" element={<Homepage />} />
         </Routes>
       </AppDrawer>

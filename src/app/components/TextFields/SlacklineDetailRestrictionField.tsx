@@ -18,7 +18,7 @@ export const SlacklineDetailRestrictionField = (props: Props) => {
       warningText = 'Partially Restricted Access';
       break;
     case 'full':
-      severity = 'warning';
+      severity = 'error';
       warningText = 'FULLY Restricted Access';
       break;
     default:
