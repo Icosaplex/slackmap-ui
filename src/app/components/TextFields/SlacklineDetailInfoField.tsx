@@ -1,10 +1,12 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import { trimString } from 'utils';
 
 interface Props {
   header: string;
   content?: string;
   skipIfEmpty?: boolean;
+  trimLength?: number;
 }
 
 export const SlacklineDetailInfoField = (props: Props) => {
@@ -15,7 +17,7 @@ export const SlacklineDetailInfoField = (props: Props) => {
     <Box>
       <Typography variant="h6"> {props.header} </Typography>
       <Typography variant="body2" color={t => t.palette.text.secondary}>
-        {props.content}
+        {trimString(props.content, props.trimLength)}
       </Typography>
     </Box>
   );

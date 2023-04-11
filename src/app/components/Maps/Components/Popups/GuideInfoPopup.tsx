@@ -76,6 +76,7 @@ export const GuideInfoPopup = (props: Props) => {
             <SlacklineDetailInfoField
               header="Description"
               content={guideDetails.description}
+              trimLength={100}
             />
           </CardContent>
           <CardActions sx={{ justifyContent: 'center', padding: 2 }}>

@@ -77,11 +77,14 @@ export const LineInfoPopup = (props: Props) => {
               <SlacklineDetailRestrictionField
                 level={lineDetails.restrictionLevel}
                 restrictionInfo={lineDetails.restrictionInfo}
+                trimLength={100}
               />
             )}
             <SlacklineDetailInfoField
               header="Description"
               content={lineDetails.description || 'Unknown'}
+              trimLength={100}
+
             />
           </CardContent>
           <CardActions sx={{ justifyContent: 'center', padding: 2 }}>

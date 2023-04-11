@@ -1,9 +1,11 @@
 import React from 'react';
 import { Alert, AlertColor, AlertTitle, Box, Typography } from '@mui/material';
+import { trimString } from 'utils';
 
 interface Props {
   level?: SlacklineRestrictionLevel;
   restrictionInfo?: string;
+  trimLength?: number;
 }
 
 export const SlacklineDetailRestrictionField = (props: Props) => {
@@ -31,7 +33,7 @@ export const SlacklineDetailRestrictionField = (props: Props) => {
     <Box>
       <Alert severity={severity}>
         <AlertTitle>Warning - {warningText}</AlertTitle>
-        {props.restrictionInfo}
+        {trimString(props.restrictionInfo, props.trimLength)}
       </Alert>
     </Box>
   );

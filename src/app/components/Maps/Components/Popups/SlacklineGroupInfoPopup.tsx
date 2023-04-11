@@ -19,6 +19,9 @@ import { spotApi } from 'app/api/spot-api';
 import { SlacklineDetailInfoField } from '../../../TextFields/SlacklineDetailInfoField';
 import { appColors } from 'styles/theme/colors';
 
+const groupEditGoogleFormUrl =
+  ' https://docs.google.com/forms/d/e/1FAIpQLSdEPV1ZV8TjmkQUGmKP8L0LrrkyUlspnfGFZ3dw32ocJ_zXVQ/viewform?usp=pp_url&entry.677223950=Edit+existing+data&entry.1762852981=';
+
 interface GroupInfo {
   id: string;
   name: string;
@@ -112,7 +115,7 @@ export const SlacklineGroupInfoPopup = (props: Props) => {
                 fontStyle: 'italic',
               }}
             >
-              This information is retrieved from the{' '}
+              All the data is public on{' '}
               <a
                 href={
                   'https://github.com/International-Slackline-Association/slackline-data/tree/master/communities/groups'
@@ -120,10 +123,10 @@ export const SlacklineGroupInfoPopup = (props: Props) => {
                 target="_blank"
                 rel="noreferrer"
               >
-                public slackline groups data
+                GitHub
               </a>
-              . If you think it is incorrect, please contact the ISA as
-              described in the link.
+              . If you know how to use Github edit the data directly on there,
+              otherwise fill in the form by clicking on the "Modify" button.
             </Typography>
           </CardContent>
           {group.link && (
@@ -135,6 +138,15 @@ export const SlacklineGroupInfoPopup = (props: Props) => {
                 rel="noreferrer"
               >
                 Visit Page
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                href={groupEditGoogleFormUrl + encodeURIComponent(group.name)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Modify
               </Button>
             </CardActions>
           )}

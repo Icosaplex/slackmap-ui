@@ -35,3 +35,16 @@ export const imageUrlFromS3Key = (s3Key?: string) => {
   }
   return `${process.env.REACT_APP_SLACKMAP_IMAGES_BASE_URL}/${s3Key}`;
 };
+
+export const trimString = (str?: string, maxLength?: number) => {
+  if (!str) {
+    return '';
+  }
+  if (!maxLength) {
+    return str;
+  }
+  if (str.length <= maxLength) {
+    return str;
+  }
+  return `${str.substring(0, maxLength)}...`;
+};

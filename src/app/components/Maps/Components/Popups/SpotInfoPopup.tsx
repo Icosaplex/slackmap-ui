@@ -77,11 +77,13 @@ export const SpotInfoPopup = (props: Props) => {
               <SlacklineDetailRestrictionField
                 level={spotDetails.restrictionLevel}
                 restrictionInfo={spotDetails.restrictionInfo}
+                trimLength={100}
               />
             )}
             <SlacklineDetailInfoField
               header="Description"
               content={spotDetails.description || 'Unknown'}
+              trimLength={100}
             />
           </CardContent>
           <CardActions sx={{ justifyContent: 'center', padding: 2 }}>
