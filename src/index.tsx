@@ -31,6 +31,8 @@ import { ThemeProvider } from '@mui/material';
 import { theme } from 'styles/theme';
 import { ConfirmProvider } from 'material-ui-confirm';
 
+import { register } from 'serviceWorkerRegistration';
+
 // the index.html file and this observer)
 const openSansObserver = new FontFaceObserver('Inter');
 
@@ -62,3 +64,6 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+// Register the PWA service worker
+register();
